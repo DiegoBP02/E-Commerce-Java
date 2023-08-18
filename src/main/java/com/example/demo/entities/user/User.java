@@ -1,6 +1,7 @@
 package com.example.demo.entities.user;
 
 import com.example.demo.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +29,9 @@ public abstract class User implements UserDetails {
     private String name;
     @Column(unique = true)
     private String email;
+    @JsonIgnore
     private String password;
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role",insertable=false, updatable=false)
     private Role role;
@@ -40,6 +43,7 @@ public abstract class User implements UserDetails {
         this.role = role;
     }
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
@@ -47,26 +51,31 @@ public abstract class User implements UserDetails {
         return authorities;
     }
 
+    @JsonIgnore
     @Override
     public String getUsername() {
         return null;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
         return true;

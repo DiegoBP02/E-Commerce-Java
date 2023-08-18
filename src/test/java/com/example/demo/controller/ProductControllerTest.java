@@ -1,0 +1,308 @@
+package com.example.demo.controller;
+
+import com.example.demo.ApplicationConfigTest;
+import com.example.demo.dtos.ProductDTO;
+import com.example.demo.entities.Product;
+import com.example.demo.entities.Review;
+import com.example.demo.entities.user.Seller;
+import com.example.demo.entities.user.User;
+import com.example.demo.services.ProductService;
+import com.example.demo.services.exceptions.DatabaseException;
+import com.example.demo.services.exceptions.ResourceNotFoundException;
+import com.example.demo.services.exceptions.UnauthorizedAccessException;
+import com.example.demo.utils.TestDataBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+class ProductControllerTest extends ApplicationConfigTest {
+
+    private static final String PATH = "/products";
+
+    @MockBean
+    private ProductService productService;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private User user = TestDataBuilder.buildUserWithId();
+    private Product product = TestDataBuilder.buildProduct((Seller) user);
+    private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
+    private ProductDTO invalidProductDTO = mock(ProductDTO.class);
+
+    private MockHttpServletRequestBuilder mockPostRequest
+            (Object requestObject) throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .post(PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(requestObject));
+    }
+
+    private MockHttpServletRequestBuilder mockGetRequest() {
+        return MockMvcRequestBuilders
+                .get(PATH)
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
+    private MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
+        return MockMvcRequestBuilders
+                .get(PATH + "/" + endpoint)
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
+    private MockHttpServletRequestBuilder mockPathRequest
+            (String endpoint, Object requestObject) throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .patch(PATH + "/" + endpoint)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(requestObject));
+    }
+
+    private MockHttpServletRequestBuilder mockDeleteRequest(String endpoint) {
+        return MockMvcRequestBuilders
+                .delete(PATH + "/" + endpoint)
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenValidBody_whenCreate_thenReturnProductAndCreated() throws Exception {
+        when(productService.create(productDTO)).thenReturn(product);
+
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest(productDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isCreated())
+                .andExpect(content().json(objectMapper.writeValueAsString(product)));
+
+        verify(productService, times(1)).create(productDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenInvalidBody_whenCreate_thenHandleMethodArgumentNotValidException() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest(invalidProductDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof MethodArgumentNotValidException));
+
+        verify(productService, never()).create(invalidProductDTO);
+    }
+
+    @Test
+    void givenNoUser_whenCreate_thenReturnStatus403Forbidden() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest(productDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertEquals("Access Denied",
+                                result.getResponse().getErrorMessage()));
+
+        verify(productService, never()).create(productDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "random")
+    void givenInvalidUserAuthority_whenCreate_thenHandleAccessDeniedException() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest(productDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verify(productService, never()).create(productDTO);
+    }
+
+    @Test
+    void givenProductsAndNoUser_whenFindAll_thenReturnProductPage() throws Exception {
+        Page<Product> productPage = mock(PageImpl.class);
+
+        when(productService.findAll(0, 5, "name")).thenReturn(productPage);
+
+        mockMvc.perform(mockGetRequest())
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
+
+        verify(productService, times(1)).findAll(0, 5, "name");
+    }
+
+    @Test
+    void givenProductAndNoUser_whenFindById_thenReturnProduct() throws Exception {
+        when(productService.findById(product.getId())).thenReturn(product);
+
+        mockMvc.perform(mockGetRequest(product.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(product)));
+
+        verify(productService, times(1)).findById(product.getId());
+    }
+
+    @Test
+    void givenNoProductAndNoUser_whenFindById_thenHandleResourceNotFoundException() throws Exception {
+        when(productService.findById(product.getId()))
+                .thenThrow(ResourceNotFoundException.class);
+
+        mockMvc.perform(mockGetRequest(product.getId().toString()))
+                .andExpect(status().isNotFound())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ResourceNotFoundException));
+
+        verify(productService, times(1)).findById(product.getId());
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenValidBodyAndUser_whenUpdate_thenReturnProduct() throws Exception {
+        when(productService.update(product.getId(), productDTO)).thenReturn(product);
+
+        mockMvc.perform(mockPathRequest(product.getId().toString(), productDTO))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(product)));
+
+        verify(productService, times(1)).update(product.getId(), productDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenNoProduct_whenUpdate_thenHandleResourceNotFoundException() throws Exception {
+        when(productService.update(product.getId(), productDTO))
+                .thenThrow(ResourceNotFoundException.class);
+
+        mockMvc.perform(mockPathRequest(product.getId().toString(), productDTO))
+                .andExpect(status().isNotFound())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ResourceNotFoundException));
+
+        verify(productService, times(1)).update(product.getId(), productDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenInvalidBody_whenUpdate_thenHandleMethodArgumentNotValidException() throws Exception {
+        mockMvc.perform(mockPathRequest(product.getId().toString(), invalidProductDTO))
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof MethodArgumentNotValidException));
+
+        verify(productService, never()).update(product.getId(), invalidProductDTO);
+    }
+
+    @Test
+    void givenNoUser_whenUpdate_thenReturnStatus403Forbidden() throws Exception {
+        mockMvc.perform(mockPathRequest(product.getId().toString(), productDTO))
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertEquals("Access Denied",
+                                result.getResponse().getErrorMessage()));
+
+        verify(productService, never()).update(product.getId(), productDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "random")
+    void givenInvalidUserAuthority_whenUpdate_thenHandleAccessDeniedException() throws Exception {
+        mockMvc.perform(mockPathRequest(product.getId().toString(), productDTO))
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verify(productService, never()).update(product.getId(), productDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenValidUserAndProduct_whenDelete_thenReturnNoContent() throws Exception {
+        mockMvc.perform(mockDeleteRequest(product.getId().toString()))
+                .andExpect(status().isNoContent());
+
+        verify(productService, times(1)).delete(product.getId());
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenProductDoesNotBelongToUser_whenDelete_thenHandleUnauthorizedAccessException() throws Exception {
+        doThrow(UnauthorizedAccessException.class)
+                .when(productService).delete(product.getId());
+
+        mockMvc.perform(mockDeleteRequest(product.getId().toString()))
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof UnauthorizedAccessException));
+
+        verify(productService, times(1)).delete(product.getId());
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenDatabaseError_whenDelete_thenHandleDatabaseException() throws Exception {
+        doThrow(DatabaseException.class)
+                .when(productService).delete(product.getId());
+
+        mockMvc.perform(mockDeleteRequest(product.getId().toString()))
+                .andExpect(status().isConflict())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof DatabaseException));
+
+        verify(productService, times(1)).delete(product.getId());
+    }
+
+    @Test
+    void givenNoUser_whenDelete_thenReturnStatus403Forbidden() throws Exception {
+        mockMvc.perform(mockDeleteRequest(product.getId().toString()))
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertEquals("Access Denied",
+                                result.getResponse().getErrorMessage()));
+
+        verify(productService, never()).delete(product.getId());
+    }
+
+    @Test
+    @WithMockUser(authorities = "random")
+    void givenInvalidUserAuthority_whenDelete_thenHandleAccessDeniedException() throws Exception {
+        mockMvc.perform(mockDeleteRequest(product.getId().toString()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verify(productService, never()).delete(product.getId());
+    }
+
+}
