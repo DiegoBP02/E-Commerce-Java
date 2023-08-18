@@ -19,8 +19,10 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -179,10 +181,35 @@ public class ExceptionHandlers {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<StandardError> AccessDeniedException(
             AccessDeniedException e, HttpServletRequest request) {
+        logger.error("Access denied exception:", e);
         String error = "Access denied";
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<StandardError> MissingServletRequestParameterException(
+            MissingServletRequestParameterException e, HttpServletRequest request) {
+        logger.error("Access denied exception:", e);
+        String error = "Missing request parameter";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<StandardError> MethodArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException e, HttpServletRequest request) {
+        logger.error("Method argument type mismatch exception", e);
+        String error = "Method argument type mismatch";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ;
+        String message = "The value provided for the request parameter " + e.getName() + " is not valid.";
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                message, request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 

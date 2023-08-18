@@ -4,6 +4,7 @@ import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
+import com.example.demo.enums.ProductCategory;
 import com.example.demo.enums.Role;
 import com.example.demo.repositories.ProductRepository;
 import com.example.demo.services.exceptions.DatabaseException;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,6 +41,7 @@ public class ProductService {
                 .description(productDTO.getDescription())
                 .price(productDTO.getPrice())
                 .seller(user)
+                .category(productDTO.getCategory())
                 .build();
         return productRepository.save(product);
     }
@@ -48,6 +51,10 @@ public class ProductService {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 
         return productRepository.findAll(paging);
+    }
+
+    public List<Product> findByCategory(ProductCategory productCategory) {
+        return productRepository.findByCategory(productCategory);
     }
 
     public Product findById(UUID id) {

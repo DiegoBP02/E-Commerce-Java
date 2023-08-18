@@ -1,5 +1,6 @@
 package com.example.demo.dtos;
 
+import com.example.demo.enums.ProductCategory;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,5 +27,8 @@ public class ProductDTO {
     @DecimalMin(value = "0.0", inclusive = false)
     @Digits(integer = 8, fraction = 2)
     private BigDecimal price;
+
+    @NotNull
+    private ProductCategory category;
 
 }

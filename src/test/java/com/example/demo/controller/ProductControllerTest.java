@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
-import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
 import com.example.demo.services.ProductService;
@@ -16,7 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Collections;
 import java.util.List;
@@ -154,6 +156,52 @@ class ProductControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
 
         verify(productService, times(1)).findAll(0, 5, "name");
+    }
+
+    @Test
+    void givenProductsAndNoUser_whenFindByCategory_thenReturnProduct() throws Exception {
+        List<Product> products = Collections.singletonList(product);
+        when(productService.findByCategory(product.getCategory())).thenReturn(products);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(PATH + "/category")
+                        .param("productCategory", product.getCategory().toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(products)));
+
+        verify(productService, times(1)).findByCategory(product.getCategory());
+    }
+
+    @Test
+    void givenMissingParamAndNoUser_whenFindByCategory_thenHandleMissingServletRequestParameterException() throws Exception {
+        List<Product> products = Collections.singletonList(product);
+        when(productService.findByCategory(product.getCategory())).thenReturn(products);
+
+        mockMvc.perform(mockGetRequest("/category"))
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof MissingServletRequestParameterException));
+
+        verify(productService, never()).findByCategory(product.getCategory());
+    }
+
+    @Test
+    void givenInvalidParamAndNoUser_whenFindByCategory_thenHandleMethodArgumentTypeMismatchException() throws Exception {
+        List<Product> products = Collections.singletonList(product);
+        when(productService.findByCategory(product.getCategory())).thenReturn(products);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(PATH + "/category")
+                        .param("productCategory", "random")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof MethodArgumentTypeMismatchException));
+
+        verify(productService, never()).findByCategory(product.getCategory());
     }
 
     @Test

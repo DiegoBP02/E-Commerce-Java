@@ -63,8 +63,6 @@ class ReviewServiceTest extends ApplicationConfigTest {
                     PageRequest.of(0, 5, Sort.by("rating")), 1);
     private UpdateReviewDTO updateReviewDTO = TestDataBuilder.buildUpdateReviewDTO();
 
-    UUID reviewId = review.getId();
-
     @BeforeEach
     void setupSecurityContext() {
         authentication = mock(Authentication.class);
@@ -131,51 +129,51 @@ class ReviewServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenReview_whenFindById_thenReturnReview() {
-        when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
+        when(reviewRepository.findById(review.getId())).thenReturn(Optional.of(review));
 
-        Review result = reviewService.findById(reviewId);
+        Review result = reviewService.findById(review.getId());
 
         assertEquals(review,result);
 
         verifyNoAuthentication();
-        verify(reviewRepository, times(1)).findById(reviewId);
+        verify(reviewRepository, times(1)).findById(review.getId());
     }
 
     @Test
     void givenNoReview_whenFindById_thenThrowResourceNotFoundException() {
-        when(reviewRepository.findById(reviewId)).thenThrow(ResourceNotFoundException.class);
+        when(reviewRepository.findById(review.getId())).thenThrow(ResourceNotFoundException.class);
 
-        assertThrows(ResourceNotFoundException.class, () -> reviewService.findById(reviewId));
+        assertThrows(ResourceNotFoundException.class, () -> reviewService.findById(review.getId()));
 
         verifyNoAuthentication();
-        verify(reviewRepository, times(1)).findById(reviewId);
+        verify(reviewRepository, times(1)).findById(review.getId());
     }
 
     @Test
     void givenValidIdAndReviewDTO_whenUpdate_thenReturnUpdatedReview() {
-        when(reviewRepository.getReferenceById(reviewId)).thenReturn(review);
+        when(reviewRepository.getReferenceById(review.getId())).thenReturn(review);
         when(reviewRepository.save(review)).thenReturn(review);
 
-        Review result = reviewService.update(reviewId, updateReviewDTO);
+        Review result = reviewService.update(review.getId(), updateReviewDTO);
 
         assertEquals(updateReviewDTO.getRating(),result.getRating());
 
         verifyAuthentication();
-        verify(reviewRepository, times(1)).getReferenceById(reviewId);
+        verify(reviewRepository, times(1)).getReferenceById(review.getId());
         verify(reviewRepository, times(1)).save(review);
     }
 
     @Test
     void givenNoReview_whenUpdate_thenThrowResourceNotFoundException(){
-        when(reviewRepository.getReferenceById(reviewId)).thenReturn(review);
+        when(reviewRepository.getReferenceById(review.getId())).thenReturn(review);
         when(reviewRepository.save(review))
                 .thenThrow(EntityNotFoundException.class);
 
         assertThrows(ResourceNotFoundException.class,
-                () -> reviewService.update(reviewId, updateReviewDTO));
+                () -> reviewService.update(review.getId(), updateReviewDTO));
 
         verifyAuthentication();
-        verify(reviewRepository, times(1)).getReferenceById(reviewId);
+        verify(reviewRepository, times(1)).getReferenceById(review.getId());
         verify(reviewRepository, times(1)).save(review);
     }
 
@@ -185,14 +183,14 @@ class ReviewServiceTest extends ApplicationConfigTest {
         when(user2.getId()).thenReturn(UUID.randomUUID());
 
         when(authentication.getPrincipal()).thenReturn(user2);
-        when(reviewRepository.getReferenceById(reviewId)).thenReturn(review);
+        when(reviewRepository.getReferenceById(review.getId())).thenReturn(review);
         when(reviewRepository.save(review)).thenReturn(review);
 
         assertThrows(UnauthorizedAccessException.class,
-                () -> reviewService.update(reviewId, updateReviewDTO));
+                () -> reviewService.update(review.getId(), updateReviewDTO));
 
         verifyAuthentication();
-        verify(reviewRepository, times(1)).getReferenceById(reviewId);
+        verify(reviewRepository, times(1)).getReferenceById(review.getId());
         verify(reviewRepository, never()).save(review);
     }
 
@@ -209,30 +207,30 @@ class ReviewServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenNoReview_whenDelete_thenThrowResourceNotFoundException(){
-        when(reviewRepository.getReferenceById(reviewId)).thenReturn(review);
+        when(reviewRepository.getReferenceById(review.getId())).thenReturn(review);
         doThrow(EmptyResultDataAccessException.class)
-                .when(reviewRepository).deleteById(reviewId);
+                .when(reviewRepository).deleteById(review.getId());
 
         assertThrows(ResourceNotFoundException.class,
-                () -> reviewService.delete(reviewId));
+                () -> reviewService.delete(review.getId()));
 
         verifyAuthentication();
-        verify(reviewRepository, times(1)).getReferenceById(reviewId);
-        verify(reviewRepository, times(1)).deleteById(reviewId);
+        verify(reviewRepository, times(1)).getReferenceById(review.getId());
+        verify(reviewRepository, times(1)).deleteById(review.getId());
     }
 
     @Test
     void givenReviewAndDeleteCausesDataIntegrityViolationException_whenDelete_thenThrowDatabaseException(){
-        when(reviewRepository.getReferenceById(reviewId)).thenReturn(review);
+        when(reviewRepository.getReferenceById(review.getId())).thenReturn(review);
         doThrow(DataIntegrityViolationException.class)
-                .when(reviewRepository).deleteById(reviewId);
+                .when(reviewRepository).deleteById(review.getId());
 
         assertThrows(DatabaseException.class,
-                () -> reviewService.delete(reviewId));
+                () -> reviewService.delete(review.getId()));
 
         verifyAuthentication();
-        verify(reviewRepository, times(1)).getReferenceById(reviewId);
-        verify(reviewRepository, times(1)).deleteById(reviewId);
+        verify(reviewRepository, times(1)).getReferenceById(review.getId());
+        verify(reviewRepository, times(1)).deleteById(review.getId());
     }
 
     @Test
@@ -243,14 +241,14 @@ class ReviewServiceTest extends ApplicationConfigTest {
         doReturn(authorities).when(user2).getAuthorities();
 
         when(authentication.getPrincipal()).thenReturn(user2);
-        when(reviewRepository.getReferenceById(reviewId)).thenReturn(review);
+        when(reviewRepository.getReferenceById(review.getId())).thenReturn(review);
 
         assertThrows(UnauthorizedAccessException.class,
-                () -> reviewService.delete(reviewId));
+                () -> reviewService.delete(review.getId()));
 
         verifyAuthentication();
-        verify(reviewRepository, times(1)).getReferenceById(reviewId);
-        verify(reviewRepository, never()).deleteById(reviewId);
+        verify(reviewRepository, times(1)).getReferenceById(review.getId());
+        verify(reviewRepository, never()).deleteById(review.getId());
     }
 
     @Test
@@ -261,13 +259,13 @@ class ReviewServiceTest extends ApplicationConfigTest {
         doReturn(authorities).when(user2).getAuthorities();
         when(authentication.getPrincipal()).thenReturn(user2);
 
-        when(reviewRepository.getReferenceById(reviewId)).thenReturn(review);
+        when(reviewRepository.getReferenceById(review.getId())).thenReturn(review);
 
-        reviewService.delete(reviewId);
+        reviewService.delete(review.getId());
 
         verifyAuthentication();
-        verify(reviewRepository, times(1)).getReferenceById(reviewId);
-        verify(reviewRepository, times(1)).deleteById(reviewId);
+        verify(reviewRepository, times(1)).getReferenceById(review.getId());
+        verify(reviewRepository, times(1)).deleteById(review.getId());
     }
 
 }

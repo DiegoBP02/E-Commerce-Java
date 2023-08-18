@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
+import com.example.demo.enums.ProductCategory;
 import com.example.demo.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -42,6 +44,11 @@ public class ProductController {
     ) {
         Page<Product> products = productService.findAll(pageNo, pageSize, sortBy);
         return ResponseEntity.ok().body(products);
+    }
+
+    @GetMapping(value = "/category")
+    public ResponseEntity<List<Product>> findByCategory(@RequestParam ProductCategory productCategory) {
+        return ResponseEntity.ok().body(productService.findByCategory(productCategory));
     }
 
     @GetMapping(value = "/{id}")

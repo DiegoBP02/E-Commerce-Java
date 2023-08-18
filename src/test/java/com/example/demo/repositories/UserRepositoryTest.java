@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class UserRepositoryTest {
+
     @Autowired
     private UserRepository userRepository;
 

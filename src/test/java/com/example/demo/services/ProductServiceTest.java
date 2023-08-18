@@ -51,7 +51,6 @@ class ProductServiceTest extends ApplicationConfigTest {
     private Page<Product> productPage = new PageImpl<>
             (Collections.singletonList(product),
                     PageRequest.of(0, 5, Sort.by("name")), 1);
-    UUID productId = product.getId();
 
     @BeforeEach
     void setupSecurityContext() {
@@ -102,54 +101,67 @@ class ProductServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenProduct_whenFindById_thenReturnProduct() {
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+    void givenProducts_whenFindByCategory_ThenReturnProducts() {
+        List<Product> products = Collections.singletonList(product);
+        when(productRepository.findByCategory(product.getCategory())).thenReturn(products);
 
-        Product result = productService.findById(productId);
+        List<Product> result = productService.findByCategory(product.getCategory());
+
+        assertEquals(products,result);
+
+        verifyNoAuthentication();
+        verify(productRepository, times(1)).findByCategory(product.getCategory());
+    }
+
+    @Test
+    void givenProduct_whenFindById_thenReturnProduct() {
+        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+
+        Product result = productService.findById(product.getId());
 
         assertEquals(product,result);
 
         verifyNoAuthentication();
-        verify(productRepository, times(1)).findById(productId);
+        verify(productRepository, times(1)).findById(product.getId());
     }
 
     @Test
     void givenNoProduct_whenFindById_thenThrowResourceNotFoundException() {
-        when(productRepository.findById(productId)).thenThrow(ResourceNotFoundException.class);
+        when(productRepository.findById(product.getId())).thenThrow(ResourceNotFoundException.class);
 
-        assertThrows(ResourceNotFoundException.class, () -> productService.findById(productId));
+        assertThrows(ResourceNotFoundException.class, () -> productService.findById(product.getId()));
 
         verifyNoAuthentication();
-        verify(productRepository, times(1)).findById(productId);
+        verify(productRepository, times(1)).findById(product.getId());
     }
 
     @Test
     void givenValidIdAndProductDTO_whenUpdate_thenReturnUpdatedProduct() {
-        when(productRepository.getReferenceById(productId)).thenReturn(product);
+        when(productRepository.getReferenceById(product.getId())).thenReturn(product);
         when(productRepository.save(product)).thenReturn(product);
 
         productDTO = ProductDTO.builder().price(BigDecimal.ONE).build();
 
-        Product result = productService.update(productId, productDTO);
+        Product result = productService.update(product.getId(), productDTO);
 
         assertEquals(productDTO.getPrice(),result.getPrice());
 
         verifyAuthentication();
-        verify(productRepository, times(1)).getReferenceById(productId);
+        verify(productRepository, times(1)).getReferenceById(product.getId());
         verify(productRepository, times(1)).save(product);
     }
 
     @Test
     void givenNoProduct_whenUpdate_thenThrowResourceNotFoundException(){
-        when(productRepository.getReferenceById(productId)).thenReturn(product);
+        when(productRepository.getReferenceById(product.getId())).thenReturn(product);
         when(productRepository.save(product))
                 .thenThrow(EntityNotFoundException.class);
 
         assertThrows(ResourceNotFoundException.class,
-                () -> productService.update(productId, productDTO));
+                () -> productService.update(product.getId(), productDTO));
 
         verifyAuthentication();
-        verify(productRepository, times(1)).getReferenceById(productId);
+        verify(productRepository, times(1)).getReferenceById(product.getId());
         verify(productRepository, times(1)).save(product);
     }
 
@@ -159,14 +171,14 @@ class ProductServiceTest extends ApplicationConfigTest {
         when(user2.getId()).thenReturn(UUID.randomUUID());
 
         when(authentication.getPrincipal()).thenReturn(user2);
-        when(productRepository.getReferenceById(productId)).thenReturn(product);
+        when(productRepository.getReferenceById(product.getId())).thenReturn(product);
         when(productRepository.save(product)).thenReturn(product);
 
         assertThrows(UnauthorizedAccessException.class,
-                () -> productService.update(productId, productDTO));
+                () -> productService.update(product.getId(), productDTO));
 
         verifyAuthentication();
-        verify(productRepository, times(1)).getReferenceById(productId);
+        verify(productRepository, times(1)).getReferenceById(product.getId());
         verify(productRepository, never()).save(product);
     }
 
@@ -183,30 +195,30 @@ class ProductServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenNoProduct_whenDelete_thenThrowResourceNotFoundException(){
-        when(productRepository.getReferenceById(productId)).thenReturn(product);
+        when(productRepository.getReferenceById(product.getId())).thenReturn(product);
         doThrow(EmptyResultDataAccessException.class)
-                .when(productRepository).deleteById(productId);
+                .when(productRepository).deleteById(product.getId());
 
         assertThrows(ResourceNotFoundException.class,
-                () -> productService.delete(productId));
+                () -> productService.delete(product.getId()));
 
         verifyAuthentication();
-        verify(productRepository, times(1)).getReferenceById(productId);
-        verify(productRepository, times(1)).deleteById(productId);
+        verify(productRepository, times(1)).getReferenceById(product.getId());
+        verify(productRepository, times(1)).deleteById(product.getId());
     }
 
     @Test
     void givenProductAndDeleteCausesDataIntegrityViolationException_whenDelete_thenThrowDatabaseException(){
-        when(productRepository.getReferenceById(productId)).thenReturn(product);
+        when(productRepository.getReferenceById(product.getId())).thenReturn(product);
         doThrow(DataIntegrityViolationException.class)
-                .when(productRepository).deleteById(productId);
+                .when(productRepository).deleteById(product.getId());
 
         assertThrows(DatabaseException.class,
-                () -> productService.delete(productId));
+                () -> productService.delete(product.getId()));
 
         verifyAuthentication();
-        verify(productRepository, times(1)).getReferenceById(productId);
-        verify(productRepository, times(1)).deleteById(productId);
+        verify(productRepository, times(1)).getReferenceById(product.getId());
+        verify(productRepository, times(1)).deleteById(product.getId());
     }
 
     @Test
@@ -217,14 +229,14 @@ class ProductServiceTest extends ApplicationConfigTest {
         doReturn(authorities).when(user2).getAuthorities();
 
         when(authentication.getPrincipal()).thenReturn(user2);
-        when(productRepository.getReferenceById(productId)).thenReturn(product);
+        when(productRepository.getReferenceById(product.getId())).thenReturn(product);
 
         assertThrows(UnauthorizedAccessException.class,
-                () -> productService.delete(productId));
+                () -> productService.delete(product.getId()));
 
         verifyAuthentication();
-        verify(productRepository, times(1)).getReferenceById(productId);
-        verify(productRepository, never()).deleteById(productId);
+        verify(productRepository, times(1)).getReferenceById(product.getId());
+        verify(productRepository, never()).deleteById(product.getId());
     }
 
     @Test
@@ -235,13 +247,13 @@ class ProductServiceTest extends ApplicationConfigTest {
         doReturn(authorities).when(user2).getAuthorities();
         when(authentication.getPrincipal()).thenReturn(user2);
 
-        when(productRepository.getReferenceById(productId)).thenReturn(product);
+        when(productRepository.getReferenceById(product.getId())).thenReturn(product);
 
-        productService.delete(productId);
+        productService.delete(product.getId());
 
         verifyAuthentication();
-        verify(productRepository, times(1)).getReferenceById(productId);
-        verify(productRepository, times(1)).deleteById(productId);
+        verify(productRepository, times(1)).getReferenceById(product.getId());
+        verify(productRepository, times(1)).deleteById(product.getId());
     }
 
 }

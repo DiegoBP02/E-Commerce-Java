@@ -6,6 +6,7 @@ import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
+import com.example.demo.enums.ProductCategory;
 import com.example.demo.enums.Role;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ public class TestDataBuilder {
     private static final BigDecimal defaultProductPrice = BigDecimal.valueOf(99.99);
     private static final String defaultReviewComment = "Default review comment";
     private static final int defaultReviewRating = 4;
+    private static final ProductCategory defaultProductCategory =  ProductCategory.CAR_ACCESSORIES;
 
     public static User buildUser() {
         return Seller.builder()
@@ -78,6 +80,18 @@ public class TestDataBuilder {
                 .price(defaultProductPrice)
                 .seller(seller)
                 .reviews(new ArrayList<>())
+                .category(defaultProductCategory)
+                .build();
+    }
+
+    public static Product buildProductNoId(Seller seller) {
+        return Product.builder()
+                .name(defaultProductName)
+                .description(defaultProductDescription)
+                .price(defaultProductPrice)
+                .seller(seller)
+                .reviews(new ArrayList<>())
+                .category(defaultProductCategory)
                 .build();
     }
 
@@ -86,6 +100,7 @@ public class TestDataBuilder {
                 .name(defaultName)
                 .description(defaultProductDescription)
                 .price(defaultProductPrice)
+                .category(defaultProductCategory)
                 .build();
     }
 

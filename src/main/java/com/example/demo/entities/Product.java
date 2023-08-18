@@ -1,6 +1,7 @@
 package com.example.demo.entities;
 
 import com.example.demo.entities.user.Seller;
+import com.example.demo.enums.ProductCategory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -41,5 +42,9 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     private Seller seller;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProductCategory category;
 
 }
