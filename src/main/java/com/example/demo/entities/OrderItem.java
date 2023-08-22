@@ -1,7 +1,9 @@
 package com.example.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,12 +14,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "order_items")
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
@@ -29,7 +33,12 @@ public class OrderItem {
     @Column(nullable = false)
     private int quantity;
 
+    @Transient
     @Column(nullable = false)
     private BigDecimal itemTotal;
+
+    public BigDecimal getItemTotal() {
+        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
+    }
 
 }

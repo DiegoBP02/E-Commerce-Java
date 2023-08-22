@@ -10,13 +10,10 @@ import com.example.demo.repositories.ProductRepository;
 import com.example.demo.services.exceptions.DatabaseException;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
 import com.example.demo.services.exceptions.UnauthorizedAccessException;
-import com.example.demo.services.utils.CheckOwnership;
 import com.example.demo.utils.TestDataBuilder;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,28 +22,31 @@ import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class ProductServiceTest extends ApplicationConfigTest {
     @Autowired
-    ProductService productService;
+    private ProductService productService;
 
     @MockBean
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
     private Authentication authentication;
     private SecurityContext securityContext;
 
     private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
-    private Product product = TestDataBuilder.buildProduct((Seller) seller);
+    private Product product = TestDataBuilder.buildProduct(seller);
     private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
     private Page<Product> productPage = new PageImpl<>
             (Collections.singletonList(product),
@@ -63,12 +63,12 @@ class ProductServiceTest extends ApplicationConfigTest {
         SecurityContextHolder.setContext(securityContext);
     }
 
-    private void verifyNoAuthentication(){
+    private void verifyNoAuthentication() {
         verify(authentication, never()).getPrincipal();
         verify(securityContext, never()).getAuthentication();
     }
 
-    private void verifyAuthentication(){
+    private void verifyAuthentication() {
         verify(authentication, times(1)).getPrincipal();
         verify(securityContext, times(1)).getAuthentication();
     }
@@ -79,7 +79,7 @@ class ProductServiceTest extends ApplicationConfigTest {
 
         Product result = productService.create(productDTO);
 
-        assertEquals(product,result);
+        assertEquals(product, result);
 
         verifyAuthentication();
         verify(productRepository, times(1)).save(any(Product.class));
@@ -94,7 +94,7 @@ class ProductServiceTest extends ApplicationConfigTest {
                         productPage.getPageable().getPageSize(),
                         productPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
-        assertEquals(productPage,result);
+        assertEquals(productPage, result);
 
         verifyNoAuthentication();
         verify(productRepository, times(1)).findAll(productPage.getPageable());
@@ -107,7 +107,7 @@ class ProductServiceTest extends ApplicationConfigTest {
 
         List<Product> result = productService.findByCategory(product.getCategory());
 
-        assertEquals(products,result);
+        assertEquals(products, result);
 
         verifyNoAuthentication();
         verify(productRepository, times(1)).findByCategory(product.getCategory());
@@ -119,7 +119,7 @@ class ProductServiceTest extends ApplicationConfigTest {
 
         Product result = productService.findById(product.getId());
 
-        assertEquals(product,result);
+        assertEquals(product, result);
 
         verifyNoAuthentication();
         verify(productRepository, times(1)).findById(product.getId());
@@ -127,7 +127,7 @@ class ProductServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenNoProduct_whenFindById_thenThrowResourceNotFoundException() {
-        when(productRepository.findById(product.getId())).thenThrow(ResourceNotFoundException.class);
+        when(productRepository.findById(product.getId())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> productService.findById(product.getId()));
 
@@ -144,7 +144,7 @@ class ProductServiceTest extends ApplicationConfigTest {
 
         Product result = productService.update(product.getId(), productDTO);
 
-        assertEquals(productDTO.getPrice(),result.getPrice());
+        assertEquals(productDTO.getPrice(), result.getPrice());
 
         verifyAuthentication();
         verify(productRepository, times(1)).getReferenceById(product.getId());
@@ -152,7 +152,7 @@ class ProductServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenNoProduct_whenUpdate_thenThrowResourceNotFoundException(){
+    void givenNoProduct_whenUpdate_thenThrowResourceNotFoundException() {
         when(productRepository.getReferenceById(product.getId())).thenReturn(product);
         when(productRepository.save(product))
                 .thenThrow(EntityNotFoundException.class);
@@ -194,7 +194,7 @@ class ProductServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenNoProduct_whenDelete_thenThrowResourceNotFoundException(){
+    void givenNoProduct_whenDelete_thenThrowResourceNotFoundException() {
         when(productRepository.getReferenceById(product.getId())).thenReturn(product);
         doThrow(EmptyResultDataAccessException.class)
                 .when(productRepository).deleteById(product.getId());
@@ -208,7 +208,7 @@ class ProductServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenProductAndDeleteCausesDataIntegrityViolationException_whenDelete_thenThrowDatabaseException(){
+    void givenProductAndDeleteCausesDataIntegrityViolationException_whenDelete_thenThrowDatabaseException() {
         when(productRepository.getReferenceById(product.getId())).thenReturn(product);
         doThrow(DataIntegrityViolationException.class)
                 .when(productRepository).deleteById(product.getId());

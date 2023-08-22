@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
-import com.example.demo.enums.Role;
 import com.example.demo.exceptions.UniqueConstraintViolationError;
 import com.example.demo.services.AuthenticationService;
 import com.example.demo.utils.TestDataBuilder;

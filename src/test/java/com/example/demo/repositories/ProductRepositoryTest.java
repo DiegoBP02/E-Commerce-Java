@@ -2,7 +2,6 @@ package com.example.demo.repositories;
 
 import com.example.demo.entities.Product;
 import com.example.demo.entities.user.Seller;
-import com.example.demo.entities.user.User;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +11,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class ProductRepositoryTest {
@@ -29,7 +27,7 @@ class ProductRepositoryTest {
     private Product product = TestDataBuilder.buildProductNoId(seller);
 
     @BeforeEach
-    void setUp() throws Exception{
+    void setUp() throws Exception {
         userRepository.save(seller);
     }
 

@@ -4,7 +4,6 @@ import com.example.demo.dtos.ReviewDTO;
 import com.example.demo.dtos.UpdateReviewDTO;
 import com.example.demo.entities.Review;
 import com.example.demo.services.ReviewService;
-import com.example.demo.services.ReviewService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -54,7 +53,7 @@ public class ReviewController {
     @PreAuthorize("hasAuthority('Customer')")
     @PatchMapping(value = "/{id}")
     public ResponseEntity<Review> update(@PathVariable UUID id,
-                                          @Valid @RequestBody UpdateReviewDTO obj) {
+                                         @Valid @RequestBody UpdateReviewDTO obj) {
         return ResponseEntity.ok().body(reviewService.update(id, obj));
     }
 

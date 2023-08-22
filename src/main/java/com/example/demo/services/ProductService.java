@@ -9,7 +9,6 @@ import com.example.demo.enums.Role;
 import com.example.demo.repositories.ProductRepository;
 import com.example.demo.services.exceptions.DatabaseException;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
-import com.example.demo.services.utils.CheckOwnership;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.demo.services.utils.CheckOwnership.checkOwnership;

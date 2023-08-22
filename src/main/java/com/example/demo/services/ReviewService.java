@@ -7,7 +7,6 @@ import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
-import com.example.demo.repositories.ProductRepository;
 import com.example.demo.repositories.ReviewRepository;
 import com.example.demo.services.exceptions.DatabaseException;
 import com.example.demo.services.exceptions.ResourceNotFoundException;

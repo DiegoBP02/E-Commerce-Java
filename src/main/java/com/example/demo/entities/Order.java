@@ -1,12 +1,10 @@
 package com.example.demo.entities;
 
 import com.example.demo.entities.user.Customer;
-import com.example.demo.entities.user.User;
 import com.example.demo.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "orders")
 public class Order {
     @Id
@@ -34,11 +33,19 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime orderDate;
 
-    @Column(nullable = false)
+    @Transient
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
+
+    public BigDecimal getTotalAmount() {
+        BigDecimal calculatedTotal = BigDecimal.ZERO;
+        for (OrderItem orderItem : items) {
+            calculatedTotal = calculatedTotal.add(orderItem.getItemTotal());
+        }
+        return calculatedTotal;
+    }
 
 }

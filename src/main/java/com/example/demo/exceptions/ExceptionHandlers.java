@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +80,7 @@ public class ExceptionHandlers {
     public ResponseEntity<StandardError> UniqueConstraintViolationError
             (UniqueConstraintViolationError e, HttpServletRequest request) {
         logger.error("Unique constraint violation error:", e);
-        String error = "Duplicate entry found. Please provide a unique value";
+        String error = "Duplicate entry found";
         HttpStatus status = HttpStatus.BAD_REQUEST;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 e.getMessage(), request.getRequestURI());
