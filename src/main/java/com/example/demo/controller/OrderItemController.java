@@ -34,7 +34,7 @@ public class OrderItemController {
         return ResponseEntity.created(uri).body(orderItem);
     }
 
-    @PreAuthorize("hasAuthority('Customer')")
+    @PreAuthorize("hasAuthority('Admin')")
     @GetMapping
     public ResponseEntity<List<OrderItem>> findAll() {
         List<OrderItem> orderItems = orderItemService.findAll();

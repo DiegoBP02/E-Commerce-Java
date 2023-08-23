@@ -137,7 +137,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
         MockHttpServletRequestBuilder mockRequest = mockPostRequest(reviewDTO);
 
         mockMvc.perform(mockRequest)
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
@@ -237,7 +237,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenUpdate_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockPathRequest(review.getId().toString(), updateReviewDTO))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
@@ -299,7 +299,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenDelete_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockDeleteRequest(review.getId().toString()))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));

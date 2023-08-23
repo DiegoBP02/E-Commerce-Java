@@ -32,7 +32,7 @@ public class OrderController {
         return ResponseEntity.created(uri).body(order);
     }
 
-    @PreAuthorize("hasAuthority('Customer')")
+    @PreAuthorize("hasAuthority('Admin')")
     @GetMapping
     public ResponseEntity<List<Order>> findAll() {
         List<Order> orders = orderService.findAll();

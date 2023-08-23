@@ -137,7 +137,7 @@ class ProductControllerTest extends ApplicationConfigTest {
         MockHttpServletRequestBuilder mockRequest = mockPostRequest(productDTO);
 
         mockMvc.perform(mockRequest)
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
@@ -283,7 +283,7 @@ class ProductControllerTest extends ApplicationConfigTest {
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenUpdate_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockPathRequest(product.getId().toString(), productDTO))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
@@ -345,7 +345,7 @@ class ProductControllerTest extends ApplicationConfigTest {
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenDelete_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockDeleteRequest(product.getId().toString()))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));

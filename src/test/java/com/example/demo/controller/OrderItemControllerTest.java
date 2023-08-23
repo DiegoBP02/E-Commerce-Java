@@ -165,7 +165,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
         MockHttpServletRequestBuilder mockRequest = mockPostRequest(orderItemDTO);
 
         mockMvc.perform(mockRequest)
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
@@ -174,8 +174,8 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "Customer")
-    void givenOrderItems_whenFindAll_thenReturnOrderItems() throws Exception {
+    @WithMockUser(authorities = "Admin")
+    void givenOrderItemsAndUserIsAdmin_whenFindAll_thenReturnOrderItems() throws Exception {
         when(orderItemService.findAll()).thenReturn(orderItems);
 
         mockMvc.perform(mockGetRequest())
@@ -201,7 +201,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     void givenInvalidUserAuthority_whenFindAll_thenHandleAccessDeniedException() throws Exception {
 
         mockMvc.perform(mockGetRequest())
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
@@ -236,7 +236,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenFindByOrderId_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockGetRequest("/order/" + order.getId().toString()))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
@@ -286,7 +286,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenFindById_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockGetRequest(orderItem.getId().toString()))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
@@ -348,7 +348,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenUpdate_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockPathRequest(orderItem.getId().toString(), orderItemDTO))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
@@ -410,7 +410,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenDelete_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockDeleteRequest(orderItem.getId().toString()))
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));

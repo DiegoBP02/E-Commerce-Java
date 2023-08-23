@@ -182,7 +182,7 @@ public class ExceptionHandlers {
             AccessDeniedException e, HttpServletRequest request) {
         logger.error("Access denied exception:", e);
         String error = "Access denied";
-        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        HttpStatus status = HttpStatus.FORBIDDEN;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
