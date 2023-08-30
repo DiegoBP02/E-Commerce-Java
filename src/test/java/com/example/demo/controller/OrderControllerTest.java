@@ -206,20 +206,20 @@ class OrderControllerTest extends ApplicationConfigTest {
 
     @Test
     @WithMockUser(authorities = "Customer")
-    void givenOrderAndValidUser_whenFindByCurrentUser_thenReturnOrder() throws Exception {
-        when(orderService.findByCurrentUser()).thenReturn(order);
+    void givenOrderAndValidUser_whenFindActiveOrderByCurrentUser_thenReturnOrder() throws Exception {
+        when(orderService.findActiveOrderByCurrentUser()).thenReturn(order);
 
         mockMvc.perform(mockGetRequest("user"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(order)));
 
-        verify(orderService, times(1)).findByCurrentUser();
+        verify(orderService, times(1)).findActiveOrderByCurrentUser();
     }
 
     @Test
     @WithMockUser(authorities = "Customer")
-    void givenNoOrderAndNoUser_whenFindByCurrentUser_thenHandleResourceNotFoundException() throws Exception {
-        when(orderService.findByCurrentUser()).thenThrow(ResourceNotFoundException.class);
+    void givenNoOrderAndNoUser_whenFindActiveOrderByCurrentUser_thenHandleResourceNotFoundException() throws Exception {
+        when(orderService.findActiveOrderByCurrentUser()).thenThrow(ResourceNotFoundException.class);
 
         mockMvc.perform(mockGetRequest("user"))
                 .andExpect(status().isNotFound())
@@ -227,30 +227,30 @@ class OrderControllerTest extends ApplicationConfigTest {
                         assertTrue(result.getResolvedException()
                                 instanceof ResourceNotFoundException));
 
-        verify(orderService, times(1)).findByCurrentUser();
+        verify(orderService, times(1)).findActiveOrderByCurrentUser();
     }
 
     @Test
-    void givenNoUser_whenFindByCurrentUser_thenReturnStatus403Forbidden() throws Exception {
+    void givenNoUser_whenFindActiveOrderByCurrentUser_thenReturnStatus403Forbidden() throws Exception {
         mockMvc.perform(mockGetRequest("user"))
                 .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertEquals("Access Denied",
                                 result.getResponse().getErrorMessage()));
 
-        verify(orderService, never()).findByCurrentUser();
+        verify(orderService, never()).findActiveOrderByCurrentUser();
     }
 
     @Test
     @WithMockUser(authorities = "random")
-    void givenInvalidUserAuthority_whenFindByCurrentUser_thenHandleAccessDeniedException() throws Exception {
+    void givenInvalidUserAuthority_whenFindActiveOrderByCurrentUser_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockGetRequest("user"))
                 .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
 
-        verify(orderService, never()).findByCurrentUser();
+        verify(orderService, never()).findActiveOrderByCurrentUser();
     }
 
     @Test

@@ -2,12 +2,10 @@ package com.example.demo.entities;
 
 import com.example.demo.entities.user.Seller;
 import com.example.demo.enums.ProductCategory;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -35,10 +33,12 @@ public class Product {
     @Column(nullable = false)
     private BigDecimal price;
 
+    @ToString.Exclude
+    @JsonIgnore
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
     private Seller seller;
 

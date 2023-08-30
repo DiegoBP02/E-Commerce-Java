@@ -1,4 +1,4 @@
-package com.example.demo.exceptions;
+package com.example.demo.services.exceptions;
 
 public class UniqueConstraintViolationError extends RuntimeException {
     public UniqueConstraintViolationError() {

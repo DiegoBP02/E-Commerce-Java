@@ -1,39 +1,59 @@
 package com.example.demo.services;
 
+import com.example.demo.dtos.OrderHistoryDTO;
 import com.example.demo.entities.Order;
+import com.example.demo.entities.OrderHistory;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.User;
+import com.example.demo.enums.CreditCard;
 import com.example.demo.enums.OrderStatus;
-import com.example.demo.exceptions.UniqueConstraintViolationError;
 import com.example.demo.repositories.OrderRepository;
-import com.example.demo.services.exceptions.DatabaseException;
-import com.example.demo.services.exceptions.ResourceNotFoundException;
+import com.example.demo.repositories.UserRepository;
+import com.example.demo.services.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.example.demo.services.utils.CheckOwnership.checkOwnership;
 
 @Service
+@Transactional
 public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private OrderHistoryService orderHistoryService;
+
+    @Transactional
     public Order create() {
         try {
             Customer user = (Customer) getCurrentUser();
+
+            Optional<Order> existingActiveOrder = orderRepository.findActiveOrderByCurrentUser(user);
+
+            if (existingActiveOrder.isPresent()) {
+                throw new ActiveOrderAlreadyExistsException("Active order already exists!");
+            }
+
             Order order = Order.builder()
                     .orderDate(LocalDateTime.now())
                     .customer(user)
-                    .status(OrderStatus.Pending)
+                    .status(OrderStatus.Active)
                     .items(new ArrayList<>())
                     .build();
             return orderRepository.save(order);
@@ -51,9 +71,10 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
-    public Order findByCurrentUser() {
-        User user = getCurrentUser();
-        return orderRepository.findByCustomerId(user.getId())
+    public Order findActiveOrderByCurrentUser() {
+        Customer user = (Customer) getCurrentUser();
+
+        return orderRepository.findActiveOrderByCurrentUser(user)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
@@ -86,6 +107,31 @@ public class OrderService {
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException(e.getMessage());
         }
+    }
+
+    public void checkUserOrder() {
+        Order order = findActiveOrderByCurrentUser();
+
+        if (order.getItems().isEmpty()) {
+            throw new InvalidOrderException("Invalid order: The order does not contain any items");
+        }
+    }
+
+    public void moveOrderToHistory(CreditCard creditCard, BigDecimal paymentAmount) {
+        Customer user = (Customer) getCurrentUser();
+        Order order = findActiveOrderByCurrentUser();
+
+        OrderHistoryDTO orderHistoryDTO = OrderHistoryDTO.builder()
+                .order(order)
+                .creditCard(creditCard)
+                .paymentAmount(paymentAmount)
+                .build();
+        OrderHistory orderHistory = orderHistoryService.create(orderHistoryDTO);
+
+        user.getOrderHistory().add(orderHistory);
+        userRepository.save(user);
+        order.setStatus(OrderStatus.Delivered);
+        orderRepository.save(order);
     }
 
     private User getCurrentUser() {

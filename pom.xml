@@ -103,6 +103,11 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>23.1.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -2,6 +2,7 @@ package com.example.demo.repositories;
 
 import com.example.demo.entities.Order;
 import com.example.demo.entities.user.Customer;
+import com.example.demo.enums.OrderStatus;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +36,6 @@ class OrderRepositoryTest {
     @AfterEach
     void tearDown() throws Exception {
         userRepository.deleteAll();
-        orderRepository.deleteAll();
     }
 
     @Test
@@ -50,5 +50,21 @@ class OrderRepositoryTest {
         Optional<Order> result = orderRepository.findByCustomerId(UUID.randomUUID());
         assertEquals(Optional.empty(), result);
     }
+
+    @Test
+    void givenOrder_whenFindActiveOrderByCustomer_thenReturnOptionalOrder() {
+        order.setStatus(OrderStatus.Active);
+        orderRepository.save(order);
+        Optional<Order> result = orderRepository.findActiveOrderByCurrentUser(customer);
+        assertEquals(Optional.of(order), result);
+    }
+
+    @Test
+    void givenNoOrder_whenFindActiveOrderByCustomer_thenReturnOptionalEmpty() {
+        Optional<Order> result = orderRepository.findActiveOrderByCurrentUser(customer);
+        assertEquals(Optional.empty(), result);
+    }
+
+
 
 }

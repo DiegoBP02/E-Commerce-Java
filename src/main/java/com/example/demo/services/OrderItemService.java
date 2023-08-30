@@ -16,7 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static com.example.demo.services.utils.CheckOwnership.checkOwnership;
@@ -40,7 +39,7 @@ public class OrderItemService {
 
         OrderItem existingOrderItem = findExistingItem(order, orderItemDTO.getProductId());
 
-        if (Objects.nonNull(existingOrderItem)) {
+        if (existingOrderItem != null) {
             OrderItemDTO updateData = OrderItemDTO.builder()
                     .quantity(existingOrderItem.getQuantity() + orderItemDTO.getQuantity())
                     .build();

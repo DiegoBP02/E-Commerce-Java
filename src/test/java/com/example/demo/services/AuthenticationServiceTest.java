@@ -8,7 +8,7 @@ import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
-import com.example.demo.exceptions.UniqueConstraintViolationError;
+import com.example.demo.services.exceptions.UniqueConstraintViolationError;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.Test;

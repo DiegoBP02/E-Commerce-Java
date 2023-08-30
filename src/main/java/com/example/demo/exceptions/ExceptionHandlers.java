@@ -4,9 +4,8 @@ package com.example.demo.exceptions;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.example.demo.services.exceptions.DatabaseException;
-import com.example.demo.services.exceptions.ResourceNotFoundException;
-import com.example.demo.services.exceptions.UnauthorizedAccessException;
+import com.example.demo.entities.exceptions.NoActiveOrderException;
+import com.example.demo.services.exceptions.*;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -178,8 +177,8 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<StandardError> AccessDeniedException(
-            AccessDeniedException e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> AccessDeniedException
+            (AccessDeniedException e, HttpServletRequest request) {
         logger.error("Access denied exception:", e);
         String error = "Access denied";
         HttpStatus status = HttpStatus.FORBIDDEN;
@@ -189,8 +188,8 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<StandardError> MissingServletRequestParameterException(
-            MissingServletRequestParameterException e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> MissingServletRequestParameterException
+            (MissingServletRequestParameterException e, HttpServletRequest request) {
         logger.error("Access denied exception:", e);
         String error = "Missing request parameter";
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -200,8 +199,8 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<StandardError> MethodArgumentTypeMismatchException(
-            MethodArgumentTypeMismatchException e, HttpServletRequest request) {
+    public ResponseEntity<StandardError> MethodArgumentTypeMismatchException
+            (MethodArgumentTypeMismatchException e, HttpServletRequest request) {
         logger.error("Method argument type mismatch exception", e);
         String error = "Method argument type mismatch";
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -209,6 +208,62 @@ public class ExceptionHandlers {
         String message = "The value provided for the request parameter " + e.getName() + " is not valid.";
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 message, request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(StripeErrorException.class)
+    public ResponseEntity<StandardError> StripeErrorException
+            (StripeErrorException e, HttpServletRequest request) {
+        logger.error("Stripe error occurred:", e);
+        String error = "Stripe error";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(InvalidOrderException.class)
+    public ResponseEntity<StandardError> InvalidOrderException
+            (InvalidOrderException e, HttpServletRequest request) {
+        logger.error("Invalid order exception:", e);
+        String error = "Invalid order";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<StandardError> InsufficientBalanceException
+            (InsufficientBalanceException e, HttpServletRequest request) {
+        logger.error("Insufficient balance exception:", e);
+        String error = "Insufficient balance";
+        HttpStatus status = HttpStatus.PAYMENT_REQUIRED;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+
+    @ExceptionHandler(ActiveOrderAlreadyExistsException.class)
+    public ResponseEntity<StandardError> ActiveOrderAlreadyExistsException
+            (ActiveOrderAlreadyExistsException e, HttpServletRequest request) {
+        logger.error("Active order already exists exception :", e);
+        String error = "A conflict occurred: An active order already exists for this customer.";
+        HttpStatus status = HttpStatus.CONFLICT;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(NoActiveOrderException.class)
+    public ResponseEntity<StandardError> NoActiveOrderException
+            (NoActiveOrderException e, HttpServletRequest request) {
+        logger.error("No active order exists:", e);
+        String error = "The customer has no active order";
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 

@@ -1,13 +1,11 @@
 package com.example.demo.utils;
 
 import com.example.demo.dtos.*;
-import com.example.demo.entities.Order;
-import com.example.demo.entities.OrderItem;
-import com.example.demo.entities.Product;
-import com.example.demo.entities.Review;
+import com.example.demo.entities.*;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
+import com.example.demo.enums.CreditCard;
 import com.example.demo.enums.OrderStatus;
 import com.example.demo.enums.ProductCategory;
 import com.example.demo.enums.Role;
@@ -25,11 +23,12 @@ public class TestDataBuilder {
     private static final Role defaultRole = Role.Seller;
     private static final String defaultProductName = "Sample Product";
     private static final String defaultProductDescription = "Sample product description";
-    private static final BigDecimal defaultProductPrice = BigDecimal.valueOf(99.99);
+    private static final BigDecimal defaultProductPrice = BigDecimal.ONE;
     private static final String defaultReviewComment = "Default review comment";
     private static final int defaultReviewRating = 4;
     private static final ProductCategory defaultProductCategory = ProductCategory.CAR_ACCESSORIES;
     private static final int defaultOrderItemQuantity = 1;
+    private static final CreditCard defaultCreditCard = CreditCard.pm_card_visa;
 
     public static User buildUser() {
         return Seller.builder()
@@ -206,6 +205,30 @@ public class TestDataBuilder {
                 .quantity(defaultOrderItemQuantity)
                 .orderId(UUID.randomUUID())
                 .productId(UUID.randomUUID())
+                .build();
+    }
+
+    public static OrderHistory buildOrderHistory(Order order) {
+        return OrderHistory.builder()
+                .order(order)
+                .customer(order.getCustomer())
+                .creditCard(defaultCreditCard)
+                .paymentAmount(defaultProductPrice)
+                .build();
+    }
+
+    public static OrderHistoryDTO buildOrderHistoryDTO(Order order) {
+        return OrderHistoryDTO.builder()
+                .order(order)
+                .customer(order.getCustomer())
+                .creditCard(defaultCreditCard)
+                .paymentAmount(defaultProductPrice)
+                .build();
+    }
+
+    public static OrderPaymentDTO buildOrderPaymentDTO() {
+        return OrderPaymentDTO.builder()
+                .creditCard(CreditCard.pm_card_visa)
                 .build();
     }
 }

@@ -47,8 +47,8 @@ public class OrderController {
 
     @PreAuthorize("hasAuthority('Customer')")
     @GetMapping(value = "/user")
-    public ResponseEntity<Order> findByCurrentUser() {
-        return ResponseEntity.ok().body(orderService.findByCurrentUser());
+    public ResponseEntity<Order> findActiveOrderByCurrentUser() {
+        return ResponseEntity.ok().body(orderService.findActiveOrderByCurrentUser());
     }
 
     @PreAuthorize("hasAuthority('Customer')")
