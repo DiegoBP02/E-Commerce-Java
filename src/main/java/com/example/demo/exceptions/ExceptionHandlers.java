@@ -15,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -262,6 +265,40 @@ public class ExceptionHandlers {
         logger.error("No active order exists:", e);
         String error = "The customer has no active order";
         HttpStatus status = HttpStatus.NOT_FOUND;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<StandardError> UserNotFoundException
+            (UserNotFoundException  e, HttpServletRequest request) {
+        logger.error("User not found exception:", e);
+        String error = "User not found";
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<StandardError> BadCredentialsException
+            (BadCredentialsException  e, HttpServletRequest request) {
+        logger.error("Bad credentials exception:", e);
+        String error = "Bad credentials";
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<StandardError> LockedException
+            (LockedException  e, HttpServletRequest request) {
+        logger.error("Locked exception:", e);
+        String error = "Locked account";
+        HttpStatus status = HttpStatus.LOCKED;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);

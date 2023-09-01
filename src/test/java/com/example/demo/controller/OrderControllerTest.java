@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.entities.Order;
 import com.example.demo.services.OrderService;
+import com.example.demo.services.exceptions.ActiveOrderAlreadyExistsException;
 import com.example.demo.services.exceptions.DatabaseException;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
 import com.example.demo.services.exceptions.UnauthorizedAccessException;
@@ -102,6 +103,21 @@ class OrderControllerTest extends ApplicationConfigTest {
                                 result.getResponse().getErrorMessage()));
 
         verify(orderService, never()).create();
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenNoExistingActiveOrder_whenCreate_thenHandleActiveOrderAlreadyExistsException() throws Exception {
+        when(orderService.create()).thenThrow(ActiveOrderAlreadyExistsException.class);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest();
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isConflict())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ActiveOrderAlreadyExistsException));
+
+        verify(orderService, times(1)).create();
     }
 
     @Test

@@ -11,10 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -38,12 +36,19 @@ public abstract class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role", insertable = false, updatable = false)
     private Role role;
+    private boolean accountNonLocked;
+    private int failedAttempt;
+    private LocalDateTime lockTime;
+    private UUID resetPasswordToken;
 
     public User(String name, String email, String password, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.accountNonLocked = true;
+        this.lockTime = null;
+        this.resetPasswordToken = null;
     }
 
     @JsonIgnore
@@ -69,7 +74,7 @@ public abstract class User implements UserDetails {
     @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return accountNonLocked;
     }
 
     @JsonIgnore
@@ -83,5 +88,6 @@ public abstract class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
 

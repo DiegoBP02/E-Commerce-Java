@@ -3,6 +3,7 @@ package com.example.demo.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -23,6 +24,10 @@ public class AuthConfig {
     @Autowired
     private FilterToken filterToken;
 
+    @Lazy
+    @Autowired
+    private CustomAuthenticationProvider customAuthenticationProvider;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -38,6 +43,7 @@ public class AuthConfig {
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(filterToken, UsernamePasswordAuthenticationFilter.class)
+                .authenticationProvider(customAuthenticationProvider)
                 .build();
     }
 

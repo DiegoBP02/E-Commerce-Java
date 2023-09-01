@@ -10,6 +10,7 @@ import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
 import com.example.demo.services.exceptions.UniqueConstraintViolationError;
 import com.example.demo.repositories.UserRepository;
+import com.example.demo.services.exceptions.UserNotFoundException;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
         when(userRepository.findByEmail(email))
                 .thenReturn(Optional.empty());
 
-        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () ->
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () ->
                 authenticationService.loadUserByUsername(email));
 
         assertEquals("Email not found: " + email, exception.getMessage());

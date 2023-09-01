@@ -3,7 +3,9 @@ package com.example.demo.controller;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.OrderPaymentDTO;
 import com.example.demo.dtos.PaymentResponse;
+import com.example.demo.entities.exceptions.NoActiveOrderException;
 import com.example.demo.services.exceptions.InsufficientBalanceException;
+import com.example.demo.services.exceptions.InvalidOrderException;
 import com.example.demo.services.exceptions.StripeErrorException;
 import com.example.demo.services.stripe.StripeService;
 import com.example.demo.utils.TestDataBuilder;
@@ -107,6 +109,38 @@ class PaymentControllerTest extends ApplicationConfigTest {
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof InsufficientBalanceException));
+
+        verify(stripeService, times(1)).createOrderPayment(orderPaymentDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenOrderHasNoItems_whenCreateOrderPayment_thenHandleInvalidOrderException() throws Exception {
+        when(stripeService.createOrderPayment(orderPaymentDTO)).thenThrow(InvalidOrderException.class);
+
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest(orderPaymentDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof InvalidOrderException));
+
+        verify(stripeService, times(1)).createOrderPayment(orderPaymentDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenUserHasNoActiveOrder_whenCreateOrderPayment_thenHandleInvalidOrderException() throws Exception {
+        when(stripeService.createOrderPayment(orderPaymentDTO)).thenThrow(NoActiveOrderException.class);
+
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest(orderPaymentDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isNotFound())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof NoActiveOrderException));
 
         verify(stripeService, times(1)).createOrderPayment(orderPaymentDTO);
     }

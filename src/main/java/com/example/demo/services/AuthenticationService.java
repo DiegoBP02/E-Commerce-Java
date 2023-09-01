@@ -10,6 +10,7 @@ import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.services.exceptions.UniqueConstraintViolationError;
+import com.example.demo.services.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,8 +23,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Service
 public class AuthenticationService implements UserDetailsService {
+
+    public static final int MAX_FAILED_ATTEMPTS = 3;
+    private static final long LOCK_TIME_DURATION_SECONDS = 5 * 60; // 5 minutes
 
     @Autowired
     private UserRepository userRepository;
@@ -38,7 +45,7 @@ public class AuthenticationService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Email not found: " + email));
+                .orElseThrow(() -> new UserNotFoundException("Email not found: " + email));
     }
 
     public String register(RegisterDTO registerDTO) {
@@ -55,8 +62,8 @@ public class AuthenticationService implements UserDetailsService {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
 
-        Authentication authentication = this.authenticationManager.authenticate
-                (usernamePasswordAuthenticationToken);
+        Authentication authentication = this.authenticationManager
+                .authenticate(usernamePasswordAuthenticationToken);
 
         User user = (User) authentication.getPrincipal();
 
@@ -85,6 +92,39 @@ public class AuthenticationService implements UserDetailsService {
                     .role(Role.Admin)
                     .build();
         };
+    }
+
+    public void increaseFailedAttempts(User user) {
+        int newFailAttempts = user.getFailedAttempt() + 1;
+        userRepository.updateFailedAttempts(newFailAttempts, user.getEmail());
+    }
+
+    public void resetFailedAttempts(String email) {
+        userRepository.updateFailedAttempts(0, email);
+    }
+
+    public void lock(User user) {
+        user.setAccountNonLocked(false);
+        user.setLockTime(LocalDateTime.now());
+
+        userRepository.save(user);
+    }
+
+    public boolean isLockTimeExpired(User user) {
+        LocalDateTime lockTime = user.getLockTime();
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        if (lockTime.plusSeconds(LOCK_TIME_DURATION_SECONDS).isBefore(currentTime)) {
+            user.setAccountNonLocked(true);
+            user.setLockTime(null);
+            user.setFailedAttempt(0);
+
+            userRepository.save(user);
+
+            return true;
+        }
+
+        return false;
     }
 
 }

@@ -38,7 +38,7 @@ public class FilterToken extends OncePerRequestFilter {
         try {
             String token;
 
-            var authorizationHeader = request.getHeader("Authorization");
+            String authorizationHeader = request.getHeader("Authorization");
 
             if (authorizationHeader != null) {
                 token = authorizationHeader.replace("Bearer ", "");
