@@ -4,6 +4,5 @@ public class StripeErrorException extends RuntimeException {
     public StripeErrorException(String message) {
         super(message);
     }
-
 }
 

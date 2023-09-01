@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 
+import com.example.demo.dtos.ChangePasswordDTO;
 import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
 import com.example.demo.entities.user.Admin;
@@ -9,6 +10,7 @@ import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
 import com.example.demo.repositories.UserRepository;
+import com.example.demo.services.exceptions.InvalidOldPasswordException;
 import com.example.demo.services.exceptions.UniqueConstraintViolationError;
 import com.example.demo.services.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,7 +40,7 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     private TokenService tokenService;
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordService passwordService;
     @Lazy
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -76,19 +79,19 @@ public class AuthenticationService implements UserDetailsService {
             case Customer -> Customer.builder()
                     .name(registerDTO.getName())
                     .email(registerDTO.getEmail())
-                    .password(passwordEncoder.encode(registerDTO.getPassword()))
+                    .password(passwordService.hashPassword(registerDTO.getPassword()))
                     .role(Role.Customer)
                     .build();
             case Seller -> Seller.builder()
                     .name(registerDTO.getName())
                     .email(registerDTO.getEmail())
-                    .password(passwordEncoder.encode(registerDTO.getPassword()))
+                    .password(passwordService.hashPassword(registerDTO.getPassword()))
                     .role(Role.Seller)
                     .build();
             case Admin -> Admin.builder()
                     .name(registerDTO.getName())
                     .email(registerDTO.getEmail())
-                    .password(passwordEncoder.encode(registerDTO.getPassword()))
+                    .password(passwordService.hashPassword(registerDTO.getPassword()))
                     .role(Role.Admin)
                     .build();
         };

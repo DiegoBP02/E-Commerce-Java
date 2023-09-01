@@ -304,4 +304,15 @@ public class ExceptionHandlers {
         return ResponseEntity.status(status).body(err);
     }
 
+    @ExceptionHandler(InvalidOldPasswordException.class)
+    public ResponseEntity<StandardError> InvalidOldPasswordException
+            (InvalidOldPasswordException  e, HttpServletRequest request) {
+        logger.error("Invalid old password exception:", e);
+        String error = "Invalid password";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(), error,
+                e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
 }

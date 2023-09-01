@@ -19,7 +19,7 @@ public class TestDataBuilder {
     private static final String defaultName = "name";
     private static final String defaultEmail = "email@email.com";
     private static final String defaultCustomerEmail = "customer@email.com";
-    private static final String defaultPassword = "email@email.com";
+    private static final String defaultPassword = "password";
     private static final Role defaultRole = Role.Seller;
     private static final String defaultProductName = "Sample Product";
     private static final String defaultProductDescription = "Sample product description";
@@ -229,6 +229,13 @@ public class TestDataBuilder {
     public static OrderPaymentDTO buildOrderPaymentDTO() {
         return OrderPaymentDTO.builder()
                 .creditCard(CreditCard.pm_card_visa)
+                .build();
+    }
+
+    public static ChangePasswordDTO buildChangePasswordDTO() {
+        return ChangePasswordDTO.builder()
+                .newPassword("newPassword")
+                .oldPassword(defaultPassword)
                 .build();
     }
 }
