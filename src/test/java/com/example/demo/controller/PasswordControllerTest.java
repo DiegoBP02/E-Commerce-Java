@@ -21,6 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.UUID;
 
@@ -55,6 +57,16 @@ class PasswordControllerTest extends ApplicationConfigTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(requestObject));
+    }
+
+    private MockHttpServletRequestBuilder mockPostRequestWithParams
+            (String endpoint, Object requestObject, String paramName, String paramValue)
+            throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .post(PATH + "/" + endpoint)
+                .param(paramName, paramValue)
+                .content(this.objectMapper.writeValueAsString(requestObject))
+                .contentType(MediaType.APPLICATION_JSON);
     }
 
     @Test
@@ -166,12 +178,9 @@ class PasswordControllerTest extends ApplicationConfigTest {
 
     @Test
     void givenValidResetPasswordDTO_whenResetPassword_thenReturnOkWithCorrectMessage() throws Exception {
-        MockHttpServletRequestBuilder mockRequest
-                = MockMvcRequestBuilders
-                .post(PATH + "/reset-password")
-                .param("token", randomToken.toString())
-                .content(this.objectMapper.writeValueAsString(resetPasswordDTO))
-                .contentType(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder mockRequest =
+                mockPostRequestWithParams("reset-password", resetPasswordDTO,
+                        "token", randomToken.toString());
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
@@ -185,12 +194,9 @@ class PasswordControllerTest extends ApplicationConfigTest {
     @Test
     void givenInvalidBody_whenResetPassword_thenHandleMethodArgumentNotValidException() throws Exception {
         ResetPasswordDTO invalidResetPasswordDTO = new ResetPasswordDTO();
-        MockHttpServletRequestBuilder mockRequest
-                = MockMvcRequestBuilders
-                .post(PATH + "/reset-password")
-                .param("token", randomToken.toString())
-                .content(this.objectMapper.writeValueAsString(invalidResetPasswordDTO))
-                .contentType(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder mockRequest =
+                mockPostRequestWithParams("reset-password", invalidResetPasswordDTO,
+                        "token", randomToken.toString());
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isBadRequest())
@@ -206,12 +212,10 @@ class PasswordControllerTest extends ApplicationConfigTest {
         doThrow(InvalidTokenException.class)
                 .when(passwordService)
                 .resetPassword(randomToken, resetPasswordDTO);
-        MockHttpServletRequestBuilder mockRequest
-                = MockMvcRequestBuilders
-                .post(PATH + "/reset-password")
-                .param("token", randomToken.toString())
-                .content(this.objectMapper.writeValueAsString(resetPasswordDTO))
-                .contentType(MediaType.APPLICATION_JSON);
+
+        MockHttpServletRequestBuilder mockRequest =
+                mockPostRequestWithParams("reset-password", resetPasswordDTO,
+                        "token", randomToken.toString());
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isBadRequest())
@@ -221,6 +225,40 @@ class PasswordControllerTest extends ApplicationConfigTest {
 
         verify(passwordService, times(1))
                 .resetPassword(randomToken, resetPasswordDTO);
+    }
+
+    @Test
+    void givenMissingParam_whenResetPassword_thenHandleMissingServletRequestParameterException() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .post(PATH + "/reset-password")
+                .param("token", "")
+                .content(this.objectMapper.writeValueAsString(resetPasswordDTO))
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof MissingServletRequestParameterException));
+
+        verify(passwordService, never()).resetPassword(randomToken, resetPasswordDTO);
+    }
+
+    @Test
+    void givenWrongParan_whenResetPassword_thenHandleMethodArgumentTypeMismatchException() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .post(PATH + "/reset-password")
+                .param("token", "random")
+                .content(this.objectMapper.writeValueAsString(resetPasswordDTO))
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof MethodArgumentTypeMismatchException));
+
+        verify(passwordService, never()).resetPassword(randomToken, resetPasswordDTO);
     }
 
 }

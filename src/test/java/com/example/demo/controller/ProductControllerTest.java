@@ -90,6 +90,15 @@ class ProductControllerTest extends ApplicationConfigTest {
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
+    private MockHttpServletRequestBuilder mockGetRequestWithParams
+            (String endpoint, String paramName, String paramValue)
+            throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .get(PATH + "/" + endpoint)
+                .param(paramName, paramValue)
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
     @Test
     @WithMockUser(authorities = "Seller")
     void givenValidBody_whenCreate_thenReturnProductAndCreated() throws Exception {
@@ -163,10 +172,10 @@ class ProductControllerTest extends ApplicationConfigTest {
         List<Product> products = Collections.singletonList(product);
         when(productService.findByCategory(product.getCategory())).thenReturn(products);
 
-        mockMvc.perform(MockMvcRequestBuilders
-                        .get(PATH + "/category")
-                        .param("productCategory", product.getCategory().toString())
-                        .contentType(MediaType.APPLICATION_JSON))
+        MockHttpServletRequestBuilder mockRequest = mockGetRequestWithParams
+                ("/category","productCategory", product.getCategory().toString());
+
+        mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(products)));
 
@@ -192,10 +201,10 @@ class ProductControllerTest extends ApplicationConfigTest {
         List<Product> products = Collections.singletonList(product);
         when(productService.findByCategory(product.getCategory())).thenReturn(products);
 
-        mockMvc.perform(MockMvcRequestBuilders
-                        .get(PATH + "/category")
-                        .param("productCategory", "random")
-                        .contentType(MediaType.APPLICATION_JSON))
+        MockHttpServletRequestBuilder mockRequest = mockGetRequestWithParams
+                ("/category","productCategory", "random");
+
+        mockMvc.perform(mockRequest)
                 .andExpect(status().isBadRequest())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
