@@ -238,4 +238,16 @@ public class TestDataBuilder {
                 .oldPassword(defaultPassword)
                 .build();
     }
+
+    public static ForgotPasswordDTO buildForgotPasswordDTO() {
+        return ForgotPasswordDTO.builder()
+                .email(defaultEmail)
+                .build();
+    }
+
+    public static ResetPasswordDTO buildResetPasswordDTO() {
+        return ResetPasswordDTO.builder()
+                .password(defaultPassword)
+                .build();
+    }
 }

@@ -193,7 +193,7 @@ public class ExceptionHandlers {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<StandardError> MissingServletRequestParameterException
             (MissingServletRequestParameterException e, HttpServletRequest request) {
-        logger.error("Access denied exception:", e);
+        logger.error("Missing servlet request parameter exception:", e);
         String error = "Missing request parameter";
         HttpStatus status = HttpStatus.BAD_REQUEST;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
@@ -312,6 +312,28 @@ public class ExceptionHandlers {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<StandardError> InvalidTokenException
+            (InvalidTokenException e, HttpServletRequest request) {
+        logger.error("Invalid token exception:", e);
+        String error = "Error during token validation";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(EmailSendException.class)
+    public ResponseEntity<StandardError> EmailSendException
+            (EmailSendException e, HttpServletRequest request) {
+        logger.error("Email send exception:", e);
+        String error = "Error during email sending";
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 

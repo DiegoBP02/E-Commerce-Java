@@ -38,7 +38,8 @@ public class AuthConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(HttpMethod.POST,
-                                        "/auth/register", "/auth/login")
+                                        "/auth/register", "/auth/login",
+                                        "/password/forgot-password", "/password/reset-password")
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET, "/products/**", "/reviews/**")
                                 .permitAll()

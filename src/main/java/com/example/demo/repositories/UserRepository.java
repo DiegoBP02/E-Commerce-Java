@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("UPDATE User SET failedAttempt = ?1 WHERE email = ?2")
     @Modifying
     void updateFailedAttempts(int failAttempts, String email);
+
+    Optional<User> findByResetPasswordToken(UUID token);
 }
