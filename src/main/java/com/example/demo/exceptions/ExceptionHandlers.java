@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.demo.entities.exceptions.NoActiveOrderException;
 import com.example.demo.services.exceptions.*;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -332,6 +333,50 @@ public class ExceptionHandlers {
         logger.error("Email send exception:", e);
         String error = "Error during email sending";
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(UserAlreadyEnabledException.class)
+    public ResponseEntity<StandardError> UserAlreadyEnabledException
+            (UserAlreadyEnabledException e, HttpServletRequest request) {
+        logger.error("User already enabled exception:", e);
+        String error = "User already enabled";
+        HttpStatus status = HttpStatus.CONFLICT;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<StandardError> EntityNotFoundException
+            (EntityNotFoundException e, HttpServletRequest request) {
+        logger.error("Entity not found exception:", e);
+        String error = "Resource not found";
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(ConfirmationTokenAlreadyExistsException.class)
+    public ResponseEntity<StandardError> ConfirmationTokenAlreadyExistsException
+            (ConfirmationTokenAlreadyExistsException e, HttpServletRequest request) {
+        logger.error("Confirmation token already exists exception:", e);
+        String error = "Confirmation token already exists for this user";
+        HttpStatus status = HttpStatus.CONFLICT;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(ConfirmationTokenExpiredException.class)
+    public ResponseEntity<StandardError> ConfirmationTokenExpiredException
+            (ConfirmationTokenExpiredException e, HttpServletRequest request) {
+        logger.error("Confirmation token expired exception:", e);
+        String error = "The confirmation token has expired";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         StandardError err = new StandardError(Instant.now(), status.value(),
                 error, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);

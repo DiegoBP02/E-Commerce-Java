@@ -40,6 +40,7 @@ public abstract class User implements UserDetails {
     private int failedAttempt;
     private LocalDateTime lockTime;
     private UUID resetPasswordToken;
+    private boolean enabled;
 
     public User(String name, String email, String password, Role role) {
         this.name = name;
@@ -86,7 +87,7 @@ public abstract class User implements UserDetails {
     @JsonIgnore
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
 }

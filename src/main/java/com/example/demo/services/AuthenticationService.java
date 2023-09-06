@@ -1,18 +1,19 @@
 package com.example.demo.services;
 
 
-import com.example.demo.dtos.ChangePasswordDTO;
 import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
+import com.example.demo.entities.ConfirmationToken;
 import com.example.demo.entities.user.Admin;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
+import com.example.demo.repositories.ConfirmationTokenRepository;
 import com.example.demo.repositories.UserRepository;
-import com.example.demo.services.exceptions.InvalidOldPasswordException;
-import com.example.demo.services.exceptions.UniqueConstraintViolationError;
-import com.example.demo.services.exceptions.UserNotFoundException;
+import com.example.demo.services.exceptions.*;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,12 +23,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class AuthenticationService implements UserDetailsService {
@@ -44,6 +43,10 @@ public class AuthenticationService implements UserDetailsService {
     @Lazy
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private ConfirmationTokenRepository confirmationTokenRepository;
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
@@ -130,4 +133,69 @@ public class AuthenticationService implements UserDetailsService {
         return false;
     }
 
+    public void confirmationRequest(HttpServletRequest request) {
+        User user = getCurrentUser();
+
+        if (user.isEnabled()) {
+            throw new UserAlreadyEnabledException();
+        }
+
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findByUser(user);
+
+        if (confirmationToken != null) {
+            if (confirmationToken.isTokenExpired()) {
+                confirmationToken.resetToken();
+            } else {
+                throw new ConfirmationTokenAlreadyExistsException(confirmationToken.getTimeUntilExpiration());
+            }
+        } else {
+            confirmationToken = new ConfirmationToken(user);
+        }
+
+        confirmationTokenRepository.save(confirmationToken);
+
+        String subject = "Complete account confirmation!";
+        String tokenLink = getSiteURL(request) + "/confirm-account?token=" + confirmationToken.getConfirmationToken();
+        String content = "<p>Hello,</p>"
+                + "<p>To confirm your account, please click in the link below: </p>"
+                + "<p><a href=\"" + tokenLink + "\">Confirm my account</a></p>";
+
+        emailService.sendEmail(user.getEmail(), subject, content);
+    }
+
+    public void confirmAccount(HttpServletRequest request, UUID token) {
+        ConfirmationToken confirmationToken =
+                confirmationTokenRepository.findByConfirmationToken(token)
+                        .orElseThrow(() -> new EntityNotFoundException("Token not found"));
+
+        User user = userRepository.findByEmail(confirmationToken.getUser().getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found for confirmation token"));
+
+        if (confirmationToken.isTokenExpired()) {
+            confirmationToken.resetToken();
+            String subject = "New confirmation token";
+            String newTokenLink = getSiteURL(request) + "/confirm-account?token=" + confirmationToken.getConfirmationToken();
+            String content = "<p>Hello,</p>"
+                    + "<p>Your previous confirmation token has expired.</p>"
+                    + "Here is a new confirmation token link: "
+                    + "<p><a href=\"" + newTokenLink + "\">Confirm my account</a></p>";
+
+            emailService.sendEmail(user.getEmail(), subject, content);
+            throw new ConfirmationTokenExpiredException();
+        }
+
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        confirmationTokenRepository.deleteById(confirmationToken.getId());
+    }
+
+    private User getCurrentUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    private String getSiteURL(HttpServletRequest request) {
+        String siteURL = request.getRequestURL().toString();
+        return siteURL.replace(request.getServletPath(), "") + "/auth";
+    }
 }

@@ -39,7 +39,8 @@ public class AuthConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(HttpMethod.POST,
                                         "/auth/register", "/auth/login",
-                                        "/password/forgot-password", "/password/reset-password")
+                                        "/password/forgot-password", "/password/reset-password",
+                                        "/auth/confirm-account")
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET, "/products/**", "/reviews/**")
                                 .permitAll()

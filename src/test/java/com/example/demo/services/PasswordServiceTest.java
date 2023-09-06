@@ -116,7 +116,7 @@ class PasswordServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenRequestAndForgotPasswordDTO_whenForgotPassword_thenGenerateTokenAndSendEmail() {
-        String URL = "http://localhost:8080/auth/path";
+        String URL = "http://localhost:8080/path";
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -131,7 +131,7 @@ class PasswordServiceTest extends ApplicationConfigTest {
         String expectedContent = "<p>Hello,</p>"
                 + "<p>You have requested to reset your password.</p>"
                 + "<p>Click the link below to change your password:</p>"
-                + "<p><a href=\"" + "http://localhost:8080/auth/reset-password?token="
+                + "<p><a href=\"" + "http://localhost:8080/password/reset-password?token="
                 + user.getResetPasswordToken() + "\">Change my password</a></p>"
                 + "<br>"
                 + "<p>Ignore this email if you do remember your password, "

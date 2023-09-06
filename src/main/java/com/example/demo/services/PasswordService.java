@@ -81,7 +81,7 @@ public class PasswordService {
 
     private String getSiteURL(HttpServletRequest request) {
         String siteURL = request.getRequestURL().toString();
-        return siteURL.replace(request.getServletPath(), "");
+        return siteURL.replace(request.getServletPath(), "") + "/password";
     }
 
     private void updateResetPasswordToken(String email, UUID token) {

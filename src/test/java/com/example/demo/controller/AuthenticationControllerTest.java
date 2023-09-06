@@ -3,22 +3,36 @@ package com.example.demo.controller;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
-import com.example.demo.services.exceptions.UniqueConstraintViolationError;
+import com.example.demo.entities.Product;
+import com.example.demo.services.exceptions.*;
 import com.example.demo.services.AuthenticationService;
-import com.example.demo.services.exceptions.UserNotFoundException;
 import com.example.demo.utils.TestDataBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -38,21 +52,44 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
     private RegisterDTO registerDTO = TestDataBuilder.buildRegisterDTO();
     private LoginDTO loginDTO = TestDataBuilder.buildLoginDTO();
     private String token = "token";
+    private UUID randomUUID = UUID.randomUUID();
 
-    private MockHttpServletRequestBuilder buildMockRequestPost
+    private MockHttpServletRequestBuilder mockPostRequest
+            (String endpoint) throws Exception {
+        return MockMvcRequestBuilders
+                .post(PATH + "/" + endpoint)
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
+    private MockHttpServletRequestBuilder mockPostRequest
             (String endpoint, Object requestObject) throws Exception {
         return MockMvcRequestBuilders
-                .post(PATH + endpoint)
+                .post(PATH + "/" + endpoint)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(requestObject));
     }
 
+    private MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
+        return MockMvcRequestBuilders
+                .get(PATH + "/" + endpoint)
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
+    private MockHttpServletRequestBuilder mockPostRequestWithParams
+            (String endpoint, String paramName, String paramValue)
+            throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .post(PATH + "/" + endpoint)
+                .param(paramName, paramValue)
+                .contentType(MediaType.APPLICATION_JSON);
+    }
+
     @Test
     void givenValidUser_whenRegister_thenReturnTokenAndOk() throws Exception {
         when(authenticationService.register(registerDTO)).thenReturn(token);
-        MockHttpServletRequestBuilder mockRequest = buildMockRequestPost
-                ("/register", registerDTO);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest
+                ("register", registerDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
@@ -65,8 +102,8 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
     void givenInvalidBody_whenRegister_thenHandleMethodArgumentNotValidException() throws Exception {
         RegisterDTO invalidRegisterDTO = new RegisterDTO();
 
-        MockHttpServletRequestBuilder mockRequest = buildMockRequestPost
-                ("/register", invalidRegisterDTO);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest
+                ("register", invalidRegisterDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isBadRequest())
@@ -83,8 +120,8 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
         when(authenticationService.register(any(RegisterDTO.class)))
                 .thenThrow(UniqueConstraintViolationError.class);
 
-        MockHttpServletRequestBuilder mockRequest = buildMockRequestPost
-                ("/register", registerDTO);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest
+                ("register", registerDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isBadRequest())
@@ -100,8 +137,8 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
         when(authenticationService.login(loginDTO)).thenReturn("token");
 
 
-        MockHttpServletRequestBuilder mockRequest = buildMockRequestPost
-                ("/login", loginDTO);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest
+                ("login", loginDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
@@ -114,8 +151,8 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
     void givenInvalidBody_whenLogin_thenHandleMethodArgumentNotValidException() throws Exception {
         LoginDTO invalidLoginDTO = new LoginDTO();
 
-        MockHttpServletRequestBuilder mockRequest = buildMockRequestPost
-                ("/login", invalidLoginDTO);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest
+                ("login", invalidLoginDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isBadRequest())
@@ -130,8 +167,8 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
     void givenUserDoesNotExists_whenLogin_thenHandleUserNotFoundException() throws Exception {
         when(authenticationService.login(loginDTO)).thenThrow(UserNotFoundException.class);
 
-        MockHttpServletRequestBuilder mockRequest = buildMockRequestPost
-                ("/login", loginDTO);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest
+                ("login", loginDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isUnauthorized())
@@ -146,8 +183,8 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
     void givenInvalidCredentials_whenLogin_thenHandleBadCredentialsException() throws Exception {
         when(authenticationService.login(loginDTO)).thenThrow(BadCredentialsException.class);
 
-        MockHttpServletRequestBuilder mockRequest = buildMockRequestPost
-                ("/login", loginDTO);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest
+                ("login", loginDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isUnauthorized())
@@ -162,8 +199,8 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
     void givenUserIsLocked_whenLogin_thenHandleLockedException() throws Exception {
         when(authenticationService.login(loginDTO)).thenThrow(LockedException.class);
 
-        MockHttpServletRequestBuilder mockRequest = buildMockRequestPost
-                ("/login", loginDTO);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest
+                ("login", loginDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isLocked())
@@ -172,6 +209,205 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
                                 instanceof LockedException));
 
         verify(authenticationService, times(1)).login(loginDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenRequestAndCustomer_whenConfirmationRequest_thenReturnOkWithMessage() throws Exception {
+        MockHttpServletRequestBuilder mockRequest =
+                mockGetRequest("confirmation-request");
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andExpect(content().string("We have sent a confirmation " +
+                        "account link to your email. Please check."));
+
+        verify(authenticationService, times(1))
+                .confirmationRequest(any(HttpServletRequest.class));
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenRequestAndSeller_whenConfirmationRequest_thenReturnOkWithMessage() throws Exception {
+        MockHttpServletRequestBuilder mockRequest =
+                mockGetRequest("confirmation-request");
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andExpect(content().string("We have sent a confirmation " +
+                        "account link to your email. Please check."));
+
+        verify(authenticationService, times(1))
+                .confirmationRequest(any(HttpServletRequest.class));
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenUserAlreadyEnabled_whenConfirmationRequest_thenHandleUserAlreadyEnabledException() throws Exception {
+        doThrow(UserAlreadyEnabledException.class).when(authenticationService)
+                .confirmationRequest(any(HttpServletRequest.class));
+
+        MockHttpServletRequestBuilder mockRequest =
+                mockGetRequest("confirmation-request");
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isConflict())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof UserAlreadyEnabledException));
+
+        verify(authenticationService, times(1))
+                .confirmationRequest(any(HttpServletRequest.class));
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenConfirmationTokenAlreadyExists_whenConfirmationRequest_thenHandleConfirmationTokenAlreadyExistsException() throws Exception {
+        doThrow(ConfirmationTokenAlreadyExistsException.class).when(authenticationService)
+                .confirmationRequest(any(HttpServletRequest.class));
+
+        MockHttpServletRequestBuilder mockRequest =
+                mockGetRequest("confirmation-request");
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isConflict())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ConfirmationTokenAlreadyExistsException));
+
+        verify(authenticationService, times(1))
+                .confirmationRequest(any(HttpServletRequest.class));
+    }
+
+    @Test
+    void givenNoUser_whenConfirmationRequest_thenReturnStatus403Forbidden() throws Exception {
+        MockHttpServletRequestBuilder mockRequest =
+                mockGetRequest("confirmation-request");
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertEquals("Access Denied",
+                                result.getResponse().getErrorMessage()));
+
+        verifyNoInteractions(authenticationService);
+    }
+
+    @Test
+    @WithMockUser(authorities = "random")
+    void givenInvalidUserAuthority_whenConfirmationRequest_thenHandleAccessDeniedException() throws Exception {
+        MockHttpServletRequestBuilder mockRequest =
+                mockGetRequest("confirmation-request");
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verifyNoInteractions(authenticationService);
+    }
+
+    @Test
+    void givenRequestAndToken_whenConfirmAccount_thenReturnOkWithMessage() throws Exception {
+        MockHttpServletRequestBuilder mockRequest =
+                mockPostRequestWithParams
+                        ("confirm-account", "token", randomUUID.toString());
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .string("You have successfully confirmed your account."));
+
+        verify(authenticationService, times(1))
+                .confirmAccount(any(HttpServletRequest.class), eq(randomUUID));
+    }
+
+    @Test
+    void givenConfirmationTokenNotFound_whenConfirmAccount_thenHandleEntityNotFoundException() throws Exception {
+        doThrow(EntityNotFoundException.class).when(authenticationService)
+                .confirmAccount(any(HttpServletRequest.class),eq(randomUUID));
+
+        MockHttpServletRequestBuilder mockRequest =
+                mockPostRequestWithParams
+                        ("confirm-account", "token", randomUUID.toString());
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isNotFound())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof EntityNotFoundException));
+
+        verify(authenticationService, times(1))
+                .confirmAccount(any(HttpServletRequest.class), eq(randomUUID));
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenUserNotFound_whenConfirmAccount_thenHandleUserNotFoundException() throws Exception {
+        doThrow(UserNotFoundException.class).when(authenticationService)
+                .confirmAccount(any(HttpServletRequest.class),eq(randomUUID));
+
+        MockHttpServletRequestBuilder mockRequest =
+                mockPostRequestWithParams
+                        ("confirm-account", "token", randomUUID.toString());
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof UserNotFoundException));
+
+        verify(authenticationService, times(1))
+                .confirmAccount(any(HttpServletRequest.class), eq(randomUUID));
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenConfirmationTokenExpired_whenConfirmAccount_thenHandleConfirmationTokenExpiredException() throws Exception {
+        doThrow(ConfirmationTokenExpiredException.class).when(authenticationService)
+                .confirmAccount(any(HttpServletRequest.class),eq(randomUUID));
+
+        MockHttpServletRequestBuilder mockRequest =
+                mockPostRequestWithParams
+                        ("confirm-account", "token", randomUUID.toString());
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ConfirmationTokenExpiredException));
+
+        verify(authenticationService, times(1))
+                .confirmAccount(any(HttpServletRequest.class), eq(randomUUID));
+    }
+
+    @Test
+    void givenMissingParam_whenConfirmAccount_thenHandleMissingServletRequestParameterException() throws Exception {
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest("confirm-account");
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof MissingServletRequestParameterException));
+
+        verifyNoInteractions(authenticationService);
+    }
+
+    @Test
+    void givenInvalidParam_whenConfirmAccount_thenHandleMethodArgumentTypeMismatchException() throws Exception {
+        MockHttpServletRequestBuilder mockRequest =
+                mockPostRequestWithParams
+                        ("confirm-account", "token", "random");
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof MethodArgumentTypeMismatchException));
+
+        verifyNoInteractions(authenticationService);
     }
 
 }
