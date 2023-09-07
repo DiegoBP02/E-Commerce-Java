@@ -4,6 +4,7 @@ package com.example.demo.exceptions;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.demo.config.exceptions.UserNotEnabledException;
 import com.example.demo.entities.exceptions.NoActiveOrderException;
 import com.example.demo.services.exceptions.*;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -18,7 +19,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -377,6 +377,17 @@ public class ExceptionHandlers {
         logger.error("Confirmation token expired exception:", e);
         String error = "The confirmation token has expired";
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(UserNotEnabledException.class)
+    public ResponseEntity<StandardError> UserNotEnabledException
+            (UserNotEnabledException e, HttpServletRequest request) {
+        logger.error("User not enabled exception:", e);
+        String error = "User not enabled. Only enabled users can access this route.";
+        HttpStatus status = HttpStatus.FORBIDDEN;
         StandardError err = new StandardError(Instant.now(), status.value(),
                 error, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);

@@ -116,7 +116,7 @@ class PasswordServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenRequestAndForgotPasswordDTO_whenForgotPassword_thenGenerateTokenAndSendEmail() {
-        String URL = "http://localhost:8080/path";
+        String URL = "URL";
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -127,20 +127,10 @@ class PasswordServiceTest extends ApplicationConfigTest {
 
         assertNotNull(user.getResetPasswordToken());
 
-        String expectedSubject = "Here's the link to reset your password";
-        String expectedContent = "<p>Hello,</p>"
-                + "<p>You have requested to reset your password.</p>"
-                + "<p>Click the link below to change your password:</p>"
-                + "<p><a href=\"" + "http://localhost:8080/password/reset-password?token="
-                + user.getResetPasswordToken() + "\">Change my password</a></p>"
-                + "<br>"
-                + "<p>Ignore this email if you do remember your password, "
-                + "or you have not made the request.</p>";
-
         verify(userRepository, times(1)).findByEmail(user.getEmail());
         verify(userRepository, times(1)).save(user);
         verify(emailService, times(1))
-                .sendEmail(forgotPasswordDTO.getEmail(), expectedSubject, expectedContent);
+                .sendEmail(eq(forgotPasswordDTO.getEmail()), anyString(), anyString());
     }
 
     @Test

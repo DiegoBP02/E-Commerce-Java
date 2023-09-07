@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -25,6 +27,9 @@ public class AuthConfig {
 
     @Autowired
     private FilterToken filterToken;
+
+    @Autowired
+    private CustomFilter customFilter;
 
     @Lazy
     @Autowired
@@ -47,6 +52,7 @@ public class AuthConfig {
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(filterToken, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(customFilter, AuthorizationFilter.class)
                 .authenticationProvider(customAuthenticationProvider)
                 .build();
     }

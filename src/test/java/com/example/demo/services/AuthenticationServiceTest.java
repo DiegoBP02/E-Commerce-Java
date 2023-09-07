@@ -58,7 +58,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
     private Authentication authentication;
     private SecurityContext securityContext;
     private HttpServletRequest request = mock(HttpServletRequest.class);
-    private String URL = "http://localhost:8080/auth/path";
+    private String URL = "URL";
 
     private User user = TestDataBuilder.buildUser();
     private RegisterDTO registerDTO = TestDataBuilder.buildRegisterDTO();

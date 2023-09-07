@@ -3,6 +3,7 @@ package com.example.demo.config;
 import com.example.demo.entities.user.User;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.services.TokenService;
+import com.example.demo.services.exceptions.UserNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,8 +46,8 @@ public class FilterToken extends OncePerRequestFilter {
                 String subject = tokenService.getSubject(token);
 
                 User user = userRepository.findByEmail(subject)
-                        .orElseThrow(() -> new UsernameNotFoundException(
-                                ("Email not found: " + subject)));
+                        .orElseThrow(() -> new UserNotFoundException(
+                                ("User not found with email: " + subject)));
 
                 Authentication authentication = new UsernamePasswordAuthenticationToken
                         (user, null, user.getAuthorities());
