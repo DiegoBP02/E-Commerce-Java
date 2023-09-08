@@ -36,10 +36,21 @@ public abstract class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role", insertable = false, updatable = false)
     private Role role;
+    @ToString.Exclude
+    @JsonIgnore
     private boolean accountNonLocked;
+    @ToString.Exclude
+    @JsonIgnore
     private int failedAttempt;
+    @ToString.Exclude
+    @JsonIgnore
     private LocalDateTime lockTime;
+    @ToString.Exclude
+    @JsonIgnore
+    @Column(unique = true)
     private UUID resetPasswordToken;
+    @ToString.Exclude
+    @JsonIgnore
     private boolean enabled;
 
     public User(String name, String email, String password, Role role) {
@@ -48,8 +59,6 @@ public abstract class User implements UserDetails {
         this.password = password;
         this.role = role;
         this.accountNonLocked = true;
-        this.lockTime = null;
-        this.resetPasswordToken = null;
     }
 
     @JsonIgnore

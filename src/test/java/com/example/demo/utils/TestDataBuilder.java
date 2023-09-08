@@ -35,7 +35,6 @@ public class TestDataBuilder {
                 .name(defaultName)
                 .email(defaultEmail)
                 .password(defaultPassword)
-                .role(defaultRole)
                 .build();
     }
 
@@ -44,7 +43,6 @@ public class TestDataBuilder {
                 .name(defaultName)
                 .email(defaultEmail)
                 .password(defaultPassword)
-                .role(defaultRole)
                 .build();
         seller.setId(UUID.randomUUID());
         return seller;
@@ -55,7 +53,6 @@ public class TestDataBuilder {
                 .name(defaultName)
                 .email(defaultCustomerEmail)
                 .password(defaultPassword)
-                .role(Role.Customer)
                 .build();
         customer.setId(UUID.randomUUID());
         return customer;
@@ -66,7 +63,6 @@ public class TestDataBuilder {
                 .name(defaultName)
                 .email(defaultCustomerEmail)
                 .password(defaultPassword)
-                .role(Role.Customer)
                 .build();
     }
 
@@ -215,6 +211,17 @@ public class TestDataBuilder {
                 .creditCard(defaultCreditCard)
                 .paymentAmount(defaultProductPrice)
                 .build();
+    }
+
+    public static OrderHistory buildOrderHistoryWithId(Order order) {
+        OrderHistory orderHistory = OrderHistory.builder()
+                .order(order)
+                .customer(order.getCustomer())
+                .creditCard(defaultCreditCard)
+                .paymentAmount(defaultProductPrice)
+                .build();
+        orderHistory.setId(UUID.randomUUID());
+        return orderHistory;
     }
 
     public static OrderHistoryDTO buildOrderHistoryDTO(Order order) {

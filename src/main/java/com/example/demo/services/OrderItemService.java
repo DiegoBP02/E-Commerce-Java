@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+import static com.example.demo.config.utils.GetCurrentUser.getCurrentUser;
 import static com.example.demo.services.utils.CheckOwnership.checkOwnership;
 
 @Service
@@ -110,10 +111,6 @@ public class OrderItemService {
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException(e.getMessage());
         }
-    }
-
-    private User getCurrentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }

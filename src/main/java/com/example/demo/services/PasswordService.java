@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+import static com.example.demo.config.utils.GetCurrentUser.getCurrentUser;
+
 @Service
 public class PasswordService {
 
@@ -54,10 +56,6 @@ public class PasswordService {
 
     private boolean isPasswordMatch(String rawPassword, String hashedPassword) {
         return passwordEncoder.matches(rawPassword, hashedPassword);
-    }
-
-    private User getCurrentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     public void forgotPassword(HttpServletRequest request, ForgotPasswordDTO forgotPasswordDTO) {

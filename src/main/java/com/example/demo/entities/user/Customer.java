@@ -40,8 +40,8 @@ public class Customer extends User {
     private List<OrderHistory> orderHistory = new ArrayList<>();
 
     @Builder
-    public Customer(String name, String email, String password, Role role) {
-        super(name, email, password, role);
+    public Customer(String name, String email, String password) {
+        super(name, email, password, Role.Customer);
     }
 
     @JsonIgnore

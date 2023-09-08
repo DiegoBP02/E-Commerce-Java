@@ -16,6 +16,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.example.demo.config.utils.GetCurrentUser.getCurrentUserDetails;
+
 @Component
 public class CustomFilter extends OncePerRequestFilter {
 
@@ -29,7 +31,7 @@ public class CustomFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        UserDetails user = getCurrentUser();
+        UserDetails user = getCurrentUserDetails();
 
         if(!user.isEnabled()){
             throw new UserNotEnabledException();
@@ -46,7 +48,4 @@ public class CustomFilter extends OncePerRequestFilter {
         return productRequestMatcher.matches(request) && paymentRequestMatcher.matches(request);
     }
 
-    private UserDetails getCurrentUser(){
-        return (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
 }

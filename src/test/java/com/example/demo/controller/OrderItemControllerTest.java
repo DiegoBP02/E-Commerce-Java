@@ -71,7 +71,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
-    private MockHttpServletRequestBuilder mockPathRequest
+    private MockHttpServletRequestBuilder mockPatchRequest
             (String endpoint, Object requestObject) throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .patch(PATH + "/" + endpoint)
@@ -299,7 +299,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     void givenValidBodyAndUser_whenUpdate_thenReturnOrderItem() throws Exception {
         when(orderItemService.update(orderItem.getId(), orderItemDTO)).thenReturn(orderItem);
 
-        mockMvc.perform(mockPathRequest(orderItem.getId().toString(), orderItemDTO))
+        mockMvc.perform(mockPatchRequest(orderItem.getId().toString(), orderItemDTO))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(orderItem)));
 
@@ -312,7 +312,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
         when(orderItemService.update(orderItem.getId(), orderItemDTO))
                 .thenThrow(ResourceNotFoundException.class);
 
-        mockMvc.perform(mockPathRequest(orderItem.getId().toString(), orderItemDTO))
+        mockMvc.perform(mockPatchRequest(orderItem.getId().toString(), orderItemDTO))
                 .andExpect(status().isNotFound())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
@@ -324,7 +324,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     @Test
     @WithMockUser(authorities = "Customer")
     void givenInvalidBody_whenUpdate_thenHandleMethodArgumentNotValidException() throws Exception {
-        mockMvc.perform(mockPathRequest(orderItem.getId().toString(), invalidOrderItemDTO))
+        mockMvc.perform(mockPatchRequest(orderItem.getId().toString(), invalidOrderItemDTO))
                 .andExpect(status().isBadRequest())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
@@ -335,7 +335,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
 
     @Test
     void givenNoUser_whenUpdate_thenReturnStatus403Forbidden() throws Exception {
-        mockMvc.perform(mockPathRequest(orderItem.getId().toString(), orderItemDTO))
+        mockMvc.perform(mockPatchRequest(orderItem.getId().toString(), orderItemDTO))
                 .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertEquals("Access Denied",
@@ -347,7 +347,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     @Test
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenUpdate_thenHandleAccessDeniedException() throws Exception {
-        mockMvc.perform(mockPathRequest(orderItem.getId().toString(), orderItemDTO))
+        mockMvc.perform(mockPatchRequest(orderItem.getId().toString(), orderItemDTO))
                 .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()

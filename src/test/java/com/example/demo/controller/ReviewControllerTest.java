@@ -75,7 +75,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
-    private MockHttpServletRequestBuilder mockPathRequest
+    private MockHttpServletRequestBuilder mockPatchRequest
             (String endpoint, Object requestObject) throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .patch(PATH + "/" + endpoint)
@@ -188,7 +188,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     void givenValidBodyAndUser_whenUpdate_thenReturnReview() throws Exception {
         when(reviewService.update(review.getId(), updateReviewDTO)).thenReturn(review);
 
-        mockMvc.perform(mockPathRequest(review.getId().toString(), updateReviewDTO))
+        mockMvc.perform(mockPatchRequest(review.getId().toString(), updateReviewDTO))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(review)));
 
@@ -201,7 +201,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
         when(reviewService.update(review.getId(), updateReviewDTO))
                 .thenThrow(ResourceNotFoundException.class);
 
-        mockMvc.perform(mockPathRequest(review.getId().toString(), updateReviewDTO))
+        mockMvc.perform(mockPatchRequest(review.getId().toString(), updateReviewDTO))
                 .andExpect(status().isNotFound())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
@@ -213,7 +213,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     @Test
     @WithMockUser(authorities = "Customer")
     void givenInvalidBody_whenUpdate_thenHandleMethodArgumentNotValidException() throws Exception {
-        mockMvc.perform(mockPathRequest(review.getId().toString(), invalidReviewDTO))
+        mockMvc.perform(mockPatchRequest(review.getId().toString(), invalidReviewDTO))
                 .andExpect(status().isBadRequest())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
@@ -224,7 +224,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
 
     @Test
     void givenNoUser_whenUpdate_thenReturnStatus403Forbidden() throws Exception {
-        mockMvc.perform(mockPathRequest(review.getId().toString(), updateReviewDTO))
+        mockMvc.perform(mockPatchRequest(review.getId().toString(), updateReviewDTO))
                 .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertEquals("Access Denied",
@@ -236,7 +236,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     @Test
     @WithMockUser(authorities = "random")
     void givenInvalidUserAuthority_whenUpdate_thenHandleAccessDeniedException() throws Exception {
-        mockMvc.perform(mockPathRequest(review.getId().toString(), updateReviewDTO))
+        mockMvc.perform(mockPatchRequest(review.getId().toString(), updateReviewDTO))
                 .andExpect(status().isForbidden())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()

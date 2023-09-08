@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.example.demo.config.utils.GetCurrentUser.getCurrentUser;
 import static com.example.demo.services.utils.CheckOwnership.checkOwnership;
 
 @Service
@@ -134,7 +135,4 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    private User getCurrentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
 }

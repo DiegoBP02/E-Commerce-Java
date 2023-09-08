@@ -25,8 +25,8 @@ public class Seller extends User {
     private List<Product> products = new ArrayList<>();
 
     @Builder
-    public Seller(String name, String email, String password, Role role) {
-        super(name, email, password, role);
+    public Seller(String name, String email, String password) {
+        super(name, email, password, Role.Seller);
     }
 
 }

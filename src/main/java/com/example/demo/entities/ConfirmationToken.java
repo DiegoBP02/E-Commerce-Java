@@ -44,7 +44,7 @@ public class ConfirmationToken {
         this.user = user;
         createdDate = Instant.now();
         confirmationToken = UUID.randomUUID();
-        this.expiryDate = createdDate.plusSeconds(EXPIRATION_TIME_IN_SECONDS); // 30 min
+        this.expiryDate = createdDate.plusSeconds(EXPIRATION_TIME_IN_SECONDS);
     }
 
     public boolean isTokenExpired() {

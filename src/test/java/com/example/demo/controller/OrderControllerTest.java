@@ -63,15 +63,6 @@ class OrderControllerTest extends ApplicationConfigTest {
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
-    private MockHttpServletRequestBuilder mockPathRequest
-            (String endpoint, Object requestObject) throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .patch(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(requestObject));
-    }
-
     private MockHttpServletRequestBuilder mockDeleteRequest(String endpoint) {
         return MockMvcRequestBuilders
                 .delete(PATH + "/" + endpoint)

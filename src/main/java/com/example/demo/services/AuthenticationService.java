@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.example.demo.config.utils.GetCurrentUser.getCurrentUser;
+
 @Service
 public class AuthenticationService implements UserDetailsService {
 
@@ -83,19 +85,16 @@ public class AuthenticationService implements UserDetailsService {
                     .name(registerDTO.getName())
                     .email(registerDTO.getEmail())
                     .password(passwordService.hashPassword(registerDTO.getPassword()))
-                    .role(Role.Customer)
                     .build();
             case Seller -> Seller.builder()
                     .name(registerDTO.getName())
                     .email(registerDTO.getEmail())
                     .password(passwordService.hashPassword(registerDTO.getPassword()))
-                    .role(Role.Seller)
                     .build();
             case Admin -> Admin.builder()
                     .name(registerDTO.getName())
                     .email(registerDTO.getEmail())
                     .password(passwordService.hashPassword(registerDTO.getPassword()))
-                    .role(Role.Admin)
                     .build();
         };
     }
@@ -188,10 +187,6 @@ public class AuthenticationService implements UserDetailsService {
         userRepository.save(user);
 
         confirmationTokenRepository.deleteById(confirmationToken.getId());
-    }
-
-    private User getCurrentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     private String getSiteURL(HttpServletRequest request) {
