@@ -137,7 +137,7 @@ class OrderServiceTest extends ApplicationConfigTest {
 
         assertEquals(order, result);
 
-        verifyNoAuthentication();
+        verifyAuthentication();
         verify(orderRepository, times(1)).findById(order.getId());
     }
 
@@ -147,7 +147,22 @@ class OrderServiceTest extends ApplicationConfigTest {
 
         assertThrows(ResourceNotFoundException.class, () -> orderService.findById(order.getId()));
 
-        verifyNoAuthentication();
+        verifyAuthentication();
+        verify(orderRepository, times(1)).findById(order.getId());
+    }
+
+    @Test
+    void givenUserIsNotTheOwnerOfTheOrder_whenFindById_thenThrowUnauthorizedAccessException() {
+        Customer customerMock = mock(Customer.class);
+        when(customerMock.getId()).thenReturn(UUID.randomUUID());
+        Order orderMock = mock(Order.class);
+        when(orderMock.getCustomer()).thenReturn(customerMock);
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(orderMock));
+
+        assertThrows(UnauthorizedAccessException.class,
+                () -> orderService.findById(order.getId()));
+
+        verifyAuthentication();
         verify(orderRepository, times(1)).findById(order.getId());
     }
 

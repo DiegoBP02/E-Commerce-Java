@@ -14,8 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemDTO {
-    @NotNull
-    private UUID orderId;
 
     @NotNull
     private UUID productId;

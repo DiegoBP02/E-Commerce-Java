@@ -12,7 +12,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,7 +34,7 @@ public class OrderItemService {
 
     public OrderItem create(OrderItemDTO orderItemDTO) {
         User user = getCurrentUser();
-        Order order = orderService.findById(orderItemDTO.getOrderId());
+        Order order = orderService.findActiveOrderByCurrentUser();
         checkOwnership(user, order.getCustomer().getId());
 
         OrderItem existingOrderItem = findExistingItem(order, orderItemDTO.getProductId());

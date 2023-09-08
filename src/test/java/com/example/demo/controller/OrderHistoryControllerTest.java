@@ -43,16 +43,6 @@ class OrderHistoryControllerTest extends ApplicationConfigTest {
     private Customer customer = TestDataBuilder.buildCustomer();
     private Order order = TestDataBuilder.buildOrder(customer);
     private OrderHistory orderHistory = TestDataBuilder.buildOrderHistoryWithId(order);
-    private OrderHistoryDTO orderHistoryDTO = TestDataBuilder.buildOrderHistoryDTO(order);
-
-    private MockHttpServletRequestBuilder mockPostRequest
-            (Object requestObject) throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .post(PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(requestObject));
-    }
 
     private MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
         return MockMvcRequestBuilders

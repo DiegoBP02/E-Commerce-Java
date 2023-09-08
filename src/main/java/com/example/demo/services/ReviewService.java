@@ -59,6 +59,13 @@ public class ReviewService {
                 .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
+    public Page<Review> findAllByProduct(UUID productId, Integer pageNo, Integer pageSize, String sortBy) {
+        Product product = productService.findById(productId);
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+        return reviewRepository.findAllByProduct(product, paging);
+    }
+
     public Review update(UUID id, UpdateReviewDTO obj) {
         try {
             Review entity = reviewRepository.getReferenceById(id);

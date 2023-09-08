@@ -1,12 +1,11 @@
 package com.example.demo.config;
 
 import com.example.demo.config.exceptions.UserNotEnabledException;
-import com.example.demo.entities.user.User;
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
@@ -33,7 +32,7 @@ public class CustomFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         UserDetails user = getCurrentUserDetails();
 
-        if(!user.isEnabled()){
+        if (!user.isEnabled()) {
             throw new UserNotEnabledException();
         }
 

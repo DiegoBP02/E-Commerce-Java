@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.ReviewDTO;
 import com.example.demo.dtos.UpdateReviewDTO;
+import com.example.demo.entities.OrderHistory;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Customer;
@@ -181,6 +182,21 @@ class ReviewControllerTest extends ApplicationConfigTest {
                                 instanceof ResourceNotFoundException));
 
         verify(reviewService, times(1)).findById(review.getId());
+    }
+
+    @Test
+    void givenReview_whenFindAllByProduct_thenReturnReviewPage() throws Exception {
+        Page<Review> reviewPage = mock(PageImpl.class);
+
+        when(reviewService.findAllByProduct(product.getId(),0, 5, "rating"))
+                .thenReturn(reviewPage);
+
+        mockMvc.perform(mockGetRequest("/product/" + product.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(reviewPage)));
+
+        verify(reviewService, times(1))
+                .findAllByProduct(product.getId(),0, 5, "rating");
     }
 
     @Test

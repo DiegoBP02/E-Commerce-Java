@@ -274,7 +274,7 @@ public class ExceptionHandlers {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<StandardError> UserNotFoundException
-            (UserNotFoundException  e, HttpServletRequest request) {
+            (UserNotFoundException e, HttpServletRequest request) {
         logger.error("User not found exception:", e);
         String error = "User not found";
         HttpStatus status = HttpStatus.UNAUTHORIZED;
@@ -285,7 +285,7 @@ public class ExceptionHandlers {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<StandardError> BadCredentialsException
-            (BadCredentialsException  e, HttpServletRequest request) {
+            (BadCredentialsException e, HttpServletRequest request) {
         logger.error("Bad credentials exception:", e);
         String error = "Bad credentials";
         HttpStatus status = HttpStatus.UNAUTHORIZED;
@@ -296,7 +296,7 @@ public class ExceptionHandlers {
 
     @ExceptionHandler(LockedException.class)
     public ResponseEntity<StandardError> LockedException
-            (LockedException  e, HttpServletRequest request) {
+            (LockedException e, HttpServletRequest request) {
         logger.error("Locked exception:", e);
         String error = "Locked account";
         HttpStatus status = HttpStatus.LOCKED;
@@ -307,7 +307,7 @@ public class ExceptionHandlers {
 
     @ExceptionHandler(InvalidOldPasswordException.class)
     public ResponseEntity<StandardError> InvalidOldPasswordException
-            (InvalidOldPasswordException  e, HttpServletRequest request) {
+            (InvalidOldPasswordException e, HttpServletRequest request) {
         logger.error("Invalid old password exception:", e);
         String error = "Invalid password";
         HttpStatus status = HttpStatus.BAD_REQUEST;

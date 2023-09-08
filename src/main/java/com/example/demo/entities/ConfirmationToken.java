@@ -25,7 +25,7 @@ public class ConfirmationToken {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "confirmation_token", unique = true,nullable = false)
+    @Column(name = "confirmation_token", unique = true, nullable = false)
     private UUID confirmationToken;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
@@ -52,7 +52,7 @@ public class ConfirmationToken {
         return currentTime.isAfter(expiryDate);
     }
 
-    public void resetToken(){
+    public void resetToken() {
         this.createdDate = Instant.now();
         this.confirmationToken = UUID.randomUUID();
         this.expiryDate = Instant.now().plusSeconds(EXPIRATION_TIME_IN_SECONDS);

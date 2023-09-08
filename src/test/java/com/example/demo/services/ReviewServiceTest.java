@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.ReviewDTO;
 import com.example.demo.dtos.UpdateReviewDTO;
+import com.example.demo.entities.OrderHistory;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Customer;
@@ -107,6 +108,24 @@ class ReviewServiceTest extends ApplicationConfigTest {
         verify(productService, times(1)).findById(reviewDTO.getProductId());
         verifyNoAuthentication();
         verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    void givenPaging_whenFindAllByCustomer_ThenReturnOrderHistoryPage() {
+        when(productService.findById(product.getId())).thenReturn(product);
+        when(reviewRepository.findAllByProduct(product, reviewPage.getPageable()))
+                .thenReturn(reviewPage);
+
+        Page<Review> result = reviewService
+                .findAllByProduct(product.getId(),
+                        reviewPage.getPageable().getPageNumber(),
+                        reviewPage.getPageable().getPageSize(),
+                        reviewPage.getPageable().getSort().stream().toList().get(0).getProperty());
+
+        assertEquals(reviewPage, result);
+
+        verify(reviewRepository, times(1))
+                .findAllByProduct(product, reviewPage.getPageable());
     }
 
     @Test

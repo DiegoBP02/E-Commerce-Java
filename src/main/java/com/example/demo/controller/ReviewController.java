@@ -50,6 +50,16 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewService.findById(id));
     }
 
+    @GetMapping(value = "/product/{productId}")
+    public ResponseEntity<Page<Review>> findAllByProduct(
+            @PathVariable UUID productId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "rating") String sortBy
+    ) {
+        return ResponseEntity.ok().body(reviewService.findAllByProduct(productId, pageNo, pageSize, sortBy));
+    }
+
     @PreAuthorize("hasAuthority('Customer')")
     @PatchMapping(value = "/{id}")
     public ResponseEntity<Review> update(@PathVariable UUID id,

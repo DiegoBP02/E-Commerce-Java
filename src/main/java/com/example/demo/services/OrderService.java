@@ -13,7 +13,6 @@ import com.example.demo.services.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,8 +67,11 @@ public class OrderService {
     }
 
     public Order findById(UUID id) {
-        return orderRepository.findById(id)
+        User user = getCurrentUser();
+        Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
+        checkOwnership(user, order.getCustomer().getId());
+        return order;
     }
 
     public Order findActiveOrderByCurrentUser() {

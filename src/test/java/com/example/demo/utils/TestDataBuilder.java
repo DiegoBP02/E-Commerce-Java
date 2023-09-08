@@ -115,13 +115,14 @@ public class TestDataBuilder {
     }
 
     public static Review buildReview(Product product, Customer customer) {
-        return Review.builder()
-                .id(UUID.randomUUID())
+        Review review = Review.builder()
                 .product(product)
                 .comment(defaultReviewComment)
                 .rating(defaultReviewRating)
                 .customer(customer)
                 .build();
+        review.setId(UUID.randomUUID());
+        return review;
     }
 
     public static ReviewDTO buildReviewDTO() {
@@ -199,7 +200,6 @@ public class TestDataBuilder {
     public static OrderItemDTO buildOrderItemDTO() {
         return OrderItemDTO.builder()
                 .quantity(defaultOrderItemQuantity)
-                .orderId(UUID.randomUUID())
                 .productId(UUID.randomUUID())
                 .build();
     }

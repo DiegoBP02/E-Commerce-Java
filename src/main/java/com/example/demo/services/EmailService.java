@@ -31,7 +31,7 @@ public class EmailService {
 
             javaMailSender.send(message);
         } catch (MessagingException e) {
-                throw new EmailSendException("Failed to send email: " + e.getMessage());
+            throw new EmailSendException("Failed to send email: " + e.getMessage());
         }
     }
 }

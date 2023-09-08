@@ -41,7 +41,7 @@ public class AuthenticationController {
 
     @PostMapping(value = "/confirm-account")
     public ResponseEntity<String> confirmAccount(HttpServletRequest request, @RequestParam UUID token) throws Exception {
-        authenticationService.confirmAccount(request,token);
+        authenticationService.confirmAccount(request, token);
 
         return ResponseEntity.ok().body("You have successfully confirmed your account.");
     }
