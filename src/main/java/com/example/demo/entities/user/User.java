@@ -1,6 +1,7 @@
 package com.example.demo.entities.user;
 
 import com.example.demo.enums.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,7 +48,9 @@ public abstract class User implements UserDetails {
     private int failedAttempt;
     @ToString.Exclude
     @JsonIgnore
-    private LocalDateTime lockTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+    private Instant lockTime;
     @ToString.Exclude
     @JsonIgnore
     @Column(unique = true)

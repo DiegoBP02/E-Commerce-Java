@@ -24,7 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import static com.example.demo.config.utils.GetCurrentUser.getCurrentUser;
@@ -109,14 +109,14 @@ public class AuthenticationService implements UserDetailsService {
 
     public void lock(User user) {
         user.setAccountNonLocked(false);
-        user.setLockTime(LocalDateTime.now());
+        user.setLockTime(Instant.now());
 
         userRepository.save(user);
     }
 
     public boolean isLockTimeExpired(User user) {
-        LocalDateTime lockTime = user.getLockTime();
-        LocalDateTime currentTime = LocalDateTime.now();
+        Instant lockTime = user.getLockTime();
+        Instant currentTime = Instant.now();
 
         if (lockTime.plusSeconds(LOCK_TIME_DURATION_SECONDS).isBefore(currentTime)) {
             user.setAccountNonLocked(true);

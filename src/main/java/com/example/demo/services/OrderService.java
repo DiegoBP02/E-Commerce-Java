@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +51,7 @@ public class OrderService {
             }
 
             Order order = Order.builder()
-                    .orderDate(LocalDateTime.now())
+                    .orderDate(Instant.now())
                     .customer(user)
                     .status(OrderStatus.Active)
                     .items(new ArrayList<>())

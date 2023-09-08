@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -116,7 +117,7 @@ class StripeServiceTest extends ApplicationConfigTest {
                 .thenReturn(mockCustomerBalanceTransaction);
 
         PaymentResponse expectedResult = PaymentResponse.builder()
-                .createdAt(mockCustomerBalanceTransaction.getCreated())
+                .createdAt(Instant.ofEpochSecond(mockCustomerBalanceTransaction.getCreated()))
                 .amount(BigDecimal.valueOf(mockCustomerBalanceTransaction.getAmount() / 100.0))
                 .endingBalance(BigDecimal.valueOf(mockCustomerBalanceTransaction.getEndingBalance() / 100.0))
                 .build();

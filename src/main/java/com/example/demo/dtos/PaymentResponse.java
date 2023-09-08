@@ -1,33 +1,27 @@
 package com.example.demo.dtos;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class PaymentResponse {
-    private LocalDateTime paymentCreatedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+    private Instant paymentCreatedAt;
     private BigDecimal amount;
     private BigDecimal endingBalance;
 
     @Builder
-    public PaymentResponse(long createdAt, BigDecimal amount, BigDecimal endingBalance) {
-        this.paymentCreatedAt = formatDate(createdAt);
+    public PaymentResponse(Instant createdAt, BigDecimal amount, BigDecimal endingBalance) {
+        this.paymentCreatedAt = createdAt;
         this.amount = amount;
         this.endingBalance = endingBalance;
-    }
-
-    private LocalDateTime formatDate(long unixDate) {
-        Instant instant = Instant.ofEpochSecond(unixDate);
-        return instant.atZone(ZoneId.of("UTC")).toLocalDateTime();
     }
 
 }

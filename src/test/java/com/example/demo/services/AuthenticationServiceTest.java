@@ -217,14 +217,14 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
         authenticationService.lock(user);
 
         assertFalse(user.isAccountNonLocked());
-        assertThat(user.getLockTime()).isCloseTo(LocalDateTime.now(), temporalUnitOffset);
+        assertThat(user.getLockTime()).isCloseTo(Instant.now(), temporalUnitOffset);
 
         verify(userRepository, times(1)).save(user);
     }
 
     @Test
     void givenUserAndLockTimeIsExpired_whenIsLockTimeExpired_thenReturnTrueAndUnlockUser(){
-        user.setLockTime(LocalDateTime.now().minusYears(1));
+        user.setLockTime(Instant.now().minusSeconds(60 * 60 * 24 * 50));
 
         boolean result = authenticationService.isLockTimeExpired(user);
         assertTrue(result);
@@ -237,7 +237,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenUserAndLockTimeIsNotExpired_whenIsLockTimeExpired_thenReturnFalseAndDoesNotUnlockUser(){
-        user.setLockTime(LocalDateTime.now());
+        user.setLockTime(Instant.now());
         user.setAccountNonLocked(false);
 
         boolean result = authenticationService.isLockTimeExpired(user);

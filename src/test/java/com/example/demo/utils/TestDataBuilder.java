@@ -11,6 +11,7 @@ import com.example.demo.enums.ProductCategory;
 import com.example.demo.enums.Role;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -144,7 +145,7 @@ public class TestDataBuilder {
         return Order.builder()
                 .items(new ArrayList<>())
                 .status(OrderStatus.Pending)
-                .orderDate(LocalDateTime.now())
+                .orderDate(Instant.now())
                 .totalAmount(BigDecimal.ONE)
                 .customer(buildCustomer())
                 .build();
@@ -155,7 +156,7 @@ public class TestDataBuilder {
                 .id(UUID.randomUUID())
                 .items(new ArrayList<>())
                 .status(OrderStatus.Pending)
-                .orderDate(LocalDateTime.now())
+                .orderDate(Instant.now())
                 .totalAmount(BigDecimal.ONE)
                 .customer(buildCustomer())
                 .build();
@@ -165,7 +166,7 @@ public class TestDataBuilder {
         return Order.builder()
                 .items(new ArrayList<>())
                 .status(OrderStatus.Pending)
-                .orderDate(LocalDateTime.now())
+                .orderDate(Instant.now())
                 .totalAmount(BigDecimal.ONE)
                 .customer(customer)
                 .build();

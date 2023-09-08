@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Service
 public class StripeService {
@@ -66,7 +67,7 @@ public class StripeService {
         orderService.moveOrderToHistory(orderPaymentDTO.getCreditCard(), convertCentsToMoney(paymentConfirmation.getAmount()));
 
         return PaymentResponse.builder()
-                .createdAt(customerBalanceTransaction.getCreated())
+                .createdAt(Instant.ofEpochSecond(customerBalanceTransaction.getCreated()))
                 .amount(convertCentsToMoney(paymentConfirmation.getAmount()))
                 .endingBalance(convertCentsToMoney(customerBalanceTransaction.getEndingBalance()))
                 .build();
