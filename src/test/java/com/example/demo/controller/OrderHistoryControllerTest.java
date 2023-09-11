@@ -89,7 +89,7 @@ class OrderHistoryControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenFindById_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockGetRequest(orderHistory.getId().toString()))
                 .andExpect(status().isForbidden())
@@ -128,7 +128,7 @@ class OrderHistoryControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenFindByCurrentUser_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockGetRequest("user"))
                 .andExpect(status().isForbidden())

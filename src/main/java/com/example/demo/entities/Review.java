@@ -16,7 +16,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "reviews")
+@Table(
+        name = "reviews",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"customer_id", "product_id"})
+)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Review {
     @Id

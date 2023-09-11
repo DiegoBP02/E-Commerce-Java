@@ -4,12 +4,10 @@ import com.example.demo.entities.user.Customer;
 import com.example.demo.enums.CreditCard;
 import com.example.demo.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -27,8 +25,6 @@ public class OrderHistory {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @JsonIgnore
-    @ToString.Exclude
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;

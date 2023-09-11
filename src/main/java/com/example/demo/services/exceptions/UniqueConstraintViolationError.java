@@ -9,5 +9,9 @@ public class UniqueConstraintViolationError extends RuntimeException {
         super("A " + entity + " with the same " + property +
                 " already exists. Duplicates are not allowed.");
     }
+
+    public UniqueConstraintViolationError(String message) {
+        super(message);
+    }
 }
 

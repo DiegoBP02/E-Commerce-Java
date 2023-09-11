@@ -84,7 +84,7 @@ public class ExceptionHandlers {
             (UniqueConstraintViolationError e, HttpServletRequest request) {
         logger.error("Unique constraint violation error:", e);
         String error = "Duplicate entry found";
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        HttpStatus status = HttpStatus.CONFLICT;
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
@@ -387,6 +387,17 @@ public class ExceptionHandlers {
             (UserNotEnabledException e, HttpServletRequest request) {
         logger.error("User not enabled exception:", e);
         String error = "User not enabled. Only enabled users can access this route.";
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(ProductNotPurchasedException.class)
+    public ResponseEntity<StandardError> ProductNotPurchasedException
+            (ProductNotPurchasedException e, HttpServletRequest request) {
+        logger.error("Product not purchased exception:", e);
+        String error = "Product not purchased";
         HttpStatus status = HttpStatus.FORBIDDEN;
         StandardError err = new StandardError(Instant.now(), status.value(),
                 error, e.getMessage(), request.getRequestURI());

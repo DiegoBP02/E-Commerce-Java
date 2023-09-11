@@ -48,7 +48,17 @@ class OrderHistoryRepositoryTest {
     }
 
     @Test
-    void givenOrderHistory_whenFindAllByCustomer_thenReturnOrderHistoryPage() {
+    void givenOrderHistory_whenFindAllByCustomer_thenReturnOrderHistoryList() {
+        orderHistoryRepository.save(orderHistory);
+
+        List<OrderHistory> expectedResult = Collections.singletonList(orderHistory);
+
+        List<OrderHistory> result = orderHistoryRepository.findAllByCustomer(customer);
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    void givenOrderHistory_whenFindAllByCustomerWithPageable_thenReturnOrderHistoryPage() {
         Pageable paging = PageRequest.of(0, 5, Sort.by("paymentDate"));
         orderHistoryRepository.save(orderHistory);
 

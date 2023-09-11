@@ -48,9 +48,7 @@ class ProductServiceTest extends ApplicationConfigTest {
     private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
     private Product product = TestDataBuilder.buildProduct(seller);
     private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
-    private Page<Product> productPage = new PageImpl<>
-            (Collections.singletonList(product),
-                    PageRequest.of(0, 5, Sort.by("name")), 1);
+    private Page<Product> productPage = TestDataBuilder.buildPage(product, 0, 5, "name");
 
     @BeforeEach
     void setupSecurityContext() {

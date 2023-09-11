@@ -124,7 +124,7 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
                 ("register", registerDTO);
 
         mockMvc.perform(mockRequest)
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException()
                                 instanceof UniqueConstraintViolationError));

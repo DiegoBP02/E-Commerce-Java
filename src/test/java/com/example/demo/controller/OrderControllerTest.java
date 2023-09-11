@@ -112,7 +112,7 @@ class OrderControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenCreate_thenHandleAccessDeniedException() throws Exception {
         MockHttpServletRequestBuilder mockRequest = mockPostRequest();
 
@@ -149,8 +149,21 @@ class OrderControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
-    void givenInvalidUserAuthority_whenFindAll_thenHandleAccessDeniedException() throws Exception {
+    @WithMockUser(authorities = "Seller")
+    void givenInvalidUserAuthoritySeller_whenFindAll_thenHandleAccessDeniedException() throws Exception {
+
+        mockMvc.perform(mockGetRequest())
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verify(orderService, never()).findAll();
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenInvalidUserAuthorityCustomer_whenFindAll_thenHandleAccessDeniedException() throws Exception {
 
         mockMvc.perform(mockGetRequest())
                 .andExpect(status().isForbidden())
@@ -200,7 +213,7 @@ class OrderControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenFindById_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockGetRequest(order.getId().toString()))
                 .andExpect(status().isForbidden())
@@ -249,7 +262,7 @@ class OrderControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenFindActiveOrderByCurrentUser_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockGetRequest("user"))
                 .andExpect(status().isForbidden())
@@ -311,7 +324,7 @@ class OrderControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenDelete_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockDeleteRequest(order.getId().toString()))
                 .andExpect(status().isForbidden())
@@ -373,7 +386,7 @@ class OrderControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenDeleteByCurrentUser_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockDeleteRequest("user"))
                 .andExpect(status().isForbidden())

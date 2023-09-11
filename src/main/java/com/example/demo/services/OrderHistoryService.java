@@ -1,7 +1,10 @@
 package com.example.demo.services;
 
 import com.example.demo.dtos.OrderHistoryDTO;
+import com.example.demo.entities.Order;
 import com.example.demo.entities.OrderHistory;
+import com.example.demo.entities.OrderItem;
+import com.example.demo.entities.Product;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.User;
 import com.example.demo.repositories.OrderHistoryRepository;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.example.demo.config.utils.GetCurrentUser.getCurrentUser;
@@ -52,4 +56,21 @@ public class OrderHistoryService {
         return orderHistoryRepository.findAllByCustomer(customer, paging);
     }
 
+    public List<OrderHistory> findByCurrentUser() {
+        Customer customer = (Customer) getCurrentUser();
+        return orderHistoryRepository.findAllByCustomer(customer);
+    }
+
+    public boolean isProductPurchasedByUser(Product product) {
+        List<OrderHistory> orderHistoryList = findByCurrentUser();
+        for (OrderHistory orderHistory : orderHistoryList) {
+            Order order = orderHistory.getOrder();
+            for (OrderItem orderItem : order.getItems()) {
+                if (orderItem.getProduct().equals(product)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

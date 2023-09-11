@@ -159,7 +159,7 @@ class PaymentControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenCreateOrderPayment_thenHandleAccessDeniedException() throws Exception {
         MockHttpServletRequestBuilder mockRequest = mockPostRequest(orderPaymentDTO);
 

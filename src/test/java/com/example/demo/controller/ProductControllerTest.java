@@ -141,7 +141,7 @@ class ProductControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Customer")
     void givenInvalidUserAuthority_whenCreate_thenHandleAccessDeniedException() throws Exception {
         MockHttpServletRequestBuilder mockRequest = mockPostRequest(productDTO);
 
@@ -289,7 +289,7 @@ class ProductControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Customer")
     void givenInvalidUserAuthority_whenUpdate_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockPatchRequest(product.getId().toString(), productDTO))
                 .andExpect(status().isForbidden())
@@ -351,7 +351,7 @@ class ProductControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Customer")
     void givenInvalidUserAuthority_whenDelete_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockDeleteRequest(product.getId().toString()))
                 .andExpect(status().isForbidden())

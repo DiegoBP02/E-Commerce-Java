@@ -9,7 +9,9 @@ import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
 import com.example.demo.repositories.ReviewRepository;
 import com.example.demo.services.exceptions.DatabaseException;
+import com.example.demo.services.exceptions.ProductNotPurchasedException;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
+import com.example.demo.services.exceptions.UniqueConstraintViolationError;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +21,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+import static com.example.demo.config.utils.GetCurrentUser.getCurrentUser;
 import static com.example.demo.services.utils.CheckOwnership.checkOwnership;
 
 @Service
@@ -35,16 +37,29 @@ public class ReviewService {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private OrderHistoryService orderHistoryService;
+
     public Review create(ReviewDTO reviewDTO) {
-        Product product = productService.findById(reviewDTO.getProductId());
-        Customer user = (Customer) getCurrentUser();
-        Review review = Review.builder()
-                .comment(reviewDTO.getComment())
-                .rating(reviewDTO.getRating())
-                .product(product)
-                .customer(user)
-                .build();
-        return reviewRepository.save(review);
+        try {
+            Product product = productService.findById(reviewDTO.getProductId());
+
+            if (!orderHistoryService.isProductPurchasedByUser(product)) {
+                throw new ProductNotPurchasedException();
+            }
+
+            Customer user = (Customer) getCurrentUser();
+            Review review = Review.builder()
+                    .comment(reviewDTO.getComment())
+                    .rating(reviewDTO.getRating())
+                    .product(product)
+                    .customer(user)
+                    .build();
+            return reviewRepository.save(review);
+        } catch (DataIntegrityViolationException e) {
+            throw new UniqueConstraintViolationError("A review for this product already exists. " +
+                    "You can create only 1 review per product.");
+        }
     }
 
     @Transactional
@@ -101,10 +116,6 @@ public class ReviewService {
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException(e.getMessage());
         }
-    }
-
-    private User getCurrentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }

@@ -9,11 +9,17 @@ import com.example.demo.enums.CreditCard;
 import com.example.demo.enums.OrderStatus;
 import com.example.demo.enums.ProductCategory;
 import com.example.demo.enums.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class TestDataBuilder {
@@ -257,5 +263,13 @@ public class TestDataBuilder {
         return ResetPasswordDTO.builder()
                 .password(defaultPassword)
                 .build();
+    }
+
+    public static <T> Page<T> buildPage(T entity, Integer pageNo, Integer pageSize, String sortBy) {
+        return new PageImpl<>(Collections.singletonList(entity), PageRequest.of(pageNo, pageSize, Sort.by(sortBy)), 1);
+    }
+
+    public static List<OrderHistory> buildOrderHistoryList(OrderHistory orderHistory) {
+        return Collections.singletonList(orderHistory);
     }
 }

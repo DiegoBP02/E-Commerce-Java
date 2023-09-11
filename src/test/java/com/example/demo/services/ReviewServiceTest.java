@@ -11,9 +11,7 @@ import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
 import com.example.demo.repositories.ReviewRepository;
-import com.example.demo.services.exceptions.DatabaseException;
-import com.example.demo.services.exceptions.ResourceNotFoundException;
-import com.example.demo.services.exceptions.UnauthorizedAccessException;
+import com.example.demo.services.exceptions.*;
 import com.example.demo.utils.TestDataBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +46,9 @@ class ReviewServiceTest extends ApplicationConfigTest {
     @MockBean
     private ProductService productService;
 
+    @MockBean
+    private OrderHistoryService orderHistoryService;
+
     private Authentication authentication;
     private SecurityContext securityContext;
 
@@ -56,9 +57,7 @@ class ReviewServiceTest extends ApplicationConfigTest {
     private Product product = TestDataBuilder.buildProduct(seller);
     private Review review = TestDataBuilder.buildReview(product, customer);
     private ReviewDTO reviewDTO = TestDataBuilder.buildReviewDTO();
-    private Page<Review> reviewPage = new PageImpl<>
-            (Collections.singletonList(review),
-                    PageRequest.of(0, 5, Sort.by("rating")), 1);
+    private Page<Review> reviewPage = TestDataBuilder.buildPage(review,0,5,"rating");
     private UpdateReviewDTO updateReviewDTO = TestDataBuilder.buildUpdateReviewDTO();
 
     @BeforeEach
@@ -83,8 +82,9 @@ class ReviewServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenValidReviewDTO_whenCreate_thenReturnReview() {
+    void givenReviewDTOAndUserProductPurchasedByUser_whenCreate_thenReturnReview() {
         when(productService.findById(reviewDTO.getProductId())).thenReturn(product);
+        when(orderHistoryService.isProductPurchasedByUser(product)).thenReturn(true);
         when(reviewRepository.save(any(Review.class))).thenReturn(review);
 
         Review result = reviewService.create(reviewDTO);
@@ -93,21 +93,37 @@ class ReviewServiceTest extends ApplicationConfigTest {
 
         verifyAuthentication();
         verify(productService, times(1)).findById(reviewDTO.getProductId());
+        verify(orderHistoryService, times(1)).isProductPurchasedByUser(product);
         verify(reviewRepository, times(1)).save(any(Review.class));
     }
 
     @Test
-    void givenValidReviewDTOAndProductDoesNotExists_whenCreate_thenThrowResourceNotFoundException() {
-        when(productService.findById(reviewDTO.getProductId()))
-                .thenThrow(ResourceNotFoundException.class);
-        when(reviewRepository.save(any(Review.class))).thenReturn(review);
+    void givenReviewDTOAndProductWasNotPurchasedByUser_whenCreate_thenThrowProductNotPurchasedException() {
+        when(productService.findById(reviewDTO.getProductId())).thenReturn(product);
+        when(orderHistoryService.isProductPurchasedByUser(product)).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () ->
-                reviewService.create(reviewDTO));
+        assertThrows(ProductNotPurchasedException.class,
+                () -> reviewService.create(reviewDTO));
 
-        verify(productService, times(1)).findById(reviewDTO.getProductId());
         verifyNoAuthentication();
-        verify(reviewRepository, never()).save(any(Review.class));
+        verify(productService, times(1)).findById(reviewDTO.getProductId());
+        verify(orderHistoryService, times(1)).isProductPurchasedByUser(product);
+        verifyNoInteractions(reviewRepository);
+    }
+
+    @Test
+    void givenReviewForProductAlreadyExists_whenCreate_thenHandleDataIntegrityViolationException() {
+        when(productService.findById(reviewDTO.getProductId())).thenReturn(product);
+        when(orderHistoryService.isProductPurchasedByUser(product)).thenReturn(true);
+        when(reviewRepository.save(any(Review.class))).thenThrow(DataIntegrityViolationException.class);
+
+        assertThrows(UniqueConstraintViolationError.class,
+                () -> reviewService.create(reviewDTO));
+
+        verifyAuthentication();
+        verify(productService, times(1)).findById(reviewDTO.getProductId());
+        verify(orderHistoryService, times(1)).isProductPurchasedByUser(product);
+        verify(reviewRepository, times(1)).save(any(Review.class));
     }
 
     @Test

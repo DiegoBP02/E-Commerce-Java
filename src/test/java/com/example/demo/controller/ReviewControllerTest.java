@@ -9,9 +9,7 @@ import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.services.ReviewService;
-import com.example.demo.services.exceptions.DatabaseException;
-import com.example.demo.services.exceptions.ResourceNotFoundException;
-import com.example.demo.services.exceptions.UnauthorizedAccessException;
+import com.example.demo.services.exceptions.*;
 import com.example.demo.utils.TestDataBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -120,6 +118,36 @@ class ReviewControllerTest extends ApplicationConfigTest {
     }
 
     @Test
+    @WithMockUser(authorities = "Customer")
+    void givenUserDidNotPurchaseProduct_whenCreate_thenHandleProductNotPurchasedException() throws Exception {
+        when(reviewService.create(reviewDTO)).thenThrow(ProductNotPurchasedException.class);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest(reviewDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ProductNotPurchasedException));
+
+        verify(reviewService, times(1)).create(reviewDTO);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenReviewForProductAlreadyExists_whenCreate_thenHandleUniqueConstraintViolationError() throws Exception {
+        when(reviewService.create(reviewDTO)).thenThrow(UniqueConstraintViolationError.class);
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest(reviewDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isConflict())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof UniqueConstraintViolationError));
+
+        verify(reviewService, times(1)).create(reviewDTO);
+    }
+
+    @Test
     void givenNoUser_whenCreate_thenReturnStatus403Forbidden() throws Exception {
         MockHttpServletRequestBuilder mockRequest = mockPostRequest(reviewDTO);
 
@@ -133,7 +161,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenCreate_thenHandleAccessDeniedException() throws Exception {
         MockHttpServletRequestBuilder mockRequest = mockPostRequest(reviewDTO);
 
@@ -250,7 +278,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenUpdate_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockPatchRequest(review.getId().toString(), updateReviewDTO))
                 .andExpect(status().isForbidden())
@@ -312,7 +340,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    @WithMockUser(authorities = "random")
+    @WithMockUser(authorities = "Seller")
     void givenInvalidUserAuthority_whenDelete_thenHandleAccessDeniedException() throws Exception {
         mockMvc.perform(mockDeleteRequest(review.getId().toString()))
                 .andExpect(status().isForbidden())
