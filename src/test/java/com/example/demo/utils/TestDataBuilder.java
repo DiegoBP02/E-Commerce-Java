@@ -290,4 +290,9 @@ public class TestDataBuilder {
                 .role(registerDTO.getRole())
                 .build();
     }
+
+    public static ResetPasswordToken buildResetPasswordTokenNoId(User user) {
+        return new ResetPasswordToken(user);
+    }
+
 }

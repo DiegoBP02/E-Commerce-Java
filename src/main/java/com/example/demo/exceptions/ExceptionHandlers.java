@@ -415,4 +415,26 @@ public class ExceptionHandlers {
         return ResponseEntity.status(status).body(err);
     }
 
+    @ExceptionHandler(ResetEmailAlreadySentException.class)
+    public ResponseEntity<StandardError> ResetEmailAlreadySentException
+            (ResetEmailAlreadySentException e, HttpServletRequest request) {
+        logger.error("Reset email already sent exception:", e);
+        String error = "Reset email already sent";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(ResetPasswordTokenExpiredException.class)
+    public ResponseEntity<StandardError> ResetPasswordTokenExpired
+            (ResetPasswordTokenExpiredException e, HttpServletRequest request) {
+        logger.error("Class cast exception exception:", e);
+        String error = "Reset password token expired";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
 }

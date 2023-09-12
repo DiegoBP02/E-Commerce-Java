@@ -5,9 +5,7 @@ import com.example.demo.dtos.ChangePasswordDTO;
 import com.example.demo.dtos.ForgotPasswordDTO;
 import com.example.demo.dtos.ResetPasswordDTO;
 import com.example.demo.services.PasswordService;
-import com.example.demo.services.exceptions.EmailSendException;
-import com.example.demo.services.exceptions.InvalidOldPasswordException;
-import com.example.demo.services.exceptions.InvalidTokenException;
+import com.example.demo.services.exceptions.*;
 import com.example.demo.utils.TestDataBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -177,6 +175,24 @@ class PasswordControllerTest extends ApplicationConfigTest {
     }
 
     @Test
+    void givenResetEmailAlreadySent_whenForgotPassword_thenHandleResetEmailAlreadySentException() throws Exception {
+        doThrow(ResetEmailAlreadySentException.class)
+                .when(passwordService)
+                .forgotPassword(any(HttpServletRequest.class), eq(forgotPasswordDTO));
+        MockHttpServletRequestBuilder mockRequest
+                = mockPostRequest("forgot-password", forgotPasswordDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ResetEmailAlreadySentException));
+
+        verify(passwordService, times(1))
+                .forgotPassword(any(HttpServletRequest.class), eq(forgotPasswordDTO));
+    }
+
+    @Test
     void givenValidResetPasswordDTO_whenResetPassword_thenReturnOkWithCorrectMessage() throws Exception {
         MockHttpServletRequestBuilder mockRequest =
                 mockPostRequestWithParams("reset-password", resetPasswordDTO,
@@ -228,6 +244,26 @@ class PasswordControllerTest extends ApplicationConfigTest {
     }
 
     @Test
+    void givenResetPasswordTokenExpired_whenResetPassword_thenHandleResetPasswordTokenExpiredException() throws Exception {
+        doThrow(ResetPasswordTokenExpiredException.class)
+                .when(passwordService)
+                .resetPassword(randomToken, resetPasswordDTO);
+
+        MockHttpServletRequestBuilder mockRequest =
+                mockPostRequestWithParams("reset-password", resetPasswordDTO,
+                        "token", randomToken.toString());
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ResetPasswordTokenExpiredException));
+
+        verify(passwordService, times(1))
+                .resetPassword(randomToken, resetPasswordDTO);
+    }
+
+    @Test
     void givenMissingParam_whenResetPassword_thenHandleMissingServletRequestParameterException() throws Exception {
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
                 .post(PATH + "/reset-password")
@@ -245,7 +281,7 @@ class PasswordControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenWrongParan_whenResetPassword_thenHandleMethodArgumentTypeMismatchException() throws Exception {
+    void givenWrongParam_whenResetPassword_thenHandleMethodArgumentTypeMismatchException() throws Exception {
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
                 .post(PATH + "/reset-password")
                 .param("token", "random")

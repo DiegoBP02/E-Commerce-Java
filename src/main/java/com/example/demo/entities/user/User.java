@@ -1,6 +1,7 @@
 package com.example.demo.entities.user;
 
 import com.example.demo.entities.ConfirmationToken;
+import com.example.demo.entities.ResetPasswordToken;
 import com.example.demo.enums.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -47,23 +48,21 @@ public abstract class User implements UserDetails {
     @ToString.Exclude
     @JsonIgnore
     private int failedAttempt;
-    @ToString.Exclude
-    @JsonIgnore
-    @JsonFormat(shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
     private Instant lockTime;
-    @ToString.Exclude
-    @JsonIgnore
-    @Column(unique = true)
-    private UUID resetPasswordToken;
     @ToString.Exclude
     @JsonIgnore
     private boolean enabled;
 
     @ToString.Exclude
     @JsonIgnore
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private ConfirmationToken confirmationToken;
+
+    @ToString.Exclude
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private ResetPasswordToken resetPasswordToken;
 
     public User(String name, String email, String password, Role role) {
         this.name = name;

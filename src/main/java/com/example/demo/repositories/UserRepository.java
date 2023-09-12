@@ -19,5 +19,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Modifying
     void updateFailedAttempts(int failAttempts, String email);
 
-    Optional<User> findByResetPasswordToken(UUID token);
+    Optional<User> findByResetPasswordTokenResetPasswordToken(UUID token);
 }

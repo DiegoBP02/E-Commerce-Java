@@ -3,11 +3,11 @@ package com.example.demo.services;
 import com.example.demo.dtos.ChangePasswordDTO;
 import com.example.demo.dtos.ForgotPasswordDTO;
 import com.example.demo.dtos.ResetPasswordDTO;
+import com.example.demo.entities.ResetPasswordToken;
 import com.example.demo.entities.user.User;
+import com.example.demo.repositories.ResetPasswordTokenRepository;
 import com.example.demo.repositories.UserRepository;
-import com.example.demo.services.exceptions.InvalidOldPasswordException;
-import com.example.demo.services.exceptions.InvalidTokenException;
-import com.example.demo.services.exceptions.UserNotFoundException;
+import com.example.demo.services.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -34,6 +34,9 @@ public class PasswordService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private ResetPasswordTokenRepository resetPasswordTokenRepository;
+
     public void changePassword(ChangePasswordDTO changePasswordDTO) {
         User user = getCurrentUser();
 
@@ -58,9 +61,7 @@ public class PasswordService {
     }
 
     public void forgotPassword(HttpServletRequest request, ForgotPasswordDTO forgotPasswordDTO) {
-        UUID token = UUID.randomUUID();
-
-        updateResetPasswordToken(forgotPasswordDTO.getEmail(), token);
+        UUID token = createResetPasswordToken(forgotPasswordDTO.getEmail());
         String resetPasswordLink = getSiteURL(request) + "/reset-password?token=" + token;
 
         String subject = "Here's the link to reset your password";
@@ -81,16 +82,29 @@ public class PasswordService {
         return siteURL.replace(request.getServletPath(), "") + "/password";
     }
 
-    private void updateResetPasswordToken(String email, UUID token) {
+    private UUID createResetPasswordToken(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Email not found: " + email));
-        user.setResetPasswordToken(token);
+        if (user.getResetPasswordToken() != null) {
+            if (!user.getResetPasswordToken().isTokenExpired()) {
+                throw new ResetEmailAlreadySentException();
+            } else {
+                resetPasswordTokenRepository.deleteById(user.getResetPasswordToken().getId());
+            }
+        }
+        ResetPasswordToken resetPasswordToken = new ResetPasswordToken(user);
+        user.setResetPasswordToken(resetPasswordToken);
         userRepository.save(user);
+        return resetPasswordToken.getResetPasswordToken();
     }
 
     public void resetPassword(UUID token, ResetPasswordDTO resetPasswordDTO) {
-        User user = userRepository.findByResetPasswordToken(token)
+        User user = userRepository.findByResetPasswordTokenResetPasswordToken(token)
                 .orElseThrow(InvalidTokenException::new);
+
+        if (user.getResetPasswordToken().isTokenExpired()) {
+            throw new ResetPasswordTokenExpiredException();
+        }
 
         changePasswordByUser(user, resetPasswordDTO.getPassword());
     }

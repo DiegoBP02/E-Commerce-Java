@@ -4,11 +4,11 @@ import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.ChangePasswordDTO;
 import com.example.demo.dtos.ForgotPasswordDTO;
 import com.example.demo.dtos.ResetPasswordDTO;
+import com.example.demo.entities.ResetPasswordToken;
 import com.example.demo.entities.user.User;
+import com.example.demo.repositories.ResetPasswordTokenRepository;
 import com.example.demo.repositories.UserRepository;
-import com.example.demo.services.exceptions.InvalidOldPasswordException;
-import com.example.demo.services.exceptions.InvalidTokenException;
-import com.example.demo.services.exceptions.UserNotFoundException;
+import com.example.demo.services.exceptions.*;
 import com.example.demo.utils.TestDataBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +43,9 @@ class PasswordServiceTest extends ApplicationConfigTest {
     @MockBean
     private EmailService emailService;
 
+    @MockBean
+    private ResetPasswordTokenRepository resetPasswordTokenRepository;
+
     private Authentication authentication;
     private SecurityContext securityContext;
 
@@ -50,6 +53,8 @@ class PasswordServiceTest extends ApplicationConfigTest {
     private ChangePasswordDTO changePasswordDTO = TestDataBuilder.buildChangePasswordDTO();
     private ForgotPasswordDTO forgotPasswordDTO = TestDataBuilder.buildForgotPasswordDTO();
     private ResetPasswordDTO resetPasswordDTO = TestDataBuilder.buildResetPasswordDTO();
+    private ResetPasswordToken resetPasswordTokenMock = mock(ResetPasswordToken.class);
+    private String URL = "URL";
 
     @BeforeEach
     void setupSecurityContext() {
@@ -115,8 +120,23 @@ class PasswordServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenRequestAndForgotPasswordDTO_whenForgotPassword_thenGenerateTokenAndSendEmail() {
-        String URL = "URL";
+    void givenNoUser_whenForgotPassword_thenThrowUserNotFoundException() {
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        assertThrows(UserNotFoundException.class, () ->
+                passwordService.forgotPassword(request, forgotPasswordDTO)
+        );
+
+        verify(userRepository, times(1)).findByEmail(user.getEmail());
+        verify(userRepository, never()).save(user);
+        verify(emailService, never())
+                .sendEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void givenUserDoesNotHaveAResetPasswordToken_whenForgotPassword_thenGenerateTokenAndSendEmail() {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -134,26 +154,54 @@ class PasswordServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenNoUser_whenForgotPassword_thenThrowUserNotFoundException() {
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+    void givenUserAlreadyHaveANotExpiredResetPasswordToken_whenForgotPassword_thenThrowResetEmailAlreadySentException() {
+        when(resetPasswordTokenMock.isTokenExpired()).thenReturn(false);
+        user.setResetPasswordToken(resetPasswordTokenMock);
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURL()).thenReturn(new StringBuffer(URL));
+        when(request.getServletPath()).thenReturn("/path");
 
-        assertThrows(UserNotFoundException.class, () ->
-                passwordService.forgotPassword(request, forgotPasswordDTO)
-        );
+        assertThrows(ResetEmailAlreadySentException.class,
+                () -> passwordService.forgotPassword(request, forgotPasswordDTO));
 
         verify(userRepository, times(1)).findByEmail(user.getEmail());
-        verify(userRepository, never()).save(user);
-        verify(emailService, never())
-                .sendEmail(anyString(), anyString(), anyString());
+        verifyNoMoreInteractions(userRepository);
+        verifyNoInteractions(emailService);
+    }
+
+    @Test
+    void givenUserAlreadyHaveAExpiredResetPasswordToken_whenForgotPassword_thenGenerateTokenAndSendEmail() {
+        when(resetPasswordTokenMock.isTokenExpired()).thenReturn(true);
+        when(resetPasswordTokenMock.getId()).thenReturn(UUID.randomUUID());
+        user.setResetPasswordToken(resetPasswordTokenMock);
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURL()).thenReturn(new StringBuffer(URL));
+        when(request.getServletPath()).thenReturn("/path");
+
+        passwordService.forgotPassword(request, forgotPasswordDTO);
+
+        assertNotNull(user.getResetPasswordToken());
+
+        verify(userRepository, times(1)).findByEmail(user.getEmail());
+        verify(resetPasswordTokenRepository, times(1))
+                .deleteById(resetPasswordTokenMock.getId());
+        verify(userRepository, times(1)).save(user);
+        verify(emailService, times(1))
+                .sendEmail(eq(forgotPasswordDTO.getEmail()), anyString(), anyString());
     }
 
     @Test
     void givenTokenAndResetPasswordDTO_whenResetPassword_thenChangePasswordAndNullifyUserPasswordToken() {
         UUID token = UUID.randomUUID();
         String hashedPassword = "hashedPassword";
-        when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.of(user));
+        when(resetPasswordTokenMock.isTokenExpired()).thenReturn(false);
+        user.setResetPasswordToken(resetPasswordTokenMock);
+        when(userRepository.findByResetPasswordTokenResetPasswordToken(token))
+                .thenReturn(Optional.of(user));
         when(passwordEncoder.encode(resetPasswordDTO.getPassword())).thenReturn(hashedPassword);
 
         passwordService.resetPassword(token, resetPasswordDTO);
@@ -161,7 +209,8 @@ class PasswordServiceTest extends ApplicationConfigTest {
         assertEquals(hashedPassword, user.getPassword());
         assertNull(user.getResetPasswordToken());
 
-        verify(userRepository, times(1)).findByResetPasswordToken(token);
+        verify(userRepository, times(1))
+                 .findByResetPasswordTokenResetPasswordToken(token);
         verify(passwordEncoder, times(1)).encode(resetPasswordDTO.getPassword());
         verify(userRepository, times(1)).save(user);
     }
@@ -169,12 +218,31 @@ class PasswordServiceTest extends ApplicationConfigTest {
     @Test
     void givenNoUser_whenResetPassword_thenThrowInvalidTokenException() {
         UUID token = UUID.randomUUID();
-        when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.empty());
+        when(userRepository.findByResetPasswordTokenResetPasswordToken(token))
+                .thenReturn(Optional.empty());
 
         assertThrows(InvalidTokenException.class,
                 () -> passwordService.resetPassword(token, resetPasswordDTO));
 
-        verify(userRepository, times(1)).findByResetPasswordToken(token);
+        verify(userRepository, times(1))
+                .findByResetPasswordTokenResetPasswordToken(token);
+        verify(passwordEncoder, never()).encode(resetPasswordDTO.getPassword());
+        verify(userRepository, never()).save(user);
+    }
+
+    @Test
+    void givenResetPasswordTokenIsExpired_whenResetPassword_thenThrowResetPasswordTokenExpired() {
+        when(resetPasswordTokenMock.isTokenExpired()).thenReturn(true);
+        user.setResetPasswordToken(resetPasswordTokenMock);
+        UUID token = UUID.randomUUID();
+        when(userRepository.findByResetPasswordTokenResetPasswordToken(token))
+                .thenReturn(Optional.of(user));
+
+        assertThrows(ResetPasswordTokenExpiredException.class,
+                () -> passwordService.resetPassword(token, resetPasswordDTO));
+
+        verify(userRepository, times(1))
+                .findByResetPasswordTokenResetPasswordToken(token);
         verify(passwordEncoder, never()).encode(resetPasswordDTO.getPassword());
         verify(userRepository, never()).save(user);
     }
