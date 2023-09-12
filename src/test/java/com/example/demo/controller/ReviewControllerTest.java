@@ -219,12 +219,52 @@ class ReviewControllerTest extends ApplicationConfigTest {
         when(reviewService.findAllByProduct(product.getId(),0, 5, "rating"))
                 .thenReturn(reviewPage);
 
-        mockMvc.perform(mockGetRequest("/product/" + product.getId()))
+        mockMvc.perform(mockGetRequest("product/" + product.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(reviewPage)));
 
         verify(reviewService, times(1))
                 .findAllByProduct(product.getId(),0, 5, "rating");
+    }
+
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenReview_whenFindByCurrentUser_thenReturnReviewPage() throws Exception {
+        Page<Review> reviewPage = mock(PageImpl.class);
+
+        when(reviewService.findByCurrentUser(0, 5, "rating"))
+                .thenReturn(reviewPage);
+
+        mockMvc.perform(mockGetRequest("user"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(reviewPage)));
+
+        verify(reviewService, times(1))
+                .findByCurrentUser(0, 5, "rating");
+    }
+
+    @Test
+    void givenNoUser_whenFindByCurrentUser_thenReturnStatus403Forbidden() throws Exception {
+        mockMvc.perform(mockGetRequest("user"))
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+       verifyNoInteractions(reviewService);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenInvalidUserAuthority_whenFindByCurrentUser_thenHandleAccessDeniedException() throws Exception {
+        mockMvc.perform(mockGetRequest("user"))
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verifyNoInteractions(reviewService);
     }
 
     @Test

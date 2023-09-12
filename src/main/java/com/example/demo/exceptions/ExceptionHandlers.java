@@ -404,4 +404,15 @@ public class ExceptionHandlers {
         return ResponseEntity.status(status).body(err);
     }
 
+    @ExceptionHandler(ClassCastException.class)
+    public ResponseEntity<StandardError> ClassCastException
+            (ClassCastException e, HttpServletRequest request) {
+        logger.error("Class cast exception exception:", e);
+        String error = "Invalid casting";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
 }

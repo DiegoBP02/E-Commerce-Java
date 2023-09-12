@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
+import com.example.demo.dtos.UserLoginResponseDTO;
 import com.example.demo.entities.Product;
 import com.example.demo.services.exceptions.*;
 import com.example.demo.services.AuthenticationService;
@@ -53,6 +54,7 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
     private LoginDTO loginDTO = TestDataBuilder.buildLoginDTO();
     private String token = "token";
     private UUID randomUUID = UUID.randomUUID();
+    private UserLoginResponseDTO userLoginResponseDTO= TestDataBuilder.buildUserLoginResponseDTO(registerDTO);
 
     private MockHttpServletRequestBuilder mockPostRequest
             (String endpoint) throws Exception {
@@ -87,13 +89,13 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
 
     @Test
     void givenValidUser_whenRegister_thenReturnTokenAndOk() throws Exception {
-        when(authenticationService.register(registerDTO)).thenReturn(token);
+        when(authenticationService.register(registerDTO)).thenReturn(userLoginResponseDTO);
         MockHttpServletRequestBuilder mockRequest = mockPostRequest
                 ("register", registerDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().string(token));
+                .andExpect(content().json(objectMapper.writeValueAsString(userLoginResponseDTO)));
 
         verify(authenticationService, times(1)).register(registerDTO);
     }
@@ -134,15 +136,14 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
 
     @Test
     void givenUser_whenLogin_thenReturnToken() throws Exception {
-        when(authenticationService.login(loginDTO)).thenReturn("token");
-
+        when(authenticationService.login(loginDTO)).thenReturn(userLoginResponseDTO);
 
         MockHttpServletRequestBuilder mockRequest = mockPostRequest
                 ("login", loginDTO);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().string("token"));
+                .andExpect(content().json(objectMapper.writeValueAsString(userLoginResponseDTO)));
 
         verify(authenticationService, times(1)).login(loginDTO);
     }

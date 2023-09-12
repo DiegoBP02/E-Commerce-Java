@@ -3,6 +3,7 @@ package com.example.demo.services;
 
 import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
+import com.example.demo.dtos.UserLoginResponseDTO;
 import com.example.demo.entities.ConfirmationToken;
 import com.example.demo.entities.user.Admin;
 import com.example.demo.entities.user.Customer;
@@ -55,17 +56,24 @@ public class AuthenticationService implements UserDetailsService {
                 .orElseThrow(() -> new UserNotFoundException("Email not found: " + email));
     }
 
-    public String register(RegisterDTO registerDTO) {
+    public UserLoginResponseDTO register(RegisterDTO registerDTO) {
         try {
             User user = createUserBasedOnRole(registerDTO);
             userRepository.save(user);
-            return tokenService.generateToken(user);
+            String token = tokenService.generateToken(user);
+
+            return UserLoginResponseDTO.builder()
+                    .token(token)
+                    .name(registerDTO.getName())
+                    .email(registerDTO.getEmail())
+                    .role(registerDTO.getRole())
+                    .build();
         } catch (DataIntegrityViolationException e) {
             throw new UniqueConstraintViolationError("user", "email");
         }
     }
 
-    public String login(LoginDTO loginDTO) {
+    public UserLoginResponseDTO login(LoginDTO loginDTO) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
 
@@ -73,8 +81,14 @@ public class AuthenticationService implements UserDetailsService {
                 .authenticate(usernamePasswordAuthenticationToken);
 
         User user = (User) authentication.getPrincipal();
+        String token = tokenService.generateToken(user);
 
-        return tokenService.generateToken(user);
+        return UserLoginResponseDTO.builder()
+                .token(token)
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
     }
 
     private User createUserBasedOnRole(RegisterDTO registerDTO) {

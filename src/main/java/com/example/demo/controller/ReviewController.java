@@ -61,6 +61,16 @@ public class ReviewController {
     }
 
     @PreAuthorize("hasAuthority('Customer')")
+    @GetMapping(value = "/user")
+    public ResponseEntity<Page<Review>> findByCurrentUser(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "rating") String sortBy
+    ) {
+        return ResponseEntity.ok().body(reviewService.findByCurrentUser(pageNo, pageSize, sortBy));
+    }
+
+    @PreAuthorize("hasAuthority('Customer')")
     @PatchMapping(value = "/{id}")
     public ResponseEntity<Review> update(@PathVariable UUID id,
                                          @Valid @RequestBody UpdateReviewDTO obj) {

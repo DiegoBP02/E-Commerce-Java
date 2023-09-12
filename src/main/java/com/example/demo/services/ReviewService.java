@@ -81,6 +81,13 @@ public class ReviewService {
         return reviewRepository.findAllByProduct(product, paging);
     }
 
+    public Page<Review> findByCurrentUser(Integer pageNo, Integer pageSize, String sortBy) {
+        Customer customer = (Customer) getCurrentUser();
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+        return reviewRepository.findAllByCustomer(customer, paging);
+    }
+
     public Review update(UUID id, UpdateReviewDTO obj) {
         try {
             Review entity = reviewRepository.getReferenceById(id);

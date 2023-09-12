@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
+import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
@@ -41,6 +42,9 @@ class ProductServiceTest extends ApplicationConfigTest {
 
     @MockBean
     private ProductRepository productRepository;
+
+    @MockBean
+    private UserService userService;
 
     private Authentication authentication;
     private SecurityContext securityContext;
@@ -131,6 +135,40 @@ class ProductServiceTest extends ApplicationConfigTest {
 
         verifyNoAuthentication();
         verify(productRepository, times(1)).findById(product.getId());
+    }
+
+    @Test
+    void givenPaging_whenFindByCurrentUser_ThenReturnProductPage() {
+        when(productRepository.findAllBySeller(seller, productPage.getPageable()))
+                .thenReturn(productPage);
+
+        Page<Product> result = productService
+                .findByCurrentUser(productPage.getPageable().getPageNumber(),
+                        productPage.getPageable().getPageSize(),
+                        productPage.getPageable().getSort().stream().toList().get(0).getProperty());
+
+        assertEquals(productPage, result);
+
+        verify(productRepository, times(1))
+                .findAllBySeller(seller, productPage.getPageable());
+    }
+
+    @Test
+    void givenPaging_whenFindAllBySeller_ThenReturnProductPage() {
+        when(userService.findByIdAndEnsureType(any(UUID.class), any(Class.class)))
+                .thenReturn(seller);
+        when(productRepository.findAllBySeller(seller, productPage.getPageable()))
+                .thenReturn(productPage);
+
+        Page<Product> result = productService
+                .findAllBySeller(seller.getId(),productPage.getPageable().getPageNumber(),
+                        productPage.getPageable().getPageSize(),
+                        productPage.getPageable().getSort().stream().toList().get(0).getProperty());
+
+        assertEquals(productPage, result);
+
+        verify(productRepository, times(1))
+                .findAllBySeller(seller, productPage.getPageable());
     }
 
     @Test

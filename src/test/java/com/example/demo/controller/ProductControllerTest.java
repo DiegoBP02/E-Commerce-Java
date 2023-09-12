@@ -53,6 +53,7 @@ class ProductControllerTest extends ApplicationConfigTest {
     private Product product = TestDataBuilder.buildProduct((Seller) user);
     private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
     private ProductDTO invalidProductDTO = mock(ProductDTO.class);
+    Page<Product> productPage = mock(PageImpl.class);
 
     private MockHttpServletRequestBuilder mockPostRequest
             (Object requestObject) throws JsonProcessingException {
@@ -173,7 +174,7 @@ class ProductControllerTest extends ApplicationConfigTest {
         when(productService.findByCategory(product.getCategory())).thenReturn(products);
 
         MockHttpServletRequestBuilder mockRequest = mockGetRequestWithParams
-                ("/category","productCategory", product.getCategory().toString());
+                ("/category", "productCategory", product.getCategory().toString());
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
@@ -202,7 +203,7 @@ class ProductControllerTest extends ApplicationConfigTest {
         when(productService.findByCategory(product.getCategory())).thenReturn(products);
 
         MockHttpServletRequestBuilder mockRequest = mockGetRequestWithParams
-                ("/category","productCategory", "random");
+                ("/category", "productCategory", "random");
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isBadRequest())
@@ -236,6 +237,71 @@ class ProductControllerTest extends ApplicationConfigTest {
                                 instanceof ResourceNotFoundException));
 
         verify(productService, times(1)).findById(product.getId());
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenProduct_whenFindByCurrentUser_thenReturnProductPage() throws Exception {
+        when(productService.findByCurrentUser(0, 5, "name"))
+                .thenReturn(productPage);
+
+        mockMvc.perform(mockGetRequest("user"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
+
+        verify(productService, times(1))
+                .findByCurrentUser(0, 5, "name");
+    }
+
+    @Test
+    void givenNoUser_whenFindByCurrentUser_thenReturnStatus403Forbidden() throws Exception {
+        mockMvc.perform(mockGetRequest("user"))
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verifyNoInteractions(productService);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenInvalidUserAuthority_whenFindByCurrentUser_thenHandleAccessDeniedException() throws Exception {
+        mockMvc.perform(mockGetRequest("user"))
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verifyNoInteractions(productService);
+    }
+
+    @Test
+    void givenProduct_whenFindBySellerId_thenReturnProductPage() throws Exception {
+        when(productService.findAllBySeller(user.getId(), 0, 5, "name"))
+                .thenReturn(productPage);
+
+        mockMvc.perform(mockGetRequest("seller/" + user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
+
+        verify(productService, times(1))
+                .findAllBySeller(user.getId(), 0, 5, "name");
+    }
+
+    @Test
+    void givenInvalidCasting_whenFindBySellerId_thenHandleClassCastException() throws Exception {
+        when(productService.findAllBySeller(user.getId(), 0, 5, "name"))
+                .thenThrow(ClassCastException.class);
+
+        mockMvc.perform(mockGetRequest("seller/" + user.getId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof ClassCastException));
+
+        verify(productService, times(1))
+                .findAllBySeller(user.getId(), 0, 5, "name");
     }
 
     @Test

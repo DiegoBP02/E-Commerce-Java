@@ -132,6 +132,15 @@ public class TestDataBuilder {
         return review;
     }
 
+    public static Review buildReviewNoId(Product product, Customer customer) {
+        return Review.builder()
+                .product(product)
+                .comment(defaultReviewComment)
+                .rating(defaultReviewRating)
+                .customer(customer)
+                .build();
+    }
+
     public static ReviewDTO buildReviewDTO() {
         return ReviewDTO.builder()
                 .productId(UUID.randomUUID())
@@ -271,5 +280,14 @@ public class TestDataBuilder {
 
     public static List<OrderHistory> buildOrderHistoryList(OrderHistory orderHistory) {
         return Collections.singletonList(orderHistory);
+    }
+
+    public static UserLoginResponseDTO buildUserLoginResponseDTO(RegisterDTO registerDTO) {
+        return UserLoginResponseDTO.builder()
+                .token("token")
+                .email(registerDTO.getEmail())
+                .name(registerDTO.getName())
+                .role(registerDTO.getRole())
+                .build();
     }
 }

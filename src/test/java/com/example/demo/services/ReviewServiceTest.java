@@ -127,7 +127,7 @@ class ReviewServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenPaging_whenFindAllByCustomer_ThenReturnOrderHistoryPage() {
+    void givenProductIdAndPaging_whenFindAllByCustomer_ThenReturnReviewPage() {
         when(productService.findById(product.getId())).thenReturn(product);
         when(reviewRepository.findAllByProduct(product, reviewPage.getPageable()))
                 .thenReturn(reviewPage);
@@ -142,6 +142,22 @@ class ReviewServiceTest extends ApplicationConfigTest {
 
         verify(reviewRepository, times(1))
                 .findAllByProduct(product, reviewPage.getPageable());
+    }
+
+    @Test
+    void givenPaging_whenFindByCurrentUser_ThenReturnReviewPage() {
+        when(reviewRepository.findAllByCustomer(customer, reviewPage.getPageable()))
+                .thenReturn(reviewPage);
+
+        Page<Review> result = reviewService
+                .findByCurrentUser(reviewPage.getPageable().getPageNumber(),
+                        reviewPage.getPageable().getPageSize(),
+                        reviewPage.getPageable().getSort().stream().toList().get(0).getProperty());
+
+        assertEquals(reviewPage, result);
+
+        verify(reviewRepository, times(1))
+                .findAllByCustomer(customer, reviewPage.getPageable());
     }
 
     @Test

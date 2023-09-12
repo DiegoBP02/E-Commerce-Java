@@ -57,6 +57,26 @@ public class ProductController {
     }
 
     @PreAuthorize("hasAuthority('Seller')")
+    @GetMapping(value = "/user")
+    public ResponseEntity<Page<Product>> findByCurrentUser(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "name") String sortBy
+    ) {
+        return ResponseEntity.ok().body(productService.findByCurrentUser(pageNo, pageSize, sortBy));
+    }
+
+    @GetMapping(value = "/seller/{sellerId}")
+    public ResponseEntity<Page<Product>> findBySellerId(
+            @PathVariable UUID sellerId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "name") String sortBy
+    ) {
+        return ResponseEntity.ok().body(productService.findAllBySeller(sellerId, pageNo, pageSize, sortBy));
+    }
+
+    @PreAuthorize("hasAuthority('Seller')")
     @PatchMapping(value = "/{id}")
     public ResponseEntity<Product> update(@PathVariable UUID id,
                                           @Valid @RequestBody ProductDTO obj) {

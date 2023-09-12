@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
+import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.ProductCategory;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+import static com.example.demo.config.utils.GetCurrentUser.getCurrentUser;
 import static com.example.demo.services.utils.CheckOwnership.checkOwnership;
 
 @Service
@@ -31,6 +33,9 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private UserService userService;
 
     public Product create(ProductDTO productDTO) {
         Seller user = (Seller) getCurrentUser();
@@ -58,6 +63,20 @@ public class ProductService {
     public Product findById(UUID id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
+    }
+
+    public Page<Product> findByCurrentUser(Integer pageNo, Integer pageSize, String sortBy) {
+        Seller seller = (Seller) getCurrentUser();
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+        return productRepository.findAllBySeller(seller, paging);
+    }
+
+    public Page<Product> findAllBySeller(UUID sellerId,Integer pageNo, Integer pageSize, String sortBy) {
+        Seller seller = userService.findByIdAndEnsureType(sellerId, Seller.class);
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+        return productRepository.findAllBySeller(seller, paging);
     }
 
     public Product update(UUID id, ProductDTO obj) {
@@ -96,10 +115,6 @@ public class ProductService {
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException(e.getMessage());
         }
-    }
-
-    private User getCurrentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
+import com.example.demo.dtos.UserLoginResponseDTO;
 import com.example.demo.entities.ConfirmationToken;
 import com.example.demo.entities.user.Admin;
 import com.example.demo.entities.user.Customer;
@@ -30,13 +31,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.within;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -67,6 +66,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
     private ConfirmationToken mockConfirmationToken = mock(ConfirmationToken.class);
     private String token = "token";
     private UUID randomUUID = UUID.randomUUID();
+    private UserLoginResponseDTO userLoginResponseDTO = TestDataBuilder.buildUserLoginResponseDTO(registerDTO);
 
     private void verifyAuthentication() {
         verify(authentication, times(1)).getPrincipal();
@@ -90,8 +90,8 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
     }
 
     private void verifyMockRequest() {
-        verify(request,times(1)).getRequestURL();
-        verify(request,times(1)).getServletPath();
+        verify(request, times(1)).getRequestURL();
+        verify(request, times(1)).getServletPath();
     }
 
     @Test
@@ -123,39 +123,57 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenValidSeller_whenRegister_thenReturnToken() {
+    void givenValidSeller_whenRegister_thenReturnUserLoginResponseDTO() {
         registerDTO.setRole(Role.Seller);
         when(tokenService.generateToken(any(User.class))).thenReturn(token);
 
-        String result = authenticationService.register(registerDTO);
+        UserLoginResponseDTO expectedResult = UserLoginResponseDTO.builder()
+                .token(token)
+                .name(registerDTO.getName())
+                .email(registerDTO.getEmail())
+                .role(registerDTO.getRole())
+                .build();
+        UserLoginResponseDTO result = authenticationService.register(registerDTO);
 
-        assertEquals(token, result);
+        assertEquals(expectedResult, result);
 
         verify(userRepository, times(1)).save(any(Seller.class));
         verify(tokenService, times(1)).generateToken(any(User.class));
     }
 
     @Test
-    void givenValidCustomer_whenRegister_thenReturnToken() {
+    void givenValidCustomer_whenRegister_thenReturnUserLoginResponseDTO() {
         registerDTO.setRole(Role.Customer);
         when(tokenService.generateToken(any(User.class))).thenReturn(token);
 
-        String result = authenticationService.register(registerDTO);
+        UserLoginResponseDTO expectedResult = UserLoginResponseDTO.builder()
+                .token(token)
+                .name(registerDTO.getName())
+                .email(registerDTO.getEmail())
+                .role(registerDTO.getRole())
+                .build();
+        UserLoginResponseDTO result = authenticationService.register(registerDTO);
 
-        assertEquals(token, result);
+        assertEquals(expectedResult, result);
 
         verify(userRepository, times(1)).save(any(Customer.class));
         verify(tokenService, times(1)).generateToken(any(User.class));
     }
 
     @Test
-    void givenValidAdmin_whenRegister_thenReturnToken() {
+    void givenValidAdmin_whenRegister_thenReturnUserLoginResponseDTO() {
         registerDTO.setRole(Role.Admin);
         when(tokenService.generateToken(any(User.class))).thenReturn(token);
 
-        String result = authenticationService.register(registerDTO);
+        UserLoginResponseDTO expectedResult = UserLoginResponseDTO.builder()
+                .token(token)
+                .name(registerDTO.getName())
+                .email(registerDTO.getEmail())
+                .role(registerDTO.getRole())
+                .build();
+        UserLoginResponseDTO result = authenticationService.register(registerDTO);
 
-        assertEquals(token, result);
+        assertEquals(expectedResult, result);
 
         verify(userRepository, times(1)).save(any(Admin.class));
         verify(tokenService, times(1)).generateToken(any(User.class));
@@ -175,17 +193,22 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenUser_whenLogin_thenReturnToken() {
-        String token = "token";
+    void givenUser_whenLogin_thenReturnUserLoginResponseDTO() {
         Authentication authenticate = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authenticate);
         when(authenticate.getPrincipal()).thenReturn(user);
         when(tokenService.generateToken(any(User.class))).thenReturn(token);
 
-        String result = authenticationService.login(loginDTO);
+        UserLoginResponseDTO expectedResult = UserLoginResponseDTO.builder()
+                .token(token)
+                .name(registerDTO.getName())
+                .email(registerDTO.getEmail())
+                .role(registerDTO.getRole())
+                .build();
+        UserLoginResponseDTO result = authenticationService.login(loginDTO);
 
-        assertEquals(token, result);
+        assertEquals(expectedResult, result);
 
         verify(authenticationManager, times(1))
                 .authenticate(any(UsernamePasswordAuthenticationToken.class));
@@ -223,7 +246,7 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenUserAndLockTimeIsExpired_whenIsLockTimeExpired_thenReturnTrueAndUnlockUser(){
+    void givenUserAndLockTimeIsExpired_whenIsLockTimeExpired_thenReturnTrueAndUnlockUser() {
         user.setLockTime(Instant.now().minusSeconds(60 * 60 * 24 * 50));
 
         boolean result = authenticationService.isLockTimeExpired(user);
@@ -232,11 +255,11 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
         assertNull(user.getLockTime());
         assertEquals(0, user.getFailedAttempt());
 
-        verify(userRepository,times(1)).save(user);
+        verify(userRepository, times(1)).save(user);
     }
 
     @Test
-    void givenUserAndLockTimeIsNotExpired_whenIsLockTimeExpired_thenReturnFalseAndDoesNotUnlockUser(){
+    void givenUserAndLockTimeIsNotExpired_whenIsLockTimeExpired_thenReturnFalseAndDoesNotUnlockUser() {
         user.setLockTime(Instant.now());
         user.setAccountNonLocked(false);
 
@@ -244,22 +267,22 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
         assertFalse(result);
         assertFalse(user.isAccountNonLocked());
 
-        verify(userRepository,never()).save(user);
+        verify(userRepository, never()).save(user);
     }
 
     @Test
-    void givenUserIsAlreadyEnabled_whenConfirmationRequest_thenThrowUserAlreadyEnabledException(){
+    void givenUserIsAlreadyEnabled_whenConfirmationRequest_thenThrowUserAlreadyEnabledException() {
         user.setEnabled(true);
 
         assertThrows(UserAlreadyEnabledException.class,
                 () -> authenticationService.confirmationRequest(request));
 
         verifyAuthentication();
-        verifyNoInteractions(confirmationTokenRepository,emailService);
+        verifyNoInteractions(confirmationTokenRepository, emailService);
     }
 
     @Test
-    void givenConfirmationTokenAlreadyExistsAndIsExpired_whenConfirmationRequest_thenResetTokenAndSendEmailWithTokenConfirmation(){
+    void givenConfirmationTokenAlreadyExistsAndIsExpired_whenConfirmationRequest_thenResetTokenAndSendEmailWithTokenConfirmation() {
         mockRequest();
         when(confirmationTokenRepository.findByUser(user)).thenReturn(mockConfirmationToken);
         when(mockConfirmationToken.isTokenExpired()).thenReturn(true);
@@ -268,16 +291,16 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
 
         verifyAuthentication();
         verifyMockRequest();
-        verify(confirmationTokenRepository,times(1)).findByUser(user);
-        verify(mockConfirmationToken,times(1)).isTokenExpired();
-        verify(mockConfirmationToken,times(1)).resetToken();
-        verify(confirmationTokenRepository,times(1)).save(mockConfirmationToken);
-        verify(emailService,times(1))
-                .sendEmail(eq(user.getEmail()), anyString(),anyString());
+        verify(confirmationTokenRepository, times(1)).findByUser(user);
+        verify(mockConfirmationToken, times(1)).isTokenExpired();
+        verify(mockConfirmationToken, times(1)).resetToken();
+        verify(confirmationTokenRepository, times(1)).save(mockConfirmationToken);
+        verify(emailService, times(1))
+                .sendEmail(eq(user.getEmail()), anyString(), anyString());
     }
 
     @Test
-    void givenConfirmationTokenAlreadyExistsAndIsNotExpired_whenConfirmationRequest_thenThrowConfirmationTokenAlreadyExistsExceptionAndSendEmailWithTokenConfirmation(){
+    void givenConfirmationTokenAlreadyExistsAndIsNotExpired_whenConfirmationRequest_thenThrowConfirmationTokenAlreadyExistsExceptionAndSendEmailWithTokenConfirmation() {
         when(confirmationTokenRepository.findByUser(user)).thenReturn(mockConfirmationToken);
         when(mockConfirmationToken.isTokenExpired()).thenReturn(false);
 
@@ -285,14 +308,14 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
                 () -> authenticationService.confirmationRequest(request));
 
         verifyAuthentication();
-        verify(confirmationTokenRepository,times(1)).findByUser(user);
-        verify(mockConfirmationToken,times(1)).isTokenExpired();
-        verify(mockConfirmationToken,times(1)).getTimeUntilExpiration();
-        verifyNoMoreInteractions(confirmationTokenRepository, emailService,mockConfirmationToken);
+        verify(confirmationTokenRepository, times(1)).findByUser(user);
+        verify(mockConfirmationToken, times(1)).isTokenExpired();
+        verify(mockConfirmationToken, times(1)).getTimeUntilExpiration();
+        verifyNoMoreInteractions(confirmationTokenRepository, emailService, mockConfirmationToken);
     }
 
     @Test
-    void givenConfirmationDoesNotExists_whenConfirmationRequest_thenCreateNewConfirmationTokenAndSendEmailWithTokenConfirmation(){
+    void givenConfirmationDoesNotExists_whenConfirmationRequest_thenCreateNewConfirmationTokenAndSendEmailWithTokenConfirmation() {
         mockRequest();
         when(confirmationTokenRepository.findByUser(user)).thenReturn(null);
 
@@ -300,15 +323,15 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
 
         verifyAuthentication();
         verifyMockRequest();
-        verify(confirmationTokenRepository,times(1)).findByUser(user);
-        verify(confirmationTokenRepository,times(1))
+        verify(confirmationTokenRepository, times(1)).findByUser(user);
+        verify(confirmationTokenRepository, times(1))
                 .save(any(ConfirmationToken.class));
-        verify(emailService,times(1))
-                .sendEmail(eq(user.getEmail()), anyString(),anyString());
+        verify(emailService, times(1))
+                .sendEmail(eq(user.getEmail()), anyString(), anyString());
     }
 
     @Test
-    void givenRequestAndTokenIsNotExpired_whenConfirmAccount_thenEnableAccountAndDeleteConfirmationToken(){
+    void givenRequestAndTokenIsNotExpired_whenConfirmAccount_thenEnableAccountAndDeleteConfirmationToken() {
         when(confirmationTokenRepository.findByConfirmationToken(randomUUID))
                 .thenReturn(Optional.of(confirmationToken));
         when(userRepository.findByEmail(confirmationToken.getUser().getEmail()))
@@ -317,50 +340,50 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
         authenticationService.confirmAccount(request, randomUUID);
         assertTrue(user.isEnabled());
 
-        verify(confirmationTokenRepository,times(1))
+        verify(confirmationTokenRepository, times(1))
                 .findByConfirmationToken(randomUUID);
-        verify(userRepository,times(1))
+        verify(userRepository, times(1))
                 .findByEmail(confirmationToken.getUser().getEmail());
-        verify(userRepository,times(1)).save(user);
-        verify(confirmationTokenRepository,times(1))
+        verify(userRepository, times(1)).save(user);
+        verify(confirmationTokenRepository, times(1))
                 .deleteById(confirmationToken.getId());
         verifyNoInteractions(emailService);
     }
 
     @Test
-    void givenNoConfirmation_whenConfirmAccount_thenThrowEntityNotFoundException(){
+    void givenNoConfirmation_whenConfirmAccount_thenThrowEntityNotFoundException() {
         when(confirmationTokenRepository.findByConfirmationToken(randomUUID))
                 .thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
-                () -> authenticationService.confirmAccount(request,randomUUID));
+                () -> authenticationService.confirmAccount(request, randomUUID));
 
-        verify(confirmationTokenRepository,times(1))
+        verify(confirmationTokenRepository, times(1))
                 .findByConfirmationToken(randomUUID);
         verifyNoMoreInteractions(confirmationTokenRepository);
         verifyNoInteractions(emailService);
     }
 
     @Test
-    void givenNoUser_whenConfirmAccount_thenThrowUserNotFoundException(){
+    void givenNoUser_whenConfirmAccount_thenThrowUserNotFoundException() {
         when(confirmationTokenRepository.findByConfirmationToken(randomUUID))
                 .thenReturn(Optional.of(confirmationToken));
         when(userRepository.findByEmail(confirmationToken.getUser().getEmail()))
                 .thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class,
-                () -> authenticationService.confirmAccount(request,randomUUID));
+                () -> authenticationService.confirmAccount(request, randomUUID));
 
-        verify(confirmationTokenRepository,times(1))
+        verify(confirmationTokenRepository, times(1))
                 .findByConfirmationToken(randomUUID);
-        verify(userRepository,times(1))
+        verify(userRepository, times(1))
                 .findByEmail(confirmationToken.getUser().getEmail());
-        verifyNoMoreInteractions(confirmationTokenRepository,userRepository);
+        verifyNoMoreInteractions(confirmationTokenRepository, userRepository);
         verifyNoInteractions(emailService);
     }
 
     @Test
-    void givenConfirmationTokenIsExpired_whenConfirmAccount_thenResetTokenAndThrowConfirmationTokenException(){
+    void givenConfirmationTokenIsExpired_whenConfirmAccount_thenResetTokenAndThrowConfirmationTokenException() {
         mockRequest();
         when(mockConfirmationToken.getUser()).thenReturn(user);
         when(mockConfirmationToken.getConfirmationToken()).thenReturn(randomUUID);
@@ -374,15 +397,15 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
                 () -> authenticationService.confirmAccount(request, randomUUID));
 
         verifyMockRequest();
-        verify(confirmationTokenRepository,times(1))
+        verify(confirmationTokenRepository, times(1))
                 .findByConfirmationToken(randomUUID);
-        verify(userRepository,times(1))
+        verify(userRepository, times(1))
                 .findByEmail(confirmationToken.getUser().getEmail());
         verify(mockConfirmationToken, times(1)).isTokenExpired();
         verify(mockConfirmationToken, times(1)).resetToken();
-        verify(emailService,times(1))
-                .sendEmail(eq(user.getEmail()), anyString(),anyString());
-        verifyNoMoreInteractions(confirmationTokenRepository,userRepository,emailService);
+        verify(emailService, times(1))
+                .sendEmail(eq(user.getEmail()), anyString(), anyString());
+        verifyNoMoreInteractions(confirmationTokenRepository, userRepository, emailService);
     }
 
 }
