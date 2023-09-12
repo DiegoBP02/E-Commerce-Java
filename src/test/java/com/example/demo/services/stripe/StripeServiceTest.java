@@ -52,7 +52,7 @@ class StripeServiceTest extends ApplicationConfigTest {
     private Authentication authentication;
     private SecurityContext securityContext;
 
-    private Customer customer = TestDataBuilder.buildCustomer();
+    private Customer customer = TestDataBuilder.buildCustomerWithId();
     private Order order = TestDataBuilder.buildOrder(customer);
     private com.stripe.model.Customer mockCustomerStripe = mock(com.stripe.model.Customer.class);
     private PaymentIntent mockPaymentIntent = mock(PaymentIntent.class);

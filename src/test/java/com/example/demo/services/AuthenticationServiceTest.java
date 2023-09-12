@@ -59,14 +59,13 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
     private HttpServletRequest request = mock(HttpServletRequest.class);
     private String URL = "URL";
 
-    private User user = TestDataBuilder.buildUser();
+    private User user = TestDataBuilder.buildUserWithId();
     private RegisterDTO registerDTO = TestDataBuilder.buildRegisterDTO();
     private LoginDTO loginDTO = TestDataBuilder.buildLoginDTO();
     private ConfirmationToken confirmationToken = new ConfirmationToken(user);
     private ConfirmationToken mockConfirmationToken = mock(ConfirmationToken.class);
     private String token = "token";
     private UUID randomUUID = UUID.randomUUID();
-    private UserLoginResponseDTO userLoginResponseDTO = TestDataBuilder.buildUserLoginResponseDTO(registerDTO);
 
     private void verifyAuthentication() {
         verify(authentication, times(1)).getPrincipal();

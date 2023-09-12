@@ -46,7 +46,7 @@ class PasswordServiceTest extends ApplicationConfigTest {
     private Authentication authentication;
     private SecurityContext securityContext;
 
-    private User user = TestDataBuilder.buildUser();
+    private User user = TestDataBuilder.buildUserWithId();
     private ChangePasswordDTO changePasswordDTO = TestDataBuilder.buildChangePasswordDTO();
     private ForgotPasswordDTO forgotPasswordDTO = TestDataBuilder.buildForgotPasswordDTO();
     private ResetPasswordDTO resetPasswordDTO = TestDataBuilder.buildResetPasswordDTO();

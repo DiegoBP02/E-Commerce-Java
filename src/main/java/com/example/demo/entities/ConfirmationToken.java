@@ -36,7 +36,7 @@ public class ConfirmationToken {
     @Column(nullable = false)
     private Instant expiryDate;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 

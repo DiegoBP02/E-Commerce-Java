@@ -32,7 +32,7 @@ class TokenServiceTest extends ApplicationConfigTest {
     @Value("${timezone.offset}")
     private String timezoneOffSet;
 
-    private User user = TestDataBuilder.buildUser();
+    private User user = TestDataBuilder.buildUserWithId();
 
     @BeforeEach
     void setup() {

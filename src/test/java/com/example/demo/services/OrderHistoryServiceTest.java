@@ -40,11 +40,11 @@ class OrderHistoryServiceTest extends ApplicationConfigTest {
     private Authentication authentication;
     private SecurityContext securityContext;
 
-    private Customer customer = TestDataBuilder.buildCustomer();
+    private Customer customer = TestDataBuilder.buildCustomerWithId();
     private Order order = TestDataBuilder.buildOrder(customer);
     private OrderHistory orderHistory = TestDataBuilder.buildOrderHistory(order);
     private OrderHistoryDTO orderHistoryDTO = TestDataBuilder.buildOrderHistoryDTO(order);
-    private List<OrderHistory> orderHistoryList = TestDataBuilder.buildOrderHistoryList(orderHistory);
+    private List<OrderHistory> orderHistoryList = TestDataBuilder.buildList(orderHistory);
     private Page<OrderHistory> orderHistoryPage = TestDataBuilder.buildPage(orderHistory, 0, 5, "paymentDate");
 
     @BeforeEach

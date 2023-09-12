@@ -46,9 +46,9 @@ class ReviewControllerTest extends ApplicationConfigTest {
     private ObjectMapper objectMapper;
 
     private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
-    private Customer customer = TestDataBuilder.buildCustomer();
-    private Product product = TestDataBuilder.buildProduct(seller);
-    private Review review = TestDataBuilder.buildReview(product, customer);
+    private Customer customer = TestDataBuilder.buildCustomerWithId();
+    private Product product = TestDataBuilder.buildProductWithId(seller);
+    private Review review = TestDataBuilder.buildReviewWithId(product, customer);
     private ReviewDTO reviewDTO = TestDataBuilder.buildReviewDTO();
     private ReviewDTO invalidReviewDTO = mock(ReviewDTO.class);
     private UpdateReviewDTO updateReviewDTO = TestDataBuilder.buildUpdateReviewDTO();

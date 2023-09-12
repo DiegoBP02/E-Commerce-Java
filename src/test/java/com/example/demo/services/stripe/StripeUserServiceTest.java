@@ -36,7 +36,7 @@ class StripeUserServiceTest extends ApplicationConfigTest {
     private Authentication authentication;
     private SecurityContext securityContext;
 
-    private Customer customer = TestDataBuilder.buildCustomer();
+    private Customer customer = TestDataBuilder.buildCustomerWithId();
 
     @BeforeEach
     void setupSecurityContext() {

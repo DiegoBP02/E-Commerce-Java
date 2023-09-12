@@ -31,7 +31,7 @@ class ReviewRepositoryTest {
     @Autowired
     private ProductRepository productRepository;
 
-    private Seller seller = (Seller) TestDataBuilder.buildUser();
+    private Seller seller = (Seller) TestDataBuilder.buildUserNoId();
     private Customer customer = TestDataBuilder.buildCustomerNoId();
     private Product product;
     private Review review;

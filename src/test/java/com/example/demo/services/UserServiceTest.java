@@ -25,24 +25,24 @@ class UserServiceTest extends ApplicationConfigTest {
     @MockBean
     private UserRepository userRepository;
 
-    private User user = TestDataBuilder.buildUser();
-    private Seller seller = (Seller) TestDataBuilder.buildUser();
-    private Customer customer = (Customer) TestDataBuilder.buildCustomer();
+    private User user = TestDataBuilder.buildUserWithId();
+    private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
+    private Customer customer = (Customer) TestDataBuilder.buildCustomerWithId();
 
     @Test
     void givenSeller_whenFindByIdAndEnsureType_thenReturnSeller(){
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(seller));
+        when(userRepository.findById(seller.getId())).thenReturn(Optional.of(seller));
 
         User result = userService.findByIdAndEnsureType(seller.getId(), Seller.class);
 
         assertThat(result).isInstanceOf(Seller.class);
 
-        verify(userRepository,times(1)).findById(user.getId());
+        verify(userRepository,times(1)).findById(seller.getId());
     }
 
     @Test
     void givenNotSeller_whenFindByIdAndEnsureType_thenThrowClassCastException(){
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(customer));
+        when(userRepository.findById(seller.getId())).thenReturn(Optional.of(customer));
 
         ClassCastException classCastException = assertThrows(ClassCastException.class,
                 () -> userService.findByIdAndEnsureType(seller.getId(), Seller.class));
@@ -50,7 +50,7 @@ class UserServiceTest extends ApplicationConfigTest {
         assertEquals("Invalid user type. Cannot cast user to the specified type."
                 ,classCastException.getMessage());
 
-        verify(userRepository,times(1)).findById(user.getId());
+        verify(userRepository,times(1)).findById(seller.getId());
     }
 
     @Test
@@ -79,12 +79,12 @@ class UserServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenUserDoesNotExists_whenFindByIdAndEnsureType_thenThrowResourceNotFoundException(){
-        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+        when(userRepository.findById(seller.getId())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,
                 () -> userService.findByIdAndEnsureType(seller.getId(), Seller.class));
 
-        verify(userRepository,times(1)).findById(user.getId());
+        verify(userRepository,times(1)).findById(seller.getId());
     }
 
 }

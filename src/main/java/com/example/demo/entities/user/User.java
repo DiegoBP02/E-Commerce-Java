@@ -1,5 +1,6 @@
 package com.example.demo.entities.user;
 
+import com.example.demo.entities.ConfirmationToken;
 import com.example.demo.enums.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -58,6 +59,11 @@ public abstract class User implements UserDetails {
     @ToString.Exclude
     @JsonIgnore
     private boolean enabled;
+
+    @ToString.Exclude
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ConfirmationToken confirmationToken;
 
     public User(String name, String email, String password, Role role) {
         this.name = name;

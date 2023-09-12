@@ -50,7 +50,7 @@ class ProductServiceTest extends ApplicationConfigTest {
     private SecurityContext securityContext;
 
     private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
-    private Product product = TestDataBuilder.buildProduct(seller);
+    private Product product = TestDataBuilder.buildProductWithId(seller);
     private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
     private Page<Product> productPage = TestDataBuilder.buildPage(product, 0, 5, "name");
 

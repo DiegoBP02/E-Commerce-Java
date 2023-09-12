@@ -14,11 +14,11 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public <T extends User> T findByIdAndEnsureType(UUID userId, Class<T> expectedClass){
+    public <T extends User> T findByIdAndEnsureType(UUID userId, Class<T> expectedClass) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(userId));
 
-        if (!expectedClass.isInstance(user)){
+        if (!expectedClass.isInstance(user)) {
             throw new ClassCastException("Invalid user type. Cannot cast user to the specified type.");
         }
 

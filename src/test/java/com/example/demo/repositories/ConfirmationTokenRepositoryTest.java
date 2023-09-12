@@ -26,7 +26,7 @@ class ConfirmationTokenRepositoryTest {
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
 
-    private User user = TestDataBuilder.buildUser();
+    private User user = TestDataBuilder.buildUserNoId();
     private ConfirmationToken confirmationToken;
 
     @BeforeEach

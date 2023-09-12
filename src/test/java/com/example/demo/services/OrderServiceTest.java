@@ -48,7 +48,7 @@ class OrderServiceTest extends ApplicationConfigTest {
     private Authentication authentication;
     private SecurityContext securityContext;
 
-    private Customer customer = TestDataBuilder.buildCustomer();
+    private Customer customer = TestDataBuilder.buildCustomerWithId();
     private Order order = TestDataBuilder.buildOrder(customer);
     private OrderItem mockOrderItem = mock(OrderItem.class);
     private OrderHistory orderHistory = TestDataBuilder.buildOrderHistory(order);

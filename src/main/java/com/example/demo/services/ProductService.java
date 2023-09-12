@@ -2,7 +2,6 @@ package com.example.demo.services;
 
 import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
-import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.ProductCategory;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -72,7 +70,7 @@ public class ProductService {
         return productRepository.findAllBySeller(seller, paging);
     }
 
-    public Page<Product> findAllBySeller(UUID sellerId,Integer pageNo, Integer pageSize, String sortBy) {
+    public Page<Product> findAllBySeller(UUID sellerId, Integer pageNo, Integer pageSize, String sortBy) {
         Seller seller = userService.findByIdAndEnsureType(sellerId, Seller.class);
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 

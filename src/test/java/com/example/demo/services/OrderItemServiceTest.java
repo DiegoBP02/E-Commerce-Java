@@ -51,11 +51,11 @@ class OrderItemServiceTest extends ApplicationConfigTest {
     private SecurityContext securityContext;
 
     private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
-    private Product product = TestDataBuilder.buildProduct(seller);
-    private Customer customer = TestDataBuilder.buildCustomer();
+    private Product product = TestDataBuilder.buildProductWithId(seller);
+    private Customer customer = TestDataBuilder.buildCustomerWithId();
     private OrderItemDTO orderItemDTO = TestDataBuilder.buildOrderItemDTO();
     private Order order = TestDataBuilder.buildOrder(customer);
-    private OrderItem orderItem = TestDataBuilder.buildOrderItem(order, product);
+    private OrderItem orderItem = TestDataBuilder.buildOrderItemNoId(order, product);
 
     @BeforeEach
     void setupSecurityContext() {

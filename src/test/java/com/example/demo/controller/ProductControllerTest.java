@@ -50,7 +50,7 @@ class ProductControllerTest extends ApplicationConfigTest {
     private ObjectMapper objectMapper;
 
     private User user = TestDataBuilder.buildUserWithId();
-    private Product product = TestDataBuilder.buildProduct((Seller) user);
+    private Product product = TestDataBuilder.buildProductWithId((Seller) user);
     private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
     private ProductDTO invalidProductDTO = mock(ProductDTO.class);
     Page<Product> productPage = mock(PageImpl.class);

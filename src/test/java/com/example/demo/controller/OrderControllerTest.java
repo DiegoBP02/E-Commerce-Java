@@ -43,7 +43,7 @@ class OrderControllerTest extends ApplicationConfigTest {
     private ObjectMapper objectMapper;
 
     private Order order = TestDataBuilder.buildOrderWithId();
-    private List<Order> orders = Collections.singletonList(order);
+    private List<Order> orders = TestDataBuilder.buildList(order);
 
     private MockHttpServletRequestBuilder mockPostRequest() throws JsonProcessingException {
         return MockMvcRequestBuilders

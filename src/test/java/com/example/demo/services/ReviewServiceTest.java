@@ -53,9 +53,9 @@ class ReviewServiceTest extends ApplicationConfigTest {
     private SecurityContext securityContext;
 
     private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
-    private Customer customer = TestDataBuilder.buildCustomer();
-    private Product product = TestDataBuilder.buildProduct(seller);
-    private Review review = TestDataBuilder.buildReview(product, customer);
+    private Customer customer = TestDataBuilder.buildCustomerWithId();
+    private Product product = TestDataBuilder.buildProductWithId(seller);
+    private Review review = TestDataBuilder.buildReviewWithId(product, customer);
     private ReviewDTO reviewDTO = TestDataBuilder.buildReviewDTO();
     private Page<Review> reviewPage = TestDataBuilder.buildPage(review,0,5,"rating");
     private UpdateReviewDTO updateReviewDTO = TestDataBuilder.buildUpdateReviewDTO();

@@ -37,7 +37,7 @@ public class TestDataBuilder {
     private static final int defaultOrderItemQuantity = 1;
     private static final CreditCard defaultCreditCard = CreditCard.pm_card_visa;
 
-    public static User buildUser() {
+    public static User buildUserNoId() {
         return Seller.builder()
                 .name(defaultName)
                 .email(defaultEmail)
@@ -55,7 +55,7 @@ public class TestDataBuilder {
         return seller;
     }
 
-    public static Customer buildCustomer() {
+    public static Customer buildCustomerWithId() {
         Customer customer = Customer.builder()
                 .name(defaultName)
                 .email(defaultCustomerEmail)
@@ -89,7 +89,7 @@ public class TestDataBuilder {
                 .build();
     }
 
-    public static Product buildProduct(Seller seller) {
+    public static Product buildProductWithId(Seller seller) {
         return Product.builder()
                 .id(UUID.randomUUID())
                 .name(defaultProductName)
@@ -121,7 +121,7 @@ public class TestDataBuilder {
                 .build();
     }
 
-    public static Review buildReview(Product product, Customer customer) {
+    public static Review buildReviewWithId(Product product, Customer customer) {
         Review review = Review.builder()
                 .product(product)
                 .comment(defaultReviewComment)
@@ -156,13 +156,13 @@ public class TestDataBuilder {
                 .build();
     }
 
-    public static Order buildOrder() {
+    public static Order buildOrderNoId() {
         return Order.builder()
                 .items(new ArrayList<>())
                 .status(OrderStatus.Pending)
                 .orderDate(Instant.now())
                 .totalAmount(BigDecimal.ONE)
-                .customer(buildCustomer())
+                .customer(buildCustomerWithId())
                 .build();
     }
 
@@ -173,7 +173,7 @@ public class TestDataBuilder {
                 .status(OrderStatus.Pending)
                 .orderDate(Instant.now())
                 .totalAmount(BigDecimal.ONE)
-                .customer(buildCustomer())
+                .customer(buildCustomerWithId())
                 .build();
     }
 
@@ -187,7 +187,7 @@ public class TestDataBuilder {
                 .build();
     }
 
-    public static OrderItem buildOrderItem(Order order, Product product) {
+    public static OrderItem buildOrderItemNoId(Order order, Product product) {
         return OrderItem.builder()
                 .order(order)
                 .product(product)
@@ -198,8 +198,8 @@ public class TestDataBuilder {
     public static OrderItem buildOrderItemWithId() {
         return OrderItem.builder()
                 .id(UUID.randomUUID())
-                .order(buildOrder())
-                .product(buildProduct((Seller) buildUser()))
+                .order(buildOrderWithId())
+                .product(buildProductWithId((Seller) buildUserWithId()))
                 .quantity(defaultOrderItemQuantity)
                 .build();
     }
@@ -278,8 +278,8 @@ public class TestDataBuilder {
         return new PageImpl<>(Collections.singletonList(entity), PageRequest.of(pageNo, pageSize, Sort.by(sortBy)), 1);
     }
 
-    public static List<OrderHistory> buildOrderHistoryList(OrderHistory orderHistory) {
-        return Collections.singletonList(orderHistory);
+    public static <T> List<T> buildList(T entity) {
+        return Collections.singletonList(entity);
     }
 
     public static UserLoginResponseDTO buildUserLoginResponseDTO(RegisterDTO registerDTO) {

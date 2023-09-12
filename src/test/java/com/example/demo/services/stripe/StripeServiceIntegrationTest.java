@@ -56,11 +56,11 @@ public class StripeServiceIntegrationTest extends ApplicationConfigTest {
     private Authentication authentication;
     private SecurityContext securityContext;
 
-    private Customer customer = TestDataBuilder.buildCustomer();
+    private Customer customer = TestDataBuilder.buildCustomerWithId();
     private Order order = TestDataBuilder.buildOrder(customer);
-    private Seller seller = (Seller) TestDataBuilder.buildUser();
-    private Product product = TestDataBuilder.buildProduct(seller);
-    private OrderItem orderItem = TestDataBuilder.buildOrderItem(order, product);
+    private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
+    private Product product = TestDataBuilder.buildProductWithId(seller);
+    private OrderItem orderItem = TestDataBuilder.buildOrderItemWithId(order, product);
     private OrderHistory orderHistory = TestDataBuilder.buildOrderHistory(order);
     private OrderHistoryDTO orderHistoryDTO = TestDataBuilder.buildOrderHistoryDTO(order);
     private OrderPaymentDTO orderPaymentDTO = TestDataBuilder.buildOrderPaymentDTO();

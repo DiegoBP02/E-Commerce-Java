@@ -25,7 +25,7 @@ class ProductRepositoryTest {
     @Autowired
     private ProductRepository productRepository;
 
-    private Seller seller = (Seller) TestDataBuilder.buildUser();
+    private Seller seller = (Seller) TestDataBuilder.buildUserNoId();
     private Product product = TestDataBuilder.buildProductNoId(seller);
     Pageable paging = PageRequest.of(0, 5, Sort.by("name"));
 

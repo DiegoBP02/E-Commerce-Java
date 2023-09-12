@@ -32,7 +32,7 @@ class OrderItemRepositoryTest {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
-    private Seller seller = (Seller) TestDataBuilder.buildUser();
+    private Seller seller = (Seller) TestDataBuilder.buildUserNoId();
     private Customer customer = TestDataBuilder.buildCustomerNoId();
     private Product product;
     private Order order;
@@ -49,7 +49,7 @@ class OrderItemRepositoryTest {
         product = TestDataBuilder.buildProductNoId(seller);
         productRepository.save(product);
 
-        orderItem = TestDataBuilder.buildOrderItem(order, product);
+        orderItem = TestDataBuilder.buildOrderItemNoId(order, product);
     }
 
     @AfterEach

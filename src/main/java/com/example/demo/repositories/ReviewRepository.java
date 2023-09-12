@@ -13,5 +13,6 @@ import java.util.UUID;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
     Page<Review> findAllByProduct(Product product, Pageable paging);
+
     Page<Review> findAllByCustomer(Customer customer, Pageable paging);
 }

@@ -17,7 +17,7 @@ class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User user = TestDataBuilder.buildUser();
+    private User user = TestDataBuilder.buildUserNoId();
 
     @AfterEach
     void tearDown() throws Exception {

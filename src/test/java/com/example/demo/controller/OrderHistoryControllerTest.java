@@ -40,7 +40,7 @@ class OrderHistoryControllerTest extends ApplicationConfigTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Customer customer = TestDataBuilder.buildCustomer();
+    private Customer customer = TestDataBuilder.buildCustomerWithId();
     private Order order = TestDataBuilder.buildOrder(customer);
     private OrderHistory orderHistory = TestDataBuilder.buildOrderHistoryWithId(order);
 

@@ -47,7 +47,7 @@ class OrderItemControllerTest extends ApplicationConfigTest {
     private OrderItemDTO orderItemDTO = TestDataBuilder.buildOrderItemDTO();
     private OrderItem orderItem = TestDataBuilder.buildOrderItemWithId();
     private OrderItemDTO invalidOrderItemDTO = mock(OrderItemDTO.class);
-    private List<OrderItem> orderItems = Collections.singletonList(orderItem);
+    private List<OrderItem> orderItems = TestDataBuilder.buildList(orderItem);
     private Order order = TestDataBuilder.buildOrderWithId();
 
     private MockHttpServletRequestBuilder mockPostRequest
