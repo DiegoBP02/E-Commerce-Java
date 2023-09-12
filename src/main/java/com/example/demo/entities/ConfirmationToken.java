@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Builder
 public class ConfirmationToken {
     public static final int EXPIRATION_TIME_IN_SECONDS = 30 * 60; // 30min
 
@@ -40,6 +39,7 @@ public class ConfirmationToken {
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
+    @Builder
     public ConfirmationToken(User user) {
         this.user = user;
         createdDate = Instant.now();

@@ -15,7 +15,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Builder
 public class ResetPasswordToken {
     public static final int EXPIRATION_TIME_IN_SECONDS = 30 * 60; // 30min
 
@@ -38,6 +37,7 @@ public class ResetPasswordToken {
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
+    @Builder
     public ResetPasswordToken(User user) {
         this.user = user;
         createdDate = Instant.now();
@@ -50,9 +50,4 @@ public class ResetPasswordToken {
         return currentTime.isAfter(expiryDate);
     }
 
-    public void resetToken() {
-        this.createdDate = Instant.now();
-        this.resetPasswordToken = UUID.randomUUID();
-        this.expiryDate = Instant.now().plusSeconds(EXPIRATION_TIME_IN_SECONDS);
-    }
 }

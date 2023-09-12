@@ -52,7 +52,8 @@ class ProductServiceTest extends ApplicationConfigTest {
     private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
     private Product product = TestDataBuilder.buildProductWithId(seller);
     private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
-    private Page<Product> productPage = TestDataBuilder.buildPage(product, 0, 5, "name");
+    private Page<Product> productPage =
+            TestDataBuilder.buildPage(product, 0, 5, Sort.Direction.ASC,"name");
 
     @BeforeEach
     void setupSecurityContext() {
@@ -94,6 +95,7 @@ class ProductServiceTest extends ApplicationConfigTest {
         Page<Product> result = productService
                 .findAll(productPage.getPageable().getPageNumber(),
                         productPage.getPageable().getPageSize(),
+                        productPage.getPageable().getSort().stream().toList().get(0).getDirection(),
                         productPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
         assertEquals(productPage, result);
@@ -145,6 +147,7 @@ class ProductServiceTest extends ApplicationConfigTest {
         Page<Product> result = productService
                 .findByCurrentUser(productPage.getPageable().getPageNumber(),
                         productPage.getPageable().getPageSize(),
+                        productPage.getPageable().getSort().stream().toList().get(0).getDirection(),
                         productPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
         assertEquals(productPage, result);
@@ -163,6 +166,7 @@ class ProductServiceTest extends ApplicationConfigTest {
         Page<Product> result = productService
                 .findAllBySeller(seller.getId(),productPage.getPageable().getPageNumber(),
                         productPage.getPageable().getPageSize(),
+                        productPage.getPageable().getSort().stream().toList().get(0).getDirection(),
                         productPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
         assertEquals(productPage, result);

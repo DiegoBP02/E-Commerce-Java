@@ -4,17 +4,14 @@ import com.example.demo.entities.OrderHistory;
 import com.example.demo.services.OrderHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping(value = "/orderHistory")
 public class OrderHistoryController {
 
@@ -32,8 +29,12 @@ public class OrderHistoryController {
     public ResponseEntity<Page<OrderHistory>> findByCurrentUser(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "paymentDate") String sortBy
     ) {
-        return ResponseEntity.ok().body(orderHistoryService.findByCurrentUser(pageNo, pageSize, sortBy));
+        Sort.Direction sortOrder = Sort.Direction.fromString(sortDirection);
+        Page<OrderHistory> orderHistoryPage =
+                orderHistoryService.findByCurrentUser(pageNo, pageSize, sortOrder, sortBy);
+        return ResponseEntity.ok().body(orderHistoryPage);
     }
 }

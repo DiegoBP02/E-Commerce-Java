@@ -208,7 +208,6 @@ public class ExceptionHandlers {
         logger.error("Method argument type mismatch exception", e);
         String error = "Method argument type mismatch";
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ;
         String message = "The value provided for the request parameter " + e.getName() + " is not valid.";
         StandardError err = new StandardError(Instant.now(), status.value(), error,
                 message, request.getRequestURI());

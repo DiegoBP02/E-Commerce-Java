@@ -7,16 +7,16 @@ import com.example.demo.services.ReviewService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping(value = "/reviews")
 public class ReviewController {
 
@@ -35,14 +35,17 @@ public class ReviewController {
         return ResponseEntity.created(uri).body(review);
     }
 
+    @PreAuthorize("hasAuthority('Admin')")
     @GetMapping
     public ResponseEntity<Page<Review>> findAll(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "rating") String sortBy
     ) {
-        Page<Review> reviews = reviewService.findAll(pageNo, pageSize, sortBy);
-        return ResponseEntity.ok().body(reviews);
+        Sort.Direction sortOrder = Sort.Direction.fromString(sortDirection);
+        Page<Review> reviewPage = reviewService.findAll(pageNo, pageSize, sortOrder, sortBy);
+        return ResponseEntity.ok().body(reviewPage);
     }
 
     @GetMapping(value = "/{id}")
@@ -55,9 +58,13 @@ public class ReviewController {
             @PathVariable UUID productId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "rating") String sortBy
     ) {
-        return ResponseEntity.ok().body(reviewService.findAllByProduct(productId, pageNo, pageSize, sortBy));
+        Sort.Direction sortOrder = Sort.Direction.fromString(sortDirection);
+        Page<Review> reviewPage =
+                reviewService.findAllByProduct(productId, pageNo, pageSize, sortOrder, sortBy);
+        return ResponseEntity.ok().body(reviewPage);
     }
 
     @PreAuthorize("hasAuthority('Customer')")
@@ -65,9 +72,13 @@ public class ReviewController {
     public ResponseEntity<Page<Review>> findByCurrentUser(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "rating") String sortBy
     ) {
-        return ResponseEntity.ok().body(reviewService.findByCurrentUser(pageNo, pageSize, sortBy));
+        Sort.Direction sortOrder = Sort.Direction.fromString(sortDirection);
+        Page<Review> reviewPage =
+                reviewService.findByCurrentUser(pageNo, pageSize, sortOrder, sortBy);
+        return ResponseEntity.ok().body(reviewPage);
     }
 
     @PreAuthorize("hasAuthority('Customer')")

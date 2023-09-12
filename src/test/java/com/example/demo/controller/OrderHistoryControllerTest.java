@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -105,7 +106,7 @@ class OrderHistoryControllerTest extends ApplicationConfigTest {
     void givenOrderHistory_whenFindByCurrentUser_thenReturnOrderHistoryPage() throws Exception {
         Page<OrderHistory> orderHistoryPage = mock(PageImpl.class);
 
-        when(orderHistoryService.findByCurrentUser(0, 5, "paymentDate"))
+        when(orderHistoryService.findByCurrentUser(0, 5, Sort.Direction.ASC,"paymentDate"))
                 .thenReturn(orderHistoryPage);
 
         mockMvc.perform(mockGetRequest("/user"))
@@ -113,7 +114,7 @@ class OrderHistoryControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(orderHistoryPage)));
 
         verify(orderHistoryService, times(1))
-                .findByCurrentUser(0, 5, "paymentDate");
+                .findByCurrentUser(0, 5, Sort.Direction.ASC,"paymentDate");
     }
 
     @Test

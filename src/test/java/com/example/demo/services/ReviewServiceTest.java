@@ -57,7 +57,8 @@ class ReviewServiceTest extends ApplicationConfigTest {
     private Product product = TestDataBuilder.buildProductWithId(seller);
     private Review review = TestDataBuilder.buildReviewWithId(product, customer);
     private ReviewDTO reviewDTO = TestDataBuilder.buildReviewDTO();
-    private Page<Review> reviewPage = TestDataBuilder.buildPage(review,0,5,"rating");
+    private Page<Review> reviewPage =
+            TestDataBuilder.buildPage(review,0,5, Sort.Direction.ASC,"rating");
     private UpdateReviewDTO updateReviewDTO = TestDataBuilder.buildUpdateReviewDTO();
 
     @BeforeEach
@@ -136,6 +137,7 @@ class ReviewServiceTest extends ApplicationConfigTest {
                 .findAllByProduct(product.getId(),
                         reviewPage.getPageable().getPageNumber(),
                         reviewPage.getPageable().getPageSize(),
+                        reviewPage.getPageable().getSort().stream().toList().get(0).getDirection(),
                         reviewPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
         assertEquals(reviewPage, result);
@@ -152,6 +154,7 @@ class ReviewServiceTest extends ApplicationConfigTest {
         Page<Review> result = reviewService
                 .findByCurrentUser(reviewPage.getPageable().getPageNumber(),
                         reviewPage.getPageable().getPageSize(),
+                        reviewPage.getPageable().getSort().stream().toList().get(0).getDirection(),
                         reviewPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
         assertEquals(reviewPage, result);
@@ -167,6 +170,7 @@ class ReviewServiceTest extends ApplicationConfigTest {
         Page<Review> result = reviewService
                 .findAll(reviewPage.getPageable().getPageNumber(),
                         reviewPage.getPageable().getPageSize(),
+                        reviewPage.getPageable().getSort().stream().toList().get(0).getDirection(),
                         reviewPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
         assertEquals(reviewPage, result);

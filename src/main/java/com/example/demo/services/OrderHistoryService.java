@@ -49,8 +49,9 @@ public class OrderHistoryService {
         return orderHistory;
     }
 
-    public Page<OrderHistory> findByCurrentUser(Integer pageNo, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+    public Page<OrderHistory> findByCurrentUser
+            (Integer pageNo, Integer pageSize, Sort.Direction sortOrder, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortOrder, sortBy);
         Customer customer = (Customer) getCurrentUser();
 
         return orderHistoryRepository.findAllByCustomer(customer, paging);

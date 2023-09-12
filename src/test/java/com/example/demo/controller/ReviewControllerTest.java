@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -175,16 +176,43 @@ class ReviewControllerTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenReviewsAndNoUser_whenFindAll_thenReturnReviewPage() throws Exception {
+    @WithMockUser(authorities = "Admin")
+    void givenReviewsAndAdmin_whenFindAll_thenReturnReviewPage() throws Exception {
         Page<Review> reviewPage = mock(PageImpl.class);
 
-        when(reviewService.findAll(0, 5, "rating")).thenReturn(reviewPage);
+        when(reviewService.findAll(0, 5, Sort.Direction.ASC,"rating"))
+                .thenReturn(reviewPage);
 
         mockMvc.perform(mockGetRequest())
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(reviewPage)));
 
-        verify(reviewService, times(1)).findAll(0, 5, "rating");
+        verify(reviewService, times(1))
+                .findAll(0, 5, Sort.Direction.ASC,"rating");
+    }
+
+    @Test
+    @WithMockUser(authorities = "Seller")
+    void givenInvalidUserAuthoritySeller_whenFindAll_thenHandleAccessDeniedException() throws Exception {
+        mockMvc.perform(mockGetRequest())
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verifyNoInteractions(reviewService);
+    }
+
+    @Test
+    @WithMockUser(authorities = "Customer")
+    void givenInvalidUserAuthorityCustomer_whenFindAll_thenHandleAccessDeniedException() throws Exception {
+        mockMvc.perform(mockGetRequest())
+                .andExpect(status().isForbidden())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof AccessDeniedException));
+
+        verifyNoInteractions(reviewService);
     }
 
     @Test
@@ -216,7 +244,8 @@ class ReviewControllerTest extends ApplicationConfigTest {
     void givenReview_whenFindAllByProduct_thenReturnReviewPage() throws Exception {
         Page<Review> reviewPage = mock(PageImpl.class);
 
-        when(reviewService.findAllByProduct(product.getId(),0, 5, "rating"))
+        when(reviewService
+                .findAllByProduct(product.getId(),0, 5, Sort.Direction.ASC,"rating"))
                 .thenReturn(reviewPage);
 
         mockMvc.perform(mockGetRequest("product/" + product.getId()))
@@ -224,7 +253,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(reviewPage)));
 
         verify(reviewService, times(1))
-                .findAllByProduct(product.getId(),0, 5, "rating");
+                .findAllByProduct(product.getId(),0, 5, Sort.Direction.ASC,"rating");
     }
 
 
@@ -233,7 +262,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     void givenReview_whenFindByCurrentUser_thenReturnReviewPage() throws Exception {
         Page<Review> reviewPage = mock(PageImpl.class);
 
-        when(reviewService.findByCurrentUser(0, 5, "rating"))
+        when(reviewService.findByCurrentUser(0, 5, Sort.Direction.ASC,"rating"))
                 .thenReturn(reviewPage);
 
         mockMvc.perform(mockGetRequest("user"))
@@ -241,7 +270,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(reviewPage)));
 
         verify(reviewService, times(1))
-                .findByCurrentUser(0, 5, "rating");
+                .findByCurrentUser(0, 5, Sort.Direction.ASC,"rating");
     }
 
     @Test

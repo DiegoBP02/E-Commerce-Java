@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,7 +46,8 @@ class OrderHistoryServiceTest extends ApplicationConfigTest {
     private OrderHistory orderHistory = TestDataBuilder.buildOrderHistory(order);
     private OrderHistoryDTO orderHistoryDTO = TestDataBuilder.buildOrderHistoryDTO(order);
     private List<OrderHistory> orderHistoryList = TestDataBuilder.buildList(orderHistory);
-    private Page<OrderHistory> orderHistoryPage = TestDataBuilder.buildPage(orderHistory, 0, 5, "paymentDate");
+    private Page<OrderHistory> orderHistoryPage = TestDataBuilder
+            .buildPage(orderHistory, 0, 5, Sort.Direction.ASC,"paymentDate");
 
     @BeforeEach
     void setupSecurityContext() {
@@ -123,6 +125,7 @@ class OrderHistoryServiceTest extends ApplicationConfigTest {
         Page<OrderHistory> result = orderHistoryService
                 .findByCurrentUser(orderHistoryPage.getPageable().getPageNumber(),
                         orderHistoryPage.getPageable().getPageSize(),
+                        orderHistoryPage.getPageable().getSort().stream().toList().get(0).getDirection(),
                         orderHistoryPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
         assertEquals(orderHistoryPage, result);

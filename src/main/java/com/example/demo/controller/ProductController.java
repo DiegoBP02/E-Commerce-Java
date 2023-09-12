@@ -7,9 +7,9 @@ import com.example.demo.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping(value = "/products")
 public class ProductController {
 
@@ -40,10 +40,12 @@ public class ProductController {
     public ResponseEntity<Page<Product>> findAll(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "name") String sortBy
     ) {
-        Page<Product> products = productService.findAll(pageNo, pageSize, sortBy);
-        return ResponseEntity.ok().body(products);
+        Sort.Direction sortOrder = Sort.Direction.fromString(sortDirection);
+        Page<Product> productPage = productService.findAll(pageNo, pageSize, sortOrder, sortBy);
+        return ResponseEntity.ok().body(productPage);
     }
 
     @GetMapping(value = "/category")
@@ -61,9 +63,12 @@ public class ProductController {
     public ResponseEntity<Page<Product>> findByCurrentUser(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "name") String sortBy
     ) {
-        return ResponseEntity.ok().body(productService.findByCurrentUser(pageNo, pageSize, sortBy));
+        Sort.Direction sortOrder = Sort.Direction.fromString(sortDirection);
+        Page<Product> productPage = productService.findByCurrentUser(pageNo, pageSize, sortOrder, sortBy);
+        return ResponseEntity.ok().body(productPage);
     }
 
     @GetMapping(value = "/seller/{sellerId}")
@@ -71,9 +76,13 @@ public class ProductController {
             @PathVariable UUID sellerId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
             @RequestParam(defaultValue = "name") String sortBy
     ) {
-        return ResponseEntity.ok().body(productService.findAllBySeller(sellerId, pageNo, pageSize, sortBy));
+        Sort.Direction sortOrder = Sort.Direction.fromString(sortDirection);
+        Page<Product> productPage =
+                productService.findAllBySeller(sellerId, pageNo, pageSize, sortOrder, sortBy);
+        return ResponseEntity.ok().body(productPage);
     }
 
     @PreAuthorize("hasAuthority('Seller')")

@@ -48,8 +48,8 @@ public class ProductService {
     }
 
     @Transactional
-    public Page<Product> findAll(Integer pageNo, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+    public Page<Product> findAll(Integer pageNo, Integer pageSize, Sort.Direction sortOrder, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortOrder, sortBy);
 
         return productRepository.findAll(paging);
     }
@@ -63,16 +63,16 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
-    public Page<Product> findByCurrentUser(Integer pageNo, Integer pageSize, String sortBy) {
+    public Page<Product> findByCurrentUser(Integer pageNo, Integer pageSize, Sort.Direction sortOrder, String sortBy) {
         Seller seller = (Seller) getCurrentUser();
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortOrder, sortBy);
 
         return productRepository.findAllBySeller(seller, paging);
     }
 
-    public Page<Product> findAllBySeller(UUID sellerId, Integer pageNo, Integer pageSize, String sortBy) {
+    public Page<Product> findAllBySeller(UUID sellerId, Integer pageNo, Integer pageSize, Sort.Direction sortOrder, String sortBy) {
         Seller seller = userService.findByIdAndEnsureType(sellerId, Seller.class);
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortOrder, sortBy);
 
         return productRepository.findAllBySeller(seller, paging);
     }

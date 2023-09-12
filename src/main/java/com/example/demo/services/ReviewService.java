@@ -63,8 +63,9 @@ public class ReviewService {
     }
 
     @Transactional
-    public Page<Review> findAll(Integer pageNo, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+    public Page<Review> findAll(Integer pageNo, Integer pageSize,
+                                Sort.Direction sortDirection, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortDirection, sortBy);
 
         return reviewRepository.findAll(paging);
     }
@@ -74,16 +75,18 @@ public class ReviewService {
                 .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
-    public Page<Review> findAllByProduct(UUID productId, Integer pageNo, Integer pageSize, String sortBy) {
+    public Page<Review> findAllByProduct(UUID productId, Integer pageNo, Integer pageSize,
+                                         Sort.Direction sortDirection, String sortBy) {
         Product product = productService.findById(productId);
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortDirection, sortBy);
 
         return reviewRepository.findAllByProduct(product, paging);
     }
 
-    public Page<Review> findByCurrentUser(Integer pageNo, Integer pageSize, String sortBy) {
+    public Page<Review> findByCurrentUser(Integer pageNo, Integer pageSize,
+                                          Sort.Direction sortDirection, String sortBy) {
         Customer customer = (Customer) getCurrentUser();
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortDirection, sortBy);
 
         return reviewRepository.findAllByCustomer(customer, paging);
     }

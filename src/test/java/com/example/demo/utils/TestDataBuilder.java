@@ -274,8 +274,10 @@ public class TestDataBuilder {
                 .build();
     }
 
-    public static <T> Page<T> buildPage(T entity, Integer pageNo, Integer pageSize, String sortBy) {
-        return new PageImpl<>(Collections.singletonList(entity), PageRequest.of(pageNo, pageSize, Sort.by(sortBy)), 1);
+    public static <T> Page<T> buildPage(T entity, Integer pageNo, Integer pageSize,
+                                        Sort.Direction sortDirection, String sortBy) {
+        return new PageImpl<>(Collections.singletonList(entity),
+                PageRequest.of(pageNo, pageSize, sortDirection,sortBy), 1);
     }
 
     public static <T> List<T> buildList(T entity) {
