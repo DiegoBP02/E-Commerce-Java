@@ -25,7 +25,7 @@ public class StripeUtils {
         Stripe.apiKey = secretKey;
     }
 
-    public static void deleteStripeCustomer(Customer customer){
+    public static void deleteStripeCustomer(Customer customer) {
         Customer deletedCustomer = null;
         try {
             deletedCustomer = customer.delete();
@@ -37,7 +37,7 @@ public class StripeUtils {
         assertTrue(deletedCustomer.getDeleted());
     }
 
-    public Customer setupStripeCustomer(){
+    public Customer setupStripeCustomer() {
         try {
             StripeClient client = new StripeClient(secretKey);
             CustomerCreateParams params =

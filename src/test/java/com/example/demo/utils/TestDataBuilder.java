@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -277,7 +276,7 @@ public class TestDataBuilder {
     public static <T> Page<T> buildPage(T entity, Integer pageNo, Integer pageSize,
                                         Sort.Direction sortDirection, String sortBy) {
         return new PageImpl<>(Collections.singletonList(entity),
-                PageRequest.of(pageNo, pageSize, sortDirection,sortBy), 1);
+                PageRequest.of(pageNo, pageSize, sortDirection, sortBy), 1);
     }
 
     public static <T> List<T> buildList(T entity) {

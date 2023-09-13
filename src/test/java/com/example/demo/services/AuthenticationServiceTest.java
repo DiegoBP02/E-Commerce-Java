@@ -5,7 +5,6 @@ import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
 import com.example.demo.dtos.UserLoginResponseDTO;
 import com.example.demo.entities.ConfirmationToken;
-import com.example.demo.entities.user.Admin;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
@@ -160,22 +159,14 @@ class AuthenticationServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenValidAdmin_whenRegister_thenReturnUserLoginResponseDTO() {
+    void givenValidAdmin_whenRegister_thenReturnThrowInvalidRoleException() {
         registerDTO.setRole(Role.Admin);
         when(tokenService.generateToken(any(User.class))).thenReturn(token);
 
-        UserLoginResponseDTO expectedResult = UserLoginResponseDTO.builder()
-                .token(token)
-                .name(registerDTO.getName())
-                .email(registerDTO.getEmail())
-                .role(registerDTO.getRole())
-                .build();
-        UserLoginResponseDTO result = authenticationService.register(registerDTO);
+        assertThrows(InvalidRoleException.class,
+                () -> authenticationService.register(registerDTO));
 
-        assertEquals(expectedResult, result);
-
-        verify(userRepository, times(1)).save(any(Admin.class));
-        verify(tokenService, times(1)).generateToken(any(User.class));
+        verifyNoInteractions(userRepository, tokenService);
     }
 
     @Test

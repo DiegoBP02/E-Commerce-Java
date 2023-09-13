@@ -7,8 +7,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -20,7 +18,6 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 class CustomFilterTest extends ApplicationConfigTest {
 
@@ -56,7 +53,7 @@ class CustomFilterTest extends ApplicationConfigTest {
         when(user.isEnabled()).thenReturn(false);
 
         assertThrows(UserNotEnabledException.class,
-                () -> customFilter.doFilterInternal(request,response,filterChain));
+                () -> customFilter.doFilterInternal(request, response, filterChain));
 
         verifyNoInteractions(filterChain);
         verifyAuthentication();
@@ -68,9 +65,9 @@ class CustomFilterTest extends ApplicationConfigTest {
         setupSecurityContext();
         when(user.isEnabled()).thenReturn(true);
 
-        customFilter.doFilterInternal(request,response,filterChain);
+        customFilter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain,times(1)).doFilter(request,response);
+        verify(filterChain, times(1)).doFilter(request, response);
         verifyAuthentication();
     }
 

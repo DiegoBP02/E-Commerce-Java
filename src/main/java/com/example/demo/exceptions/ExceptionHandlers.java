@@ -436,4 +436,15 @@ public class ExceptionHandlers {
         return ResponseEntity.status(status).body(err);
     }
 
+    @ExceptionHandler(InvalidRoleException.class)
+    public ResponseEntity<StandardError> ResetPasswordTokenExpired
+            (InvalidRoleException e, HttpServletRequest request) {
+        logger.error("Invalid rode exception:", e);
+        String error = "Invalid role";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
 }

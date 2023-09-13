@@ -3,7 +3,6 @@ package com.example.demo.services;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.ReviewDTO;
 import com.example.demo.dtos.UpdateReviewDTO;
-import com.example.demo.entities.OrderHistory;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Customer;
@@ -20,14 +19,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -58,7 +58,7 @@ class ReviewServiceTest extends ApplicationConfigTest {
     private Review review = TestDataBuilder.buildReviewWithId(product, customer);
     private ReviewDTO reviewDTO = TestDataBuilder.buildReviewDTO();
     private Page<Review> reviewPage =
-            TestDataBuilder.buildPage(review,0,5, Sort.Direction.ASC,"rating");
+            TestDataBuilder.buildPage(review, 0, 5, Sort.Direction.ASC, "rating");
     private UpdateReviewDTO updateReviewDTO = TestDataBuilder.buildUpdateReviewDTO();
 
     @BeforeEach

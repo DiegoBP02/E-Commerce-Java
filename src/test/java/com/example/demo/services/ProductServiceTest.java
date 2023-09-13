@@ -3,7 +3,6 @@ package com.example.demo.services;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
-import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
@@ -19,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -53,7 +54,7 @@ class ProductServiceTest extends ApplicationConfigTest {
     private Product product = TestDataBuilder.buildProductWithId(seller);
     private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
     private Page<Product> productPage =
-            TestDataBuilder.buildPage(product, 0, 5, Sort.Direction.ASC,"name");
+            TestDataBuilder.buildPage(product, 0, 5, Sort.Direction.ASC, "name");
 
     @BeforeEach
     void setupSecurityContext() {
@@ -164,7 +165,7 @@ class ProductServiceTest extends ApplicationConfigTest {
                 .thenReturn(productPage);
 
         Page<Product> result = productService
-                .findAllBySeller(seller.getId(),productPage.getPageable().getPageNumber(),
+                .findAllBySeller(seller.getId(), productPage.getPageable().getPageNumber(),
                         productPage.getPageable().getPageSize(),
                         productPage.getPageable().getSort().stream().toList().get(0).getDirection(),
                         productPage.getPageable().getSort().stream().toList().get(0).getProperty());

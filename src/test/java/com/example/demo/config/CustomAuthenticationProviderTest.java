@@ -102,7 +102,7 @@ class CustomAuthenticationProviderTest extends ApplicationConfigTest {
         verify(authenticationService, times(1)).loadUserByUsername(user.getEmail());
         verify(passwordEncoder, times(1))
                 .matches(user.getPassword(), user.getPassword());
-        verify(user,times(1)).isAccountNonLocked();
+        verify(user, times(1)).isAccountNonLocked();
         verify(user, times(1)).getFailedAttempt();
         verify(authenticationService, times(1)).increaseFailedAttempts(user);
     }
@@ -121,12 +121,12 @@ class CustomAuthenticationProviderTest extends ApplicationConfigTest {
                         customAuthenticationProvider.authenticate(authentication));
         assertEquals(lockedException.getMessage(),
                 "Your account has been locked due to 3 failed login attempts."
-                + " It will be unlocked after 5 minutes.");
+                        + " It will be unlocked after 5 minutes.");
 
         verify(authenticationService, times(1)).loadUserByUsername(user.getEmail());
         verify(passwordEncoder, times(1))
                 .matches(user.getPassword(), user.getPassword());
-        verify(user,times(1)).isAccountNonLocked();
+        verify(user, times(1)).isAccountNonLocked();
         verify(user, times(1)).getFailedAttempt();
         verify(authenticationService, never()).increaseFailedAttempts(user);
         verify(authenticationService, times(1)).lock(user);
@@ -150,8 +150,8 @@ class CustomAuthenticationProviderTest extends ApplicationConfigTest {
         verify(authenticationService, times(1)).loadUserByUsername(user.getEmail());
         verify(passwordEncoder, times(1))
                 .matches(user.getPassword(), user.getPassword());
-        verify(user,times(1)).isAccountNonLocked();
-        verify(authenticationService,times(1)).isLockTimeExpired(user);
+        verify(user, times(1)).isAccountNonLocked();
+        verify(authenticationService, times(1)).isLockTimeExpired(user);
     }
 
     @Test
@@ -173,14 +173,14 @@ class CustomAuthenticationProviderTest extends ApplicationConfigTest {
         verify(authenticationService, times(1)).loadUserByUsername(user.getEmail());
         verify(passwordEncoder, times(1))
                 .matches(user.getPassword(), user.getPassword());
-        verify(user,times(1)).isAccountNonLocked();
-        verify(authenticationService,times(1)).isLockTimeExpired(user);
+        verify(user, times(1)).isAccountNonLocked();
+        verify(authenticationService, times(1)).isLockTimeExpired(user);
     }
 
     @Test
     @DisplayName("given authentication is UsernamePasswordAuthenticationToken object," +
             "when supports, then return true")
-    void supports_validAuthentication(){
+    void supports_validAuthentication() {
         boolean result = customAuthenticationProvider.supports(authentication.getClass());
         assertTrue(result);
     }
@@ -188,7 +188,7 @@ class CustomAuthenticationProviderTest extends ApplicationConfigTest {
     @Test
     @DisplayName("given authentication is not UsernamePasswordAuthenticationToken object," +
             "when supports, then return false")
-    void supports_invalidAuthentication(){
+    void supports_invalidAuthentication() {
         TestingAuthenticationToken authentication
                 = new TestingAuthenticationToken("user", "password");
         boolean result = customAuthenticationProvider.supports(authentication.getClass());

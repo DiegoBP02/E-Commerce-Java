@@ -14,7 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class UserServiceTest extends ApplicationConfigTest {
@@ -30,61 +31,61 @@ class UserServiceTest extends ApplicationConfigTest {
     private Customer customer = (Customer) TestDataBuilder.buildCustomerWithId();
 
     @Test
-    void givenSeller_whenFindByIdAndEnsureType_thenReturnSeller(){
+    void givenSeller_whenFindByIdAndEnsureType_thenReturnSeller() {
         when(userRepository.findById(seller.getId())).thenReturn(Optional.of(seller));
 
         User result = userService.findByIdAndEnsureType(seller.getId(), Seller.class);
 
         assertThat(result).isInstanceOf(Seller.class);
 
-        verify(userRepository,times(1)).findById(seller.getId());
+        verify(userRepository, times(1)).findById(seller.getId());
     }
 
     @Test
-    void givenNotSeller_whenFindByIdAndEnsureType_thenThrowClassCastException(){
+    void givenNotSeller_whenFindByIdAndEnsureType_thenThrowClassCastException() {
         when(userRepository.findById(seller.getId())).thenReturn(Optional.of(customer));
 
         ClassCastException classCastException = assertThrows(ClassCastException.class,
                 () -> userService.findByIdAndEnsureType(seller.getId(), Seller.class));
 
         assertEquals("Invalid user type. Cannot cast user to the specified type."
-                ,classCastException.getMessage());
+                , classCastException.getMessage());
 
-        verify(userRepository,times(1)).findById(seller.getId());
+        verify(userRepository, times(1)).findById(seller.getId());
     }
 
     @Test
-    void givenCustomer_whenFindByIdAndEnsureType_thenReturnCustomer(){
+    void givenCustomer_whenFindByIdAndEnsureType_thenReturnCustomer() {
         when(userRepository.findById(customer.getId())).thenReturn(Optional.of(customer));
 
         User result = userService.findByIdAndEnsureType(customer.getId(), Customer.class);
 
         assertThat(result).isInstanceOf(Customer.class);
 
-        verify(userRepository,times(1)).findById(customer.getId());
+        verify(userRepository, times(1)).findById(customer.getId());
     }
 
     @Test
-    void givenNotCustomer_whenFindByIdAndEnsureType_thenThrowClassCastException(){
+    void givenNotCustomer_whenFindByIdAndEnsureType_thenThrowClassCastException() {
         when(userRepository.findById(customer.getId())).thenReturn(Optional.of(seller));
 
         ClassCastException classCastException = assertThrows(ClassCastException.class,
                 () -> userService.findByIdAndEnsureType(customer.getId(), Customer.class));
 
         assertEquals("Invalid user type. Cannot cast user to the specified type."
-                ,classCastException.getMessage());
+                , classCastException.getMessage());
 
-        verify(userRepository,times(1)).findById(customer.getId());
+        verify(userRepository, times(1)).findById(customer.getId());
     }
 
     @Test
-    void givenUserDoesNotExists_whenFindByIdAndEnsureType_thenThrowResourceNotFoundException(){
+    void givenUserDoesNotExists_whenFindByIdAndEnsureType_thenThrowResourceNotFoundException() {
         when(userRepository.findById(seller.getId())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,
                 () -> userService.findByIdAndEnsureType(seller.getId(), Seller.class));
 
-        verify(userRepository,times(1)).findById(seller.getId());
+        verify(userRepository, times(1)).findById(seller.getId());
     }
 
 }

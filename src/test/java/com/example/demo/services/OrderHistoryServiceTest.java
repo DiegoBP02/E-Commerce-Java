@@ -47,7 +47,7 @@ class OrderHistoryServiceTest extends ApplicationConfigTest {
     private OrderHistoryDTO orderHistoryDTO = TestDataBuilder.buildOrderHistoryDTO(order);
     private List<OrderHistory> orderHistoryList = TestDataBuilder.buildList(orderHistory);
     private Page<OrderHistory> orderHistoryPage = TestDataBuilder
-            .buildPage(orderHistory, 0, 5, Sort.Direction.ASC,"paymentDate");
+            .buildPage(orderHistory, 0, 5, Sort.Direction.ASC, "paymentDate");
 
     @BeforeEach
     void setupSecurityContext() {
@@ -146,7 +146,7 @@ class OrderHistoryServiceTest extends ApplicationConfigTest {
     }
 
     @Test
-    void givenUserPurchasedProduct_whenIsProductPurchasedByUser_thenReturnTrue(){
+    void givenUserPurchasedProduct_whenIsProductPurchasedByUser_thenReturnTrue() {
         Product product = mock(Product.class);
         OrderItem orderItem = mock(OrderItem.class);
         when(orderItem.getProduct()).thenReturn(product);
@@ -160,22 +160,22 @@ class OrderHistoryServiceTest extends ApplicationConfigTest {
         boolean result = orderHistoryService.isProductPurchasedByUser(product);
 
         assertTrue(result);
-        verify(orderHistoryRepository,times(1)).findAllByCustomer(customer);
-        verify(orderItem,times(1)).getProduct();
-        verify(order,times(1)).getItems();
-        verify(orderHistory,times(1)).getOrder();
-        verify(orderHistoryRepository,times(1)).findAllByCustomer(customer);
+        verify(orderHistoryRepository, times(1)).findAllByCustomer(customer);
+        verify(orderItem, times(1)).getProduct();
+        verify(order, times(1)).getItems();
+        verify(orderHistory, times(1)).getOrder();
+        verify(orderHistoryRepository, times(1)).findAllByCustomer(customer);
     }
 
     @Test
-    void givenUserDidNotPurchaseProduct_whenIsProductPurchasedByUser_thenReturnTrue(){
+    void givenUserDidNotPurchaseProduct_whenIsProductPurchasedByUser_thenReturnTrue() {
         Product product = mock(Product.class);
         customer.setOrderHistory(Collections.emptyList());
 
         boolean result = orderHistoryService.isProductPurchasedByUser(product);
 
         assertFalse(result);
-        verify(orderHistoryRepository,times(1)).findAllByCustomer(customer);
+        verify(orderHistoryRepository, times(1)).findAllByCustomer(customer);
     }
 
 }

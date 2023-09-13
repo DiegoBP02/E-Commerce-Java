@@ -13,15 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.Optional;
 
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 class FilterTokenTest extends ApplicationConfigTest {
@@ -52,15 +51,15 @@ class FilterTokenTest extends ApplicationConfigTest {
         when(tokenService.getSubject(token)).thenReturn(subject);
         when(userRepository.findByEmail(subject)).thenReturn(Optional.of(user));
 
-        filterToken.doFilterInternal(request,response,filterChain);
+        filterToken.doFilterInternal(request, response, filterChain);
 
         User checkAuthentication = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        assertEquals(user,checkAuthentication);
+        assertEquals(user, checkAuthentication);
 
-        verify(request,times(1)).getHeader("Authorization");
-        verify(tokenService,times(1)).getSubject(token);
-        verify(userRepository,times(1)).findByEmail(subject);
-        verify(filterChain,times(1)).doFilter(request,response);
+        verify(request, times(1)).getHeader("Authorization");
+        verify(tokenService, times(1)).getSubject(token);
+        verify(userRepository, times(1)).findByEmail(subject);
+        verify(filterChain, times(1)).doFilter(request, response);
     }
 
     @Test
@@ -72,16 +71,16 @@ class FilterTokenTest extends ApplicationConfigTest {
             Exception e = invocation.getArgument(3);
             assertEquals(UserNotFoundException.class, e.getClass());
             return null;
-        }).when(resolver).resolveException(eq(request),eq(response),eq(null), any(Exception.class));
+        }).when(resolver).resolveException(eq(request), eq(response), eq(null), any(Exception.class));
 
-        filterToken.doFilterInternal(request,response,filterChain);
+        filterToken.doFilterInternal(request, response, filterChain);
         assertNull(SecurityContextHolder.getContext().getAuthentication());
 
-        verify(request,times(1)).getHeader("Authorization");
-        verify(tokenService,times(1)).getSubject(token);
-        verify(userRepository,times(1)).findByEmail(subject);
-        verify(resolver,times(1))
-                .resolveException(eq(request),eq(response),eq(null), any(Exception.class));
+        verify(request, times(1)).getHeader("Authorization");
+        verify(tokenService, times(1)).getSubject(token);
+        verify(userRepository, times(1)).findByEmail(subject);
+        verify(resolver, times(1))
+                .resolveException(eq(request), eq(response), eq(null), any(Exception.class));
         verifyNoInteractions(filterChain);
     }
 

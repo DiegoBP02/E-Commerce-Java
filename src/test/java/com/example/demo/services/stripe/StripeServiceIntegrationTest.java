@@ -10,7 +10,6 @@ import com.example.demo.entities.OrderItem;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
-import com.example.demo.enums.CreditCard;
 import com.example.demo.enums.OrderStatus;
 import com.example.demo.repositories.OrderRepository;
 import com.example.demo.repositories.UserRepository;
@@ -20,7 +19,6 @@ import com.example.demo.services.stripe.utils.StripeUtils;
 import com.example.demo.utils.TestDataBuilder;
 import com.stripe.exception.StripeException;
 import com.stripe.model.CustomerCollection;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -77,14 +75,14 @@ public class StripeServiceIntegrationTest extends ApplicationConfigTest {
     }
 
     @BeforeEach
-    void setupTestData(){
+    void setupTestData() {
         order.setStatus(OrderStatus.Active);
         order.setItems(Collections.singletonList(orderItem));
         customer.setOrders(Collections.singletonList(order));
     }
 
     @AfterEach
-    void deleteStripeCustomer(){
+    void deleteStripeCustomer() {
         Map<String, Object> params = new HashMap<>();
         params.put("email", customer.getEmail());
         try {

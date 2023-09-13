@@ -5,7 +5,6 @@ import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
 import com.example.demo.dtos.UserLoginResponseDTO;
 import com.example.demo.entities.ConfirmationToken;
-import com.example.demo.entities.user.Admin;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.entities.user.User;
@@ -104,11 +103,7 @@ public class AuthenticationService implements UserDetailsService {
                     .email(registerDTO.getEmail())
                     .password(passwordService.hashPassword(registerDTO.getPassword()))
                     .build();
-            case Admin -> Admin.builder()
-                    .name(registerDTO.getName())
-                    .email(registerDTO.getEmail())
-                    .password(passwordService.hashPassword(registerDTO.getPassword()))
-                    .build();
+            case Admin -> throw new InvalidRoleException();
         };
     }
 

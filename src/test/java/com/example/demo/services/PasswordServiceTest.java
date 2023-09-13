@@ -210,7 +210,7 @@ class PasswordServiceTest extends ApplicationConfigTest {
         assertNull(user.getResetPasswordToken());
 
         verify(userRepository, times(1))
-                 .findByResetPasswordTokenResetPasswordToken(token);
+                .findByResetPasswordTokenResetPasswordToken(token);
         verify(passwordEncoder, times(1)).encode(resetPasswordDTO.getPassword());
         verify(userRepository, times(1)).save(user);
     }

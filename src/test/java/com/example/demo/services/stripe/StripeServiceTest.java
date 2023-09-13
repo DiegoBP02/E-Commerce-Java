@@ -135,8 +135,8 @@ class StripeServiceTest extends ApplicationConfigTest {
                 .createPaymentConfirmation(creditCard, mockPaymentIntent.getId());
         verify(stripeBalanceService, times(1))
                 .createBalanceTransfer
-                        (mockPaymentConfirmation.getCustomer(),mockPaymentConfirmation.getAmount());
-        verify(orderService,times(1)).moveOrderToHistory
+                        (mockPaymentConfirmation.getCustomer(), mockPaymentConfirmation.getAmount());
+        verify(orderService, times(1)).moveOrderToHistory
                 (creditCard, BigDecimal.valueOf(mockCustomerBalanceTransaction.getAmount() / 100.0));
     }
 
@@ -168,8 +168,8 @@ class StripeServiceTest extends ApplicationConfigTest {
                 .createPaymentConfirmation(creditCard, mockPaymentIntent.getId());
         verify(stripeBalanceService, never())
                 .createBalanceTransfer
-                        (mockPaymentConfirmation.getCustomer(),mockPaymentConfirmation.getAmount());
-        verify(orderService,never()).moveOrderToHistory
+                        (mockPaymentConfirmation.getCustomer(), mockPaymentConfirmation.getAmount());
+        verify(orderService, never()).moveOrderToHistory
                 (creditCard, BigDecimal.valueOf(mockCustomerBalanceTransaction.getAmount() / 100.0));
     }
 

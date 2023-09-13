@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.ReviewDTO;
 import com.example.demo.dtos.UpdateReviewDTO;
-import com.example.demo.entities.OrderHistory;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Customer;
@@ -180,7 +179,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     void givenReviewsAndAdmin_whenFindAll_thenReturnReviewPage() throws Exception {
         Page<Review> reviewPage = mock(PageImpl.class);
 
-        when(reviewService.findAll(0, 5, Sort.Direction.ASC,"rating"))
+        when(reviewService.findAll(0, 5, Sort.Direction.ASC, "rating"))
                 .thenReturn(reviewPage);
 
         mockMvc.perform(mockGetRequest())
@@ -188,7 +187,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(reviewPage)));
 
         verify(reviewService, times(1))
-                .findAll(0, 5, Sort.Direction.ASC,"rating");
+                .findAll(0, 5, Sort.Direction.ASC, "rating");
     }
 
     @Test
@@ -245,7 +244,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
         Page<Review> reviewPage = mock(PageImpl.class);
 
         when(reviewService
-                .findAllByProduct(product.getId(),0, 5, Sort.Direction.ASC,"rating"))
+                .findAllByProduct(product.getId(), 0, 5, Sort.Direction.ASC, "rating"))
                 .thenReturn(reviewPage);
 
         mockMvc.perform(mockGetRequest("product/" + product.getId()))
@@ -253,7 +252,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(reviewPage)));
 
         verify(reviewService, times(1))
-                .findAllByProduct(product.getId(),0, 5, Sort.Direction.ASC,"rating");
+                .findAllByProduct(product.getId(), 0, 5, Sort.Direction.ASC, "rating");
     }
 
 
@@ -262,7 +261,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
     void givenReview_whenFindByCurrentUser_thenReturnReviewPage() throws Exception {
         Page<Review> reviewPage = mock(PageImpl.class);
 
-        when(reviewService.findByCurrentUser(0, 5, Sort.Direction.ASC,"rating"))
+        when(reviewService.findByCurrentUser(0, 5, Sort.Direction.ASC, "rating"))
                 .thenReturn(reviewPage);
 
         mockMvc.perform(mockGetRequest("user"))
@@ -270,7 +269,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(reviewPage)));
 
         verify(reviewService, times(1))
-                .findByCurrentUser(0, 5, Sort.Direction.ASC,"rating");
+                .findByCurrentUser(0, 5, Sort.Direction.ASC, "rating");
     }
 
     @Test
@@ -281,7 +280,7 @@ class ReviewControllerTest extends ApplicationConfigTest {
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
 
-       verifyNoInteractions(reviewService);
+        verifyNoInteractions(reviewService);
     }
 
     @Test

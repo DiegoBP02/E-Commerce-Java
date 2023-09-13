@@ -52,7 +52,6 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
 
     private RegisterDTO registerDTO = TestDataBuilder.buildRegisterDTO();
     private LoginDTO loginDTO = TestDataBuilder.buildLoginDTO();
-    private String token = "token";
     private UUID randomUUID = UUID.randomUUID();
     private UserLoginResponseDTO userLoginResponseDTO= TestDataBuilder.buildUserLoginResponseDTO(registerDTO);
 
@@ -96,6 +95,22 @@ class AuthenticationControllerTest extends ApplicationConfigTest {
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(userLoginResponseDTO)));
+
+        verify(authenticationService, times(1)).register(registerDTO);
+    }
+
+    @Test
+    void givenRoleIsAdmin_whenRegister_thenHandleInvalidRoleException() throws Exception {
+        when(authenticationService.register(registerDTO)).thenThrow(InvalidRoleException.class);
+
+        MockHttpServletRequestBuilder mockRequest = mockPostRequest
+                ("register", registerDTO);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result ->
+                        assertTrue(result.getResolvedException()
+                                instanceof InvalidRoleException));
 
         verify(authenticationService, times(1)).register(registerDTO);
     }

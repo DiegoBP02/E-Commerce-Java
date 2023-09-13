@@ -160,7 +160,7 @@ class ProductControllerTest extends ApplicationConfigTest {
     void givenProductsAndNoUser_whenFindAll_thenReturnProductPage() throws Exception {
         Page<Product> productPage = mock(PageImpl.class);
 
-        when(productService.findAll(0, 5, Sort.Direction.ASC,"name"))
+        when(productService.findAll(0, 5, Sort.Direction.ASC, "name"))
                 .thenReturn(productPage);
 
         mockMvc.perform(mockGetRequest())
@@ -168,7 +168,7 @@ class ProductControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
 
         verify(productService, times(1))
-                .findAll(0, 5, Sort.Direction.ASC,"name");
+                .findAll(0, 5, Sort.Direction.ASC, "name");
     }
 
     @Test
@@ -245,7 +245,7 @@ class ProductControllerTest extends ApplicationConfigTest {
     @Test
     @WithMockUser(authorities = "Seller")
     void givenProduct_whenFindByCurrentUser_thenReturnProductPage() throws Exception {
-        when(productService.findByCurrentUser(0, 5, Sort.Direction.ASC,"name"))
+        when(productService.findByCurrentUser(0, 5, Sort.Direction.ASC, "name"))
                 .thenReturn(productPage);
 
         mockMvc.perform(mockGetRequest("user"))
@@ -253,7 +253,7 @@ class ProductControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
 
         verify(productService, times(1))
-                .findByCurrentUser(0, 5, Sort.Direction.ASC,"name");
+                .findByCurrentUser(0, 5, Sort.Direction.ASC, "name");
     }
 
     @Test
@@ -281,7 +281,7 @@ class ProductControllerTest extends ApplicationConfigTest {
 
     @Test
     void givenProduct_whenFindBySellerId_thenReturnProductPage() throws Exception {
-        when(productService.findAllBySeller(user.getId(), 0, 5, Sort.Direction.ASC,"name"))
+        when(productService.findAllBySeller(user.getId(), 0, 5, Sort.Direction.ASC, "name"))
                 .thenReturn(productPage);
 
         mockMvc.perform(mockGetRequest("seller/" + user.getId()))
@@ -289,12 +289,12 @@ class ProductControllerTest extends ApplicationConfigTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
 
         verify(productService, times(1))
-                .findAllBySeller(user.getId(), 0, 5, Sort.Direction.ASC,"name");
+                .findAllBySeller(user.getId(), 0, 5, Sort.Direction.ASC, "name");
     }
 
     @Test
     void givenInvalidCasting_whenFindBySellerId_thenHandleClassCastException() throws Exception {
-        when(productService.findAllBySeller(user.getId(), 0, 5, Sort.Direction.ASC,"name"))
+        when(productService.findAllBySeller(user.getId(), 0, 5, Sort.Direction.ASC, "name"))
                 .thenThrow(ClassCastException.class);
 
         mockMvc.perform(mockGetRequest("seller/" + user.getId()))
@@ -304,7 +304,7 @@ class ProductControllerTest extends ApplicationConfigTest {
                                 instanceof ClassCastException));
 
         verify(productService, times(1))
-                .findAllBySeller(user.getId(), 0, 5, Sort.Direction.ASC,"name");
+                .findAllBySeller(user.getId(), 0, 5, Sort.Direction.ASC, "name");
     }
 
     @Test
