@@ -80,7 +80,7 @@ class OrderItemServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenValidOrderItemDTOAndProductDoesNotExistsInOrder_whenCreate_thenReturnNewOrderItem() {
-        when(orderService.findActiveOrderByCurrentUser()).thenReturn(order);
+        when(orderService.findOrCreateActiveOrderByCurrentUser()).thenReturn(order);
         when(productService.findById(orderItemDTO.getProductId()))
                 .thenReturn(product);
         when(orderItemRepository.save(any(OrderItem.class)))
@@ -95,7 +95,7 @@ class OrderItemServiceTest extends ApplicationConfigTest {
         assertEquals(orderItem, result);
 
         verifyAuthentication();
-        verify(orderService, times(1)).findActiveOrderByCurrentUser();
+        verify(orderService, times(1)).findOrCreateActiveOrderByCurrentUser();
         verify(productService, times(1)).findById(orderItemDTO.getProductId());
         verify(orderItemRepository, times(1)).save(expectedOrderItem);
     }
@@ -107,7 +107,7 @@ class OrderItemServiceTest extends ApplicationConfigTest {
         orderItem1.setProduct(product);
         order.setItems(Collections.singletonList(orderItem1));
 
-        when(orderService.findActiveOrderByCurrentUser()).thenReturn(order);
+        when(orderService.findOrCreateActiveOrderByCurrentUser()).thenReturn(order);
         when(orderItemRepository.save(any(OrderItem.class)))
                 .thenReturn(orderItem);
 
@@ -120,20 +120,20 @@ class OrderItemServiceTest extends ApplicationConfigTest {
         assertEquals(orderItem, result);
 
         verifyAuthentication();
-        verify(orderService, times(1)).findActiveOrderByCurrentUser();
+        verify(orderService, times(1)).findOrCreateActiveOrderByCurrentUser();
         verify(productService, never()).findById(any(UUID.class));
         verify(orderItemRepository, times(1)).save(expectedOrderItem);
     }
 
     @Test
     void givenNoOrder_whenCreate_thenThrowResourceNotFoundException() {
-        when(orderService.findActiveOrderByCurrentUser()).thenThrow(ResourceNotFoundException.class);
+        when(orderService.findOrCreateActiveOrderByCurrentUser()).thenThrow(ResourceNotFoundException.class);
 
         assertThrows(ResourceNotFoundException.class, () ->
                 orderItemService.create(orderItemDTO));
 
         verifyAuthentication();
-        verify(orderService, times(1)).findActiveOrderByCurrentUser();
+        verify(orderService, times(1)).findOrCreateActiveOrderByCurrentUser();
         verify(productService, never()).findById(any(UUID.class));
         verify(orderItemRepository, never()).save(any(OrderItem.class));
     }
@@ -143,13 +143,13 @@ class OrderItemServiceTest extends ApplicationConfigTest {
         User user2 = mock(User.class);
         when(user2.getId()).thenReturn(UUID.randomUUID());
         when(authentication.getPrincipal()).thenReturn(user2);
-        when(orderService.findActiveOrderByCurrentUser()).thenReturn(order);
+        when(orderService.findOrCreateActiveOrderByCurrentUser()).thenReturn(order);
 
         assertThrows(UnauthorizedAccessException.class, () ->
                 orderItemService.create(orderItemDTO));
 
         verifyAuthentication();
-        verify(orderService, times(1)).findActiveOrderByCurrentUser();
+        verify(orderService, times(1)).findOrCreateActiveOrderByCurrentUser();
         verify(productService, never()).findById(any(UUID.class));
         verify(orderItemRepository, never()).save(any(OrderItem.class));
     }

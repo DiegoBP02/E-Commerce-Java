@@ -48,6 +48,8 @@ public abstract class User implements UserDetails {
     @ToString.Exclude
     @JsonIgnore
     private int failedAttempt;
+    @ToString.Exclude
+    @JsonIgnore
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
     private Instant lockTime;
     @ToString.Exclude

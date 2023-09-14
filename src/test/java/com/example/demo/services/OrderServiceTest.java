@@ -191,6 +191,34 @@ class OrderServiceTest extends ApplicationConfigTest {
     }
 
     @Test
+    void givenOrder_whenFindOrCreateActiveOrderByCurrentUser_thenReturnorder() {
+        when(orderRepository.findActiveOrderByCurrentUser(customer)).thenReturn(Optional.of(order));
+
+        Order result = orderService.findOrCreateActiveOrderByCurrentUser();
+
+        assertEquals(order,result);
+
+        verifyAuthentication();
+        verify(orderRepository, times(1)).findActiveOrderByCurrentUser(customer);
+        verifyNoMoreInteractions(orderRepository);
+    }
+
+    @Test
+    void givenNoOrder_whenFindOrCreateActiveOrderByCurrentUser_thenCreateAndReturnNewOrder() {
+        when(orderRepository.findActiveOrderByCurrentUser(customer)).thenReturn(Optional.empty());
+        when(orderRepository.save(any(Order.class))).thenReturn(order);
+
+        Order result = orderService.findOrCreateActiveOrderByCurrentUser();
+
+        assertEquals(order, result);
+
+        verify(authentication, times(2)).getPrincipal();
+        verify(securityContext, times(2)).getAuthentication();
+        verify(orderRepository, times(2)).findActiveOrderByCurrentUser(customer);
+        verify(orderRepository, times(1)).save(any(Order.class));
+    }
+
+    @Test
     void givenOrder_whenDelete_thenDeleteOrder() {
         when(orderRepository.getReferenceById(order.getId())).thenReturn(order);
 

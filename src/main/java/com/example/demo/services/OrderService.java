@@ -81,6 +81,13 @@ public class OrderService {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
+    public Order findOrCreateActiveOrderByCurrentUser() {
+        Customer user = (Customer) getCurrentUser();
+
+        return orderRepository.findActiveOrderByCurrentUser(user)
+                .orElseGet(() -> create());
+    }
+
     private Order findByUser(User user) {
         return orderRepository.findByCustomerId(user.getId())
                 .orElseThrow(ResourceNotFoundException::new);

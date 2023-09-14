@@ -46,7 +46,8 @@ public class AuthConfig {
                                         "/password/forgot-password", "/password/reset-password",
                                         "/auth/confirm-account")
                                 .permitAll()
-                                .requestMatchers(HttpMethod.GET, "/products/**", "/reviews/**")
+                                .requestMatchers(HttpMethod.GET, "/products/**", "/reviews/**",
+                                        "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**")
                                 .permitAll()
                                 .anyRequest().authenticated()
                 )

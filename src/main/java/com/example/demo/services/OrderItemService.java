@@ -34,7 +34,7 @@ public class OrderItemService {
 
     public OrderItem create(OrderItemDTO orderItemDTO) {
         User user = getCurrentUser();
-        Order order = orderService.findActiveOrderByCurrentUser();
+        Order order = orderService.findOrCreateActiveOrderByCurrentUser();
         checkOwnership(user, order.getCustomer().getId());
 
         OrderItem existingOrderItem = findExistingItem(order, orderItemDTO.getProductId());

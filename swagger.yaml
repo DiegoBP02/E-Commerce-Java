@@ -1,0 +1,2557 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenApi specification",
+    "description": "OpenApi documentation",
+    "contact": {
+      "name": "Diego",
+      "url": "https://portfolio-diegobp.netlify.app",
+      "email": "diegobpdev@gmail.com"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local ENV"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/reviews": {
+      "get": {
+        "tags": [
+          "review-controller"
+        ],
+        "operationId": "findAll",
+        "parameters": [
+          {
+            "name": "pageNo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "rating"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageReview"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "review-controller"
+        ],
+        "operationId": "createReview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "findAll_1",
+        "parameters": [
+          {
+            "name": "pageNo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageProduct"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "createProduct",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment": {
+      "post": {
+        "tags": [
+          "payment-controller"
+        ],
+        "operationId": "createOrderPayment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderPaymentDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/password/reset-password": {
+      "post": {
+        "tags": [
+          "password-controller"
+        ],
+        "operationId": "resetPassword",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/password/forgot-password": {
+      "post": {
+        "tags": [
+          "password-controller"
+        ],
+        "operationId": "forgotPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/password/change-password": {
+      "post": {
+        "tags": [
+          "password-controller"
+        ],
+        "operationId": "changePassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "findAll_2",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orderItems": {
+      "get": {
+        "tags": [
+          "order-item-controller"
+        ],
+        "operationId": "findAll_3",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "order-item-controller"
+        ],
+        "operationId": "create_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderItemDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "authentication-controller"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLoginResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "authentication-controller"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLoginResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/confirm-account": {
+      "post": {
+        "tags": [
+          "authentication-controller"
+        ],
+        "operationId": "confirmAccount",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reviews/{id}": {
+      "get": {
+        "tags": [
+          "review-controller"
+        ],
+        "operationId": "findById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "review-controller"
+        ],
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "review-controller"
+        ],
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateReviewDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "findById_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "delete_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "update_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orderItems/{id}": {
+      "get": {
+        "tags": [
+          "order-item-controller"
+        ],
+        "operationId": "findById_3",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "order-item-controller"
+        ],
+        "operationId": "delete_3",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "order-item-controller"
+        ],
+        "operationId": "update_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderItemDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reviews/user": {
+      "get": {
+        "tags": [
+          "review-controller"
+        ],
+        "operationId": "findByCurrentUser",
+        "parameters": [
+          {
+            "name": "pageNo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "rating"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageReview"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reviews/product/{productId}": {
+      "get": {
+        "tags": [
+          "review-controller"
+        ],
+        "operationId": "findAllByProduct",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "pageNo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "rating"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageReview"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/user": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "findByCurrentUser_1",
+        "parameters": [
+          {
+            "name": "pageNo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageProduct"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/seller/{sellerId}": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "findBySellerId",
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "pageNo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageProduct"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/category": {
+      "get": {
+        "tags": [
+          "product-controller"
+        ],
+        "operationId": "findByCategory",
+        "parameters": [
+          {
+            "name": "productCategory",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ELECTRONICS",
+                "CLOTHING",
+                "BEAUTY",
+                "HOME_AND_KITCHEN",
+                "SPORTS_AND_OUTDOORS",
+                "BOOKS",
+                "TOYS",
+                "JEWELRY",
+                "HEALTH_AND_WELLNESS",
+                "FOOD_AND_DRINKS",
+                "MUSIC_AND_INSTRUMENTS",
+                "ART_AND_CRAFTS",
+                "AUTOMOTIVE",
+                "PET_SUPPLIES",
+                "FURNITURE",
+                "OFFICE_SUPPLIES",
+                "BABY_AND_CHILD",
+                "TRAVEL",
+                "GAMES_AND_PUZZLES",
+                "FITNESS_EQUIPMENT",
+                "PARTY_SUPPLIES",
+                "TECH_ACCESSORIES",
+                "HOBBIES",
+                "GARDEN_AND_OUTDOOR",
+                "COLLECTIBLES",
+                "WATCHES",
+                "CAMERAS_AND_PHOTOGRAPHY",
+                "MUSICAL_INSTRUMENTS",
+                "DIY_SUPPLIES",
+                "VINTAGE_AND_ANTIQUE",
+                "ELECTRICAL_APPLIANCES",
+                "BEVERAGES",
+                "ELECTRONIC_ACCESSORIES",
+                "FITNESS_APPAREL",
+                "SHOES",
+                "HOME_DECOR",
+                "SPORTS_GEAR",
+                "BEAUTY_PRODUCTS",
+                "BED_AND_BATH",
+                "FITNESS_TRACKERS",
+                "LAPTOPS_AND_COMPUTERS",
+                "CELL_PHONES",
+                "GAMING_CONSOLES",
+                "AUDIO_EQUIPMENT",
+                "SUNGLASSES",
+                "WATCH_ACCESSORIES",
+                "COOKWARE",
+                "TOOLS",
+                "BIKES",
+                "MOTORCYCLES",
+                "HEADPHONES",
+                "SKINCARE",
+                "COFFEE_AND_TEA",
+                "PARTY_DECORATIONS",
+                "BOARD_GAMES",
+                "VITAMINS_AND_SUPPLEMENTS",
+                "WRITING_SUPPLIES",
+                "BABY_CLOTHING",
+                "BABY_TOYS",
+                "SHOWER_AND_BATH",
+                "TELEVISIONS",
+                "HOME_APPLIANCES",
+                "OUTERWEAR",
+                "FITNESS_SUPPLEMENTS",
+                "HANDBAGS",
+                "ELECTRICAL_TOOLS",
+                "CAMERA_ACCESSORIES",
+                "ART_SUPPLIES",
+                "COLLECTOR_ITEMS",
+                "WEDDING_SUPPLIES",
+                "SWIMWEAR",
+                "CAR_ACCESSORIES",
+                "HAIR_ACCESSORIES",
+                "GARDEN_TOOLS",
+                "ANTIQUES",
+                "FINE_JEWELRY",
+                "SMART_HOME_DEVICES",
+                "TABLEWARE",
+                "KITCHEN_APPLIANCES",
+                "ORGANIZATIONAL_ITEMS",
+                "COMPUTER_ACCESSORIES",
+                "COMPUTER_COMPONENTS",
+                "COMPUTER_PERIPHERALS",
+                "GAMING_ACCESSORIES",
+                "MUSICAL_INSTRUMENT_ACCESSORIES",
+                "FITNESS_ACCESSORIES",
+                "PARTY_FAVORS",
+                "SEASONAL_DECOR",
+                "PETS",
+                "PET_TOYS",
+                "PET_FOOD",
+                "PET_CLOTHING",
+                "WINE_AND_SPIRITS",
+                "SPORTS_MEMORABILIA",
+                "ART_PRINTS",
+                "VINTAGE_CLOTHING",
+                "VINTAGE_FURNITURE",
+                "APPLIANCES",
+                "RECREATIONAL_EQUIPMENT",
+                "OUTDOOR_FURNITURE",
+                "ELECTRONIC_GADGETS",
+                "BEAUTY_TOOLS",
+                "BATH_AND_BODY",
+                "CLEANING_SUPPLIES",
+                "CANDLES",
+                "HOME_FRAGRANCES",
+                "BOARD_GAME_ACCESSORIES",
+                "CAMERA_LENS",
+                "BABY_FOOD",
+                "BABY_ACCESSORIES",
+                "INFANT_CLOTHING",
+                "TODDLER_CLOTHING",
+                "EDUCATIONAL_TOYS",
+                "COSTUMES",
+                "COSMETICS",
+                "WATCHES_AND_CLOCKS",
+                "COFFEE_MAKERS",
+                "TEA_INFUSERS",
+                "SMARTWATCHES",
+                "SMARTPHONES",
+                "PC_GAMING",
+                "CONSOLE_GAMING",
+                "CAMERA_LENS_ACCESSORIES",
+                "FINE_ART",
+                "DECORATIVE_ART",
+                "HOME_TEXTILES",
+                "TELEPHONE_ACCESSORIES",
+                "LIGHTING",
+                "VINTAGE_COLLECTIBLES",
+                "KITCHEN_TOOLS",
+                "BAKEWARE",
+                "COOKING_UTENSILS",
+                "COOKBOOKS",
+                "CHINAWARE",
+                "DRINKWARE",
+                "FURNITURE_ACCESSORIES",
+                "EXERCISE_EQUIPMENT",
+                "FITNESS_APPAREL_ACCESSORIES",
+                "WEDDING_DECORATIONS",
+                "BRIDAL_FASHION",
+                "BRIDAL_ACCESSORIES",
+                "HONEYMOON_SUPPLIES",
+                "BRIDAL_PARTY_GIFTS",
+                "BRIDESMAID_DRESSES",
+                "GROOMSMEN_ATTIRE",
+                "SWIMWEAR_ACCESSORIES",
+                "CAR_MAINTENANCE",
+                "CAR_CARE_PRODUCTS",
+                "CAR_INTERIOR_ACCESSORIES",
+                "HAIR_STYLING_PRODUCTS",
+                "HAIR_COLOR",
+                "GARDEN_PLANTS",
+                "GARDEN_DECOR",
+                "GARDEN_FURNITURE",
+                "HANDCRAFTED_JEWELRY",
+                "FINE_JEWELRY_ACCESSORIES",
+                "SMART_HOME_DEVICES_ACCESSORIES",
+                "TABLEWARE_ACCESSORIES",
+                "BATHROOM_ACCESSORIES",
+                "OUTDOOR_FURNITURE_ACCESSORIES",
+                "ELECTRONIC_GADGETS_ACCESSORIES",
+                "BEAUTY_TOOLS_ACCESSORIES",
+                "BOARD_GAME_EXPANSIONS",
+                "BABY_FURNITURE",
+                "BABY_TRANSPORTATION",
+                "BABY_CARE_PRODUCTS",
+                "TODDLER_FURNITURE",
+                "TOY_VEHICLES",
+                "KIDS_ELECTRONIC_TOYS",
+                "KIDS_BUILDING_TOYS",
+                "KIDS_LEARNING_TOYS",
+                "COSTUME_ACCESSORIES",
+                "MAKEUP_PRODUCTS",
+                "SKIN_CARE_PRODUCTS",
+                "HAIR_CARE_PRODUCTS",
+                "WATCH_BATTERIES",
+                "WATCH_STRAPS",
+                "ESPRESSO_MACHINES",
+                "COFFEE_GRINDERS",
+                "COFFEE_ACCESSORIES",
+                "TEA_ACCESSORIES",
+                "TABLET_ACCESSORIES",
+                "PHONE_CASES",
+                "GAMING_CONTROLLER_ACCESSORIES",
+                "GAMING_HEADSET_ACCESSORIES",
+                "MUSICAL_INSTRUMENT_CASES",
+                "MUSICAL_INSTRUMENT_STANDS",
+                "FITNESS_APPAREL_EXPANSIONS",
+                "FITNESS_SUPPLEMENTS_ACCESSORIES",
+                "BEVERAGE_ACCESSORIES",
+                "ELECTRONIC_ACCESSORIES_EXPANSIONS",
+                "HEADPHONE_ACCESSORIES",
+                "SMARTWATCH_ACCESSORIES",
+                "COMPUTER_ACCESSORIES_EXPANSIONS",
+                "COMPUTER_COMPONENTS_EXPANSIONS",
+                "COMPUTER_PERIPHERALS_EXPANSIONS",
+                "GAMING_ACCESSORIES_EXPANSIONS",
+                "MUSICAL_INSTRUMENT_ACCESSORIES_EXPANSIONS",
+                "FITNESS_ACCESSORIES_EXPANSIONS",
+                "PARTY_FAVORS_EXPANSIONS",
+                "SEASONAL_DECOR_EXPANSIONS",
+                "PETS_EXPANSIONS",
+                "PET_TOYS_EXPANSIONS",
+                "PET_FOOD_EXPANSIONS",
+                "PET_CLOTHING_EXPANSIONS",
+                "WINE_AND_SPIRITS_EXPANSIONS",
+                "SPORTS_MEMORABILIA_EXPANSIONS",
+                "ART_PRINTS_EXPANSIONS",
+                "VINTAGE_CLOTHING_EXPANSIONS",
+                "VINTAGE_FURNITURE_EXPANSIONS",
+                "APPLIANCES_EXPANSIONS",
+                "RECREATIONAL_EQUIPMENT_EXPANSIONS",
+                "OUTDOOR"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "findById_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "delete_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/orders/user": {
+      "get": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "findActiveOrderByCurrentUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "order-controller"
+        ],
+        "operationId": "deleteByCurrentUser",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/orderItems/order/{id}": {
+      "get": {
+        "tags": [
+          "order-item-controller"
+        ],
+        "operationId": "findByOrderId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orderHistory/{id}": {
+      "get": {
+        "tags": [
+          "order-history-controller"
+        ],
+        "operationId": "findById_4",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderHistory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orderHistory/user": {
+      "get": {
+        "tags": [
+          "order-history-controller"
+        ],
+        "operationId": "findByCurrentUser_2",
+        "parameters": [
+          {
+            "name": "pageNo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "paymentDate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageOrderHistory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/confirmation-request": {
+      "get": {
+        "tags": [
+          "authentication-controller"
+        ],
+        "operationId": "confirmationRequest",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ReviewDTO": {
+        "required": [
+          "comment",
+          "productId",
+          "rating"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "comment": {
+            "maxLength": 150,
+            "minLength": 3,
+            "type": "string"
+          },
+          "rating": {
+            "maximum": 5,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "seller": {
+            "$ref": "#/components/schemas/Seller"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "ELECTRONICS",
+              "CLOTHING",
+              "BEAUTY",
+              "HOME_AND_KITCHEN",
+              "SPORTS_AND_OUTDOORS",
+              "BOOKS",
+              "TOYS",
+              "JEWELRY",
+              "HEALTH_AND_WELLNESS",
+              "FOOD_AND_DRINKS",
+              "MUSIC_AND_INSTRUMENTS",
+              "ART_AND_CRAFTS",
+              "AUTOMOTIVE",
+              "PET_SUPPLIES",
+              "FURNITURE",
+              "OFFICE_SUPPLIES",
+              "BABY_AND_CHILD",
+              "TRAVEL",
+              "GAMES_AND_PUZZLES",
+              "FITNESS_EQUIPMENT",
+              "PARTY_SUPPLIES",
+              "TECH_ACCESSORIES",
+              "HOBBIES",
+              "GARDEN_AND_OUTDOOR",
+              "COLLECTIBLES",
+              "WATCHES",
+              "CAMERAS_AND_PHOTOGRAPHY",
+              "MUSICAL_INSTRUMENTS",
+              "DIY_SUPPLIES",
+              "VINTAGE_AND_ANTIQUE",
+              "ELECTRICAL_APPLIANCES",
+              "BEVERAGES",
+              "ELECTRONIC_ACCESSORIES",
+              "FITNESS_APPAREL",
+              "SHOES",
+              "HOME_DECOR",
+              "SPORTS_GEAR",
+              "BEAUTY_PRODUCTS",
+              "BED_AND_BATH",
+              "FITNESS_TRACKERS",
+              "LAPTOPS_AND_COMPUTERS",
+              "CELL_PHONES",
+              "GAMING_CONSOLES",
+              "AUDIO_EQUIPMENT",
+              "SUNGLASSES",
+              "WATCH_ACCESSORIES",
+              "COOKWARE",
+              "TOOLS",
+              "BIKES",
+              "MOTORCYCLES",
+              "HEADPHONES",
+              "SKINCARE",
+              "COFFEE_AND_TEA",
+              "PARTY_DECORATIONS",
+              "BOARD_GAMES",
+              "VITAMINS_AND_SUPPLEMENTS",
+              "WRITING_SUPPLIES",
+              "BABY_CLOTHING",
+              "BABY_TOYS",
+              "SHOWER_AND_BATH",
+              "TELEVISIONS",
+              "HOME_APPLIANCES",
+              "OUTERWEAR",
+              "FITNESS_SUPPLEMENTS",
+              "HANDBAGS",
+              "ELECTRICAL_TOOLS",
+              "CAMERA_ACCESSORIES",
+              "ART_SUPPLIES",
+              "COLLECTOR_ITEMS",
+              "WEDDING_SUPPLIES",
+              "SWIMWEAR",
+              "CAR_ACCESSORIES",
+              "HAIR_ACCESSORIES",
+              "GARDEN_TOOLS",
+              "ANTIQUES",
+              "FINE_JEWELRY",
+              "SMART_HOME_DEVICES",
+              "TABLEWARE",
+              "KITCHEN_APPLIANCES",
+              "ORGANIZATIONAL_ITEMS",
+              "COMPUTER_ACCESSORIES",
+              "COMPUTER_COMPONENTS",
+              "COMPUTER_PERIPHERALS",
+              "GAMING_ACCESSORIES",
+              "MUSICAL_INSTRUMENT_ACCESSORIES",
+              "FITNESS_ACCESSORIES",
+              "PARTY_FAVORS",
+              "SEASONAL_DECOR",
+              "PETS",
+              "PET_TOYS",
+              "PET_FOOD",
+              "PET_CLOTHING",
+              "WINE_AND_SPIRITS",
+              "SPORTS_MEMORABILIA",
+              "ART_PRINTS",
+              "VINTAGE_CLOTHING",
+              "VINTAGE_FURNITURE",
+              "APPLIANCES",
+              "RECREATIONAL_EQUIPMENT",
+              "OUTDOOR_FURNITURE",
+              "ELECTRONIC_GADGETS",
+              "BEAUTY_TOOLS",
+              "BATH_AND_BODY",
+              "CLEANING_SUPPLIES",
+              "CANDLES",
+              "HOME_FRAGRANCES",
+              "BOARD_GAME_ACCESSORIES",
+              "CAMERA_LENS",
+              "BABY_FOOD",
+              "BABY_ACCESSORIES",
+              "INFANT_CLOTHING",
+              "TODDLER_CLOTHING",
+              "EDUCATIONAL_TOYS",
+              "COSTUMES",
+              "COSMETICS",
+              "WATCHES_AND_CLOCKS",
+              "COFFEE_MAKERS",
+              "TEA_INFUSERS",
+              "SMARTWATCHES",
+              "SMARTPHONES",
+              "PC_GAMING",
+              "CONSOLE_GAMING",
+              "CAMERA_LENS_ACCESSORIES",
+              "FINE_ART",
+              "DECORATIVE_ART",
+              "HOME_TEXTILES",
+              "TELEPHONE_ACCESSORIES",
+              "LIGHTING",
+              "VINTAGE_COLLECTIBLES",
+              "KITCHEN_TOOLS",
+              "BAKEWARE",
+              "COOKING_UTENSILS",
+              "COOKBOOKS",
+              "CHINAWARE",
+              "DRINKWARE",
+              "FURNITURE_ACCESSORIES",
+              "EXERCISE_EQUIPMENT",
+              "FITNESS_APPAREL_ACCESSORIES",
+              "WEDDING_DECORATIONS",
+              "BRIDAL_FASHION",
+              "BRIDAL_ACCESSORIES",
+              "HONEYMOON_SUPPLIES",
+              "BRIDAL_PARTY_GIFTS",
+              "BRIDESMAID_DRESSES",
+              "GROOMSMEN_ATTIRE",
+              "SWIMWEAR_ACCESSORIES",
+              "CAR_MAINTENANCE",
+              "CAR_CARE_PRODUCTS",
+              "CAR_INTERIOR_ACCESSORIES",
+              "HAIR_STYLING_PRODUCTS",
+              "HAIR_COLOR",
+              "GARDEN_PLANTS",
+              "GARDEN_DECOR",
+              "GARDEN_FURNITURE",
+              "HANDCRAFTED_JEWELRY",
+              "FINE_JEWELRY_ACCESSORIES",
+              "SMART_HOME_DEVICES_ACCESSORIES",
+              "TABLEWARE_ACCESSORIES",
+              "BATHROOM_ACCESSORIES",
+              "OUTDOOR_FURNITURE_ACCESSORIES",
+              "ELECTRONIC_GADGETS_ACCESSORIES",
+              "BEAUTY_TOOLS_ACCESSORIES",
+              "BOARD_GAME_EXPANSIONS",
+              "BABY_FURNITURE",
+              "BABY_TRANSPORTATION",
+              "BABY_CARE_PRODUCTS",
+              "TODDLER_FURNITURE",
+              "TOY_VEHICLES",
+              "KIDS_ELECTRONIC_TOYS",
+              "KIDS_BUILDING_TOYS",
+              "KIDS_LEARNING_TOYS",
+              "COSTUME_ACCESSORIES",
+              "MAKEUP_PRODUCTS",
+              "SKIN_CARE_PRODUCTS",
+              "HAIR_CARE_PRODUCTS",
+              "WATCH_BATTERIES",
+              "WATCH_STRAPS",
+              "ESPRESSO_MACHINES",
+              "COFFEE_GRINDERS",
+              "COFFEE_ACCESSORIES",
+              "TEA_ACCESSORIES",
+              "TABLET_ACCESSORIES",
+              "PHONE_CASES",
+              "GAMING_CONTROLLER_ACCESSORIES",
+              "GAMING_HEADSET_ACCESSORIES",
+              "MUSICAL_INSTRUMENT_CASES",
+              "MUSICAL_INSTRUMENT_STANDS",
+              "FITNESS_APPAREL_EXPANSIONS",
+              "FITNESS_SUPPLEMENTS_ACCESSORIES",
+              "BEVERAGE_ACCESSORIES",
+              "ELECTRONIC_ACCESSORIES_EXPANSIONS",
+              "HEADPHONE_ACCESSORIES",
+              "SMARTWATCH_ACCESSORIES",
+              "COMPUTER_ACCESSORIES_EXPANSIONS",
+              "COMPUTER_COMPONENTS_EXPANSIONS",
+              "COMPUTER_PERIPHERALS_EXPANSIONS",
+              "GAMING_ACCESSORIES_EXPANSIONS",
+              "MUSICAL_INSTRUMENT_ACCESSORIES_EXPANSIONS",
+              "FITNESS_ACCESSORIES_EXPANSIONS",
+              "PARTY_FAVORS_EXPANSIONS",
+              "SEASONAL_DECOR_EXPANSIONS",
+              "PETS_EXPANSIONS",
+              "PET_TOYS_EXPANSIONS",
+              "PET_FOOD_EXPANSIONS",
+              "PET_CLOTHING_EXPANSIONS",
+              "WINE_AND_SPIRITS_EXPANSIONS",
+              "SPORTS_MEMORABILIA_EXPANSIONS",
+              "ART_PRINTS_EXPANSIONS",
+              "VINTAGE_CLOTHING_EXPANSIONS",
+              "VINTAGE_FURNITURE_EXPANSIONS",
+              "APPLIANCES_EXPANSIONS",
+              "RECREATIONAL_EQUIPMENT_EXPANSIONS",
+              "OUTDOOR"
+            ]
+          }
+        }
+      },
+      "Review": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product": {
+            "$ref": "#/components/schemas/Product"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Seller": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductDTO": {
+        "required": [
+          "category",
+          "description",
+          "name",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "minLength": 2,
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 300,
+            "minLength": 20,
+            "type": "string"
+          },
+          "price": {
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "type": "number"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "ELECTRONICS",
+              "CLOTHING",
+              "BEAUTY",
+              "HOME_AND_KITCHEN",
+              "SPORTS_AND_OUTDOORS",
+              "BOOKS",
+              "TOYS",
+              "JEWELRY",
+              "HEALTH_AND_WELLNESS",
+              "FOOD_AND_DRINKS",
+              "MUSIC_AND_INSTRUMENTS",
+              "ART_AND_CRAFTS",
+              "AUTOMOTIVE",
+              "PET_SUPPLIES",
+              "FURNITURE",
+              "OFFICE_SUPPLIES",
+              "BABY_AND_CHILD",
+              "TRAVEL",
+              "GAMES_AND_PUZZLES",
+              "FITNESS_EQUIPMENT",
+              "PARTY_SUPPLIES",
+              "TECH_ACCESSORIES",
+              "HOBBIES",
+              "GARDEN_AND_OUTDOOR",
+              "COLLECTIBLES",
+              "WATCHES",
+              "CAMERAS_AND_PHOTOGRAPHY",
+              "MUSICAL_INSTRUMENTS",
+              "DIY_SUPPLIES",
+              "VINTAGE_AND_ANTIQUE",
+              "ELECTRICAL_APPLIANCES",
+              "BEVERAGES",
+              "ELECTRONIC_ACCESSORIES",
+              "FITNESS_APPAREL",
+              "SHOES",
+              "HOME_DECOR",
+              "SPORTS_GEAR",
+              "BEAUTY_PRODUCTS",
+              "BED_AND_BATH",
+              "FITNESS_TRACKERS",
+              "LAPTOPS_AND_COMPUTERS",
+              "CELL_PHONES",
+              "GAMING_CONSOLES",
+              "AUDIO_EQUIPMENT",
+              "SUNGLASSES",
+              "WATCH_ACCESSORIES",
+              "COOKWARE",
+              "TOOLS",
+              "BIKES",
+              "MOTORCYCLES",
+              "HEADPHONES",
+              "SKINCARE",
+              "COFFEE_AND_TEA",
+              "PARTY_DECORATIONS",
+              "BOARD_GAMES",
+              "VITAMINS_AND_SUPPLEMENTS",
+              "WRITING_SUPPLIES",
+              "BABY_CLOTHING",
+              "BABY_TOYS",
+              "SHOWER_AND_BATH",
+              "TELEVISIONS",
+              "HOME_APPLIANCES",
+              "OUTERWEAR",
+              "FITNESS_SUPPLEMENTS",
+              "HANDBAGS",
+              "ELECTRICAL_TOOLS",
+              "CAMERA_ACCESSORIES",
+              "ART_SUPPLIES",
+              "COLLECTOR_ITEMS",
+              "WEDDING_SUPPLIES",
+              "SWIMWEAR",
+              "CAR_ACCESSORIES",
+              "HAIR_ACCESSORIES",
+              "GARDEN_TOOLS",
+              "ANTIQUES",
+              "FINE_JEWELRY",
+              "SMART_HOME_DEVICES",
+              "TABLEWARE",
+              "KITCHEN_APPLIANCES",
+              "ORGANIZATIONAL_ITEMS",
+              "COMPUTER_ACCESSORIES",
+              "COMPUTER_COMPONENTS",
+              "COMPUTER_PERIPHERALS",
+              "GAMING_ACCESSORIES",
+              "MUSICAL_INSTRUMENT_ACCESSORIES",
+              "FITNESS_ACCESSORIES",
+              "PARTY_FAVORS",
+              "SEASONAL_DECOR",
+              "PETS",
+              "PET_TOYS",
+              "PET_FOOD",
+              "PET_CLOTHING",
+              "WINE_AND_SPIRITS",
+              "SPORTS_MEMORABILIA",
+              "ART_PRINTS",
+              "VINTAGE_CLOTHING",
+              "VINTAGE_FURNITURE",
+              "APPLIANCES",
+              "RECREATIONAL_EQUIPMENT",
+              "OUTDOOR_FURNITURE",
+              "ELECTRONIC_GADGETS",
+              "BEAUTY_TOOLS",
+              "BATH_AND_BODY",
+              "CLEANING_SUPPLIES",
+              "CANDLES",
+              "HOME_FRAGRANCES",
+              "BOARD_GAME_ACCESSORIES",
+              "CAMERA_LENS",
+              "BABY_FOOD",
+              "BABY_ACCESSORIES",
+              "INFANT_CLOTHING",
+              "TODDLER_CLOTHING",
+              "EDUCATIONAL_TOYS",
+              "COSTUMES",
+              "COSMETICS",
+              "WATCHES_AND_CLOCKS",
+              "COFFEE_MAKERS",
+              "TEA_INFUSERS",
+              "SMARTWATCHES",
+              "SMARTPHONES",
+              "PC_GAMING",
+              "CONSOLE_GAMING",
+              "CAMERA_LENS_ACCESSORIES",
+              "FINE_ART",
+              "DECORATIVE_ART",
+              "HOME_TEXTILES",
+              "TELEPHONE_ACCESSORIES",
+              "LIGHTING",
+              "VINTAGE_COLLECTIBLES",
+              "KITCHEN_TOOLS",
+              "BAKEWARE",
+              "COOKING_UTENSILS",
+              "COOKBOOKS",
+              "CHINAWARE",
+              "DRINKWARE",
+              "FURNITURE_ACCESSORIES",
+              "EXERCISE_EQUIPMENT",
+              "FITNESS_APPAREL_ACCESSORIES",
+              "WEDDING_DECORATIONS",
+              "BRIDAL_FASHION",
+              "BRIDAL_ACCESSORIES",
+              "HONEYMOON_SUPPLIES",
+              "BRIDAL_PARTY_GIFTS",
+              "BRIDESMAID_DRESSES",
+              "GROOMSMEN_ATTIRE",
+              "SWIMWEAR_ACCESSORIES",
+              "CAR_MAINTENANCE",
+              "CAR_CARE_PRODUCTS",
+              "CAR_INTERIOR_ACCESSORIES",
+              "HAIR_STYLING_PRODUCTS",
+              "HAIR_COLOR",
+              "GARDEN_PLANTS",
+              "GARDEN_DECOR",
+              "GARDEN_FURNITURE",
+              "HANDCRAFTED_JEWELRY",
+              "FINE_JEWELRY_ACCESSORIES",
+              "SMART_HOME_DEVICES_ACCESSORIES",
+              "TABLEWARE_ACCESSORIES",
+              "BATHROOM_ACCESSORIES",
+              "OUTDOOR_FURNITURE_ACCESSORIES",
+              "ELECTRONIC_GADGETS_ACCESSORIES",
+              "BEAUTY_TOOLS_ACCESSORIES",
+              "BOARD_GAME_EXPANSIONS",
+              "BABY_FURNITURE",
+              "BABY_TRANSPORTATION",
+              "BABY_CARE_PRODUCTS",
+              "TODDLER_FURNITURE",
+              "TOY_VEHICLES",
+              "KIDS_ELECTRONIC_TOYS",
+              "KIDS_BUILDING_TOYS",
+              "KIDS_LEARNING_TOYS",
+              "COSTUME_ACCESSORIES",
+              "MAKEUP_PRODUCTS",
+              "SKIN_CARE_PRODUCTS",
+              "HAIR_CARE_PRODUCTS",
+              "WATCH_BATTERIES",
+              "WATCH_STRAPS",
+              "ESPRESSO_MACHINES",
+              "COFFEE_GRINDERS",
+              "COFFEE_ACCESSORIES",
+              "TEA_ACCESSORIES",
+              "TABLET_ACCESSORIES",
+              "PHONE_CASES",
+              "GAMING_CONTROLLER_ACCESSORIES",
+              "GAMING_HEADSET_ACCESSORIES",
+              "MUSICAL_INSTRUMENT_CASES",
+              "MUSICAL_INSTRUMENT_STANDS",
+              "FITNESS_APPAREL_EXPANSIONS",
+              "FITNESS_SUPPLEMENTS_ACCESSORIES",
+              "BEVERAGE_ACCESSORIES",
+              "ELECTRONIC_ACCESSORIES_EXPANSIONS",
+              "HEADPHONE_ACCESSORIES",
+              "SMARTWATCH_ACCESSORIES",
+              "COMPUTER_ACCESSORIES_EXPANSIONS",
+              "COMPUTER_COMPONENTS_EXPANSIONS",
+              "COMPUTER_PERIPHERALS_EXPANSIONS",
+              "GAMING_ACCESSORIES_EXPANSIONS",
+              "MUSICAL_INSTRUMENT_ACCESSORIES_EXPANSIONS",
+              "FITNESS_ACCESSORIES_EXPANSIONS",
+              "PARTY_FAVORS_EXPANSIONS",
+              "SEASONAL_DECOR_EXPANSIONS",
+              "PETS_EXPANSIONS",
+              "PET_TOYS_EXPANSIONS",
+              "PET_FOOD_EXPANSIONS",
+              "PET_CLOTHING_EXPANSIONS",
+              "WINE_AND_SPIRITS_EXPANSIONS",
+              "SPORTS_MEMORABILIA_EXPANSIONS",
+              "ART_PRINTS_EXPANSIONS",
+              "VINTAGE_CLOTHING_EXPANSIONS",
+              "VINTAGE_FURNITURE_EXPANSIONS",
+              "APPLIANCES_EXPANSIONS",
+              "RECREATIONAL_EQUIPMENT_EXPANSIONS",
+              "OUTDOOR"
+            ]
+          }
+        }
+      },
+      "OrderPaymentDTO": {
+        "required": [
+          "creditCard"
+        ],
+        "type": "object",
+        "properties": {
+          "creditCard": {
+            "type": "string",
+            "enum": [
+              "pm_card_visa"
+            ]
+          }
+        }
+      },
+      "PaymentResponse": {
+        "type": "object",
+        "properties": {
+          "paymentCreatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "endingBalance": {
+            "type": "number"
+          }
+        }
+      },
+      "ResetPasswordDTO": {
+        "required": [
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "password": {
+            "maxLength": 30,
+            "minLength": 4,
+            "type": "string"
+          }
+        }
+      },
+      "ForgotPasswordDTO": {
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "ChangePasswordDTO": {
+        "required": [
+          "newPassword",
+          "oldPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "oldPassword": {
+            "maxLength": 30,
+            "minLength": 4,
+            "type": "string"
+          },
+          "newPassword": {
+            "maxLength": 30,
+            "minLength": 4,
+            "type": "string"
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            }
+          },
+          "orderDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "totalAmount": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Pending",
+              "Processing",
+              "Delivered",
+              "Active"
+            ]
+          }
+        }
+      },
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product": {
+            "$ref": "#/components/schemas/Product"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "itemTotal": {
+            "type": "number"
+          }
+        }
+      },
+      "OrderItemDTO": {
+        "required": [
+          "productId",
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RegisterDTO": {
+        "required": [
+          "email",
+          "name",
+          "password",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 40,
+            "minLength": 3,
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 30,
+            "minLength": 4,
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "Customer",
+              "Seller",
+              "Admin"
+            ]
+          }
+        }
+      },
+      "UserLoginResponseDTO": {
+        "required": [
+          "email",
+          "name",
+          "role",
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 40,
+            "minLength": 3,
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "Customer",
+              "Seller",
+              "Admin"
+            ]
+          }
+        }
+      },
+      "LoginDTO": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 30,
+            "minLength": 4,
+            "type": "string"
+          }
+        }
+      },
+      "UpdateReviewDTO": {
+        "required": [
+          "comment",
+          "rating"
+        ],
+        "type": "object",
+        "properties": {
+          "comment": {
+            "maxLength": 150,
+            "minLength": 3,
+            "type": "string"
+          },
+          "rating": {
+            "maximum": 5,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PageReview": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Review"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "empty": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          },
+          "sorted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageProduct": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OrderHistory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "order": {
+            "$ref": "#/components/schemas/Order"
+          },
+          "paymentDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "creditCard": {
+            "type": "string",
+            "enum": [
+              "pm_card_visa"
+            ]
+          },
+          "paymentAmount": {
+            "type": "number"
+          },
+          "orderStatus": {
+            "type": "string",
+            "enum": [
+              "Pending",
+              "Processing",
+              "Delivered",
+              "Active"
+            ]
+          }
+        }
+      },
+      "PageOrderHistory": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderHistory"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "JWT auth description",
+        "in": "header",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
