@@ -18,4 +18,11 @@ public class StandardError {
     private String error;
     private String message;
     private String path;
+
+    public StandardError(Instant timestamp, Integer status, String error, String message) {
+        this.timestamp = timestamp;
+        this.status = status;
+        this.error = error;
+        this.message = message;
+    }
 }

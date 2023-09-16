@@ -32,19 +32,16 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class ReviewControllerTest extends ApplicationConfigTest {
+class ReviewControllerTest extends ApplicationConfigTestController {
 
     private static final String PATH = "/reviews";
 
+    public ReviewControllerTest() {
+        super(PATH);
+    }
+
     @MockBean
     private ReviewService reviewService;
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private Seller seller = (Seller) TestDataBuilder.buildUserWithId();
     private Customer customer = TestDataBuilder.buildCustomerWithId();
     private Product product = TestDataBuilder.buildProductWithId(seller);
@@ -52,42 +49,6 @@ class ReviewControllerTest extends ApplicationConfigTest {
     private ReviewDTO reviewDTO = TestDataBuilder.buildReviewDTO();
     private ReviewDTO invalidReviewDTO = mock(ReviewDTO.class);
     private UpdateReviewDTO updateReviewDTO = TestDataBuilder.buildUpdateReviewDTO();
-
-    private MockHttpServletRequestBuilder mockPostRequest
-            (Object requestObject) throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .post(PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(requestObject));
-    }
-
-    private MockHttpServletRequestBuilder mockGetRequest() {
-        return MockMvcRequestBuilders
-                .get(PATH)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .get(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockPatchRequest
-            (String endpoint, Object requestObject) throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .patch(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(requestObject));
-    }
-
-    private MockHttpServletRequestBuilder mockDeleteRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .delete(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
 
     @Test
     @WithMockUser(authorities = "Customer")

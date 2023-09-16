@@ -28,45 +28,19 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class OrderControllerTest extends ApplicationConfigTest {
+class OrderControllerTest extends ApplicationConfigTestController {
 
     private static final String PATH = "/orders";
+
+    public OrderControllerTest() {
+        super(PATH);
+    }
 
     @MockBean
     private OrderService orderService;
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private Order order = TestDataBuilder.buildOrderWithId();
     private List<Order> orders = TestDataBuilder.buildList(order);
-
-    private MockHttpServletRequestBuilder mockPostRequest() throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .post(PATH)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockGetRequest() {
-        return MockMvcRequestBuilders
-                .get(PATH)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .get(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockDeleteRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .delete(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
 
     @Test
     @WithMockUser(authorities = "Customer")

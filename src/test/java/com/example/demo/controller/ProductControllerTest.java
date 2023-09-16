@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.ApplicationConfigTest;
+import com.example.demo.config.RateLimitInterceptor;
 import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.user.Seller;
@@ -12,6 +13,7 @@ import com.example.demo.services.exceptions.UnauthorizedAccessException;
 import com.example.demo.utils.TestDataBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,69 +39,22 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class ProductControllerTest extends ApplicationConfigTest {
+class ProductControllerTest extends ApplicationConfigTestController {
 
     private static final String PATH = "/products";
 
+    public ProductControllerTest() {
+        super(PATH);
+    }
+
     @MockBean
     private ProductService productService;
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private User user = TestDataBuilder.buildUserWithId();
     private Product product = TestDataBuilder.buildProductWithId((Seller) user);
     private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
     private ProductDTO invalidProductDTO = mock(ProductDTO.class);
     Page<Product> productPage = mock(PageImpl.class);
-
-    private MockHttpServletRequestBuilder mockPostRequest
-            (Object requestObject) throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .post(PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(requestObject));
-    }
-
-    private MockHttpServletRequestBuilder mockGetRequest() {
-        return MockMvcRequestBuilders
-                .get(PATH)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .get(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockPatchRequest
-            (String endpoint, Object requestObject) throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .patch(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(requestObject));
-    }
-
-    private MockHttpServletRequestBuilder mockDeleteRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .delete(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockGetRequestWithParams
-            (String endpoint, String paramName, String paramValue)
-            throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .get(PATH + "/" + endpoint)
-                .param(paramName, paramValue)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
 
     @Test
     @WithMockUser(authorities = "Seller")

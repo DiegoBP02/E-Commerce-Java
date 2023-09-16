@@ -40,51 +40,21 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class AuthenticationControllerTest extends ApplicationConfigTest {
+class AuthenticationControllerTest extends ApplicationConfigTestController  {
+
     private static final String PATH = "/auth";
+
+    public AuthenticationControllerTest() {
+        super(PATH);
+    }
 
     @MockBean
     private AuthenticationService authenticationService;
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private RegisterDTO registerDTO = TestDataBuilder.buildRegisterDTO();
     private LoginDTO loginDTO = TestDataBuilder.buildLoginDTO();
     private UUID randomUUID = UUID.randomUUID();
     private UserLoginResponseDTO userLoginResponseDTO= TestDataBuilder.buildUserLoginResponseDTO(registerDTO);
-
-    private MockHttpServletRequestBuilder mockPostRequest
-            (String endpoint) throws Exception {
-        return MockMvcRequestBuilders
-                .post(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockPostRequest
-            (String endpoint, Object requestObject) throws Exception {
-        return MockMvcRequestBuilders
-                .post(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(requestObject));
-    }
-
-    private MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .get(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
-
-    private MockHttpServletRequestBuilder mockPostRequestWithParams
-            (String endpoint, String paramName, String paramValue)
-            throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .post(PATH + "/" + endpoint)
-                .param(paramName, paramValue)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
 
     @Test
     void givenValidUser_whenRegister_thenReturnTokenAndOk() throws Exception {

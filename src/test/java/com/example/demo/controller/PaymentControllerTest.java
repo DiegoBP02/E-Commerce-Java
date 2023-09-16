@@ -28,30 +28,19 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class PaymentControllerTest extends ApplicationConfigTest {
+class PaymentControllerTest extends ApplicationConfigTestController {
 
     private static final String PATH = "/payment";
+
+    public PaymentControllerTest() {
+        super(PATH);
+    }
 
     @MockBean
     private StripeService stripeService;
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private OrderPaymentDTO orderPaymentDTO = TestDataBuilder.buildOrderPaymentDTO();
     private PaymentResponse mockPaymentResponse = mock(PaymentResponse.class);
-
-    private MockHttpServletRequestBuilder mockPostRequest
-            (Object requestObject) throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .post(PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(requestObject));
-    }
 
     @Test
     @WithMockUser(authorities = "Customer")

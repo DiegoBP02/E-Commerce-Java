@@ -28,28 +28,20 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class OrderHistoryControllerTest extends ApplicationConfigTest {
+class OrderHistoryControllerTest extends ApplicationConfigTestController {
 
     private static final String PATH = "/orderHistory";
+
+    public OrderHistoryControllerTest() {
+        super(PATH);
+    }
 
     @MockBean
     private OrderHistoryService orderHistoryService;
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private Customer customer = TestDataBuilder.buildCustomerWithId();
     private Order order = TestDataBuilder.buildOrder(customer);
     private OrderHistory orderHistory = TestDataBuilder.buildOrderHistoryWithId(order);
-
-    private MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .get(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
-    }
 
     @Test
     @WithMockUser(authorities = "Customer")

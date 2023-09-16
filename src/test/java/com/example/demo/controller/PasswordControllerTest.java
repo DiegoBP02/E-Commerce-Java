@@ -30,42 +30,21 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class PasswordControllerTest extends ApplicationConfigTest {
+class PasswordControllerTest extends ApplicationConfigTestController {
 
     private static final String PATH = "/password";
 
+    public PasswordControllerTest() {
+        super(PATH);
+    }
+
     @MockBean
     private PasswordService passwordService;
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private ChangePasswordDTO changePasswordDTO = TestDataBuilder.buildChangePasswordDTO();
     private ForgotPasswordDTO forgotPasswordDTO = TestDataBuilder.buildForgotPasswordDTO();
     private ResetPasswordDTO resetPasswordDTO = TestDataBuilder.buildResetPasswordDTO();
     private UUID randomToken = UUID.randomUUID();
-
-    private MockHttpServletRequestBuilder mockPostRequest
-            (String endpoint, Object requestObject) throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .post(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsString(requestObject));
-    }
-
-    private MockHttpServletRequestBuilder mockPostRequestWithParams
-            (String endpoint, Object requestObject, String paramName, String paramValue)
-            throws JsonProcessingException {
-        return MockMvcRequestBuilders
-                .post(PATH + "/" + endpoint)
-                .param(paramName, paramValue)
-                .content(this.objectMapper.writeValueAsString(requestObject))
-                .contentType(MediaType.APPLICATION_JSON);
-    }
 
     @Test
     @WithMockUser

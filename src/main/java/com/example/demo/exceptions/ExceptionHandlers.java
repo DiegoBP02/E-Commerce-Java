@@ -5,6 +5,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.demo.config.exceptions.UserNotEnabledException;
+import com.example.demo.controller.exceptions.RateLimitException;
 import com.example.demo.entities.exceptions.NoActiveOrderException;
 import com.example.demo.services.exceptions.*;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -437,11 +438,22 @@ public class ExceptionHandlers {
     }
 
     @ExceptionHandler(InvalidRoleException.class)
-    public ResponseEntity<StandardError> ResetPasswordTokenExpired
+    public ResponseEntity<StandardError> InvalidRoleException
             (InvalidRoleException e, HttpServletRequest request) {
         logger.error("Invalid rode exception:", e);
         String error = "Invalid role";
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError err = new StandardError(Instant.now(), status.value(),
+                error, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<StandardError> RateLimitException
+            (RateLimitException e, HttpServletRequest request) {
+        logger.error("Rate limit exception:", e);
+        String error = "You have exhausted your API Request Quota";
+        HttpStatus status = HttpStatus.TOO_MANY_REQUESTS;
         StandardError err = new StandardError(Instant.now(), status.value(),
                 error, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
