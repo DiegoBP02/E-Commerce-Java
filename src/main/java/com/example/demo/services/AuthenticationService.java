@@ -50,7 +50,7 @@ public class AuthenticationService implements UserDetailsService {
     private EmailService emailService;
 
     @Override
-    public UserDetails loadUserByUsername(String email) {
+    public User loadUserByUsername(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Email not found: " + email));
     }

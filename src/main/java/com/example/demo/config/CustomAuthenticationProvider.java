@@ -27,7 +27,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String email = authentication.getPrincipal().toString();
         String password = authentication.getCredentials().toString();
 
-        User user = (User) authenticationService.loadUserByUsername(email);
+        User user = authenticationService.loadUserByUsername(email);
 
         if (passwordEncoder.matches(password, user.getPassword()) && user.isAccountNonLocked()) {
             if (user.getFailedAttempt() > 0) {

@@ -24,10 +24,10 @@ public abstract class ApplicationConfigTestController extends ApplicationConfigT
     }
 
     @Autowired
-    MockMvc mockMvc;
+    protected MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
 
     @MockBean
     private RateLimitInterceptor rateLimitInterceptor;
@@ -37,21 +37,21 @@ public abstract class ApplicationConfigTestController extends ApplicationConfigT
         when(rateLimitInterceptor.preHandle(any(), any(), any())).thenReturn(true);
     }
 
-    MockHttpServletRequestBuilder mockPostRequest
+    protected MockHttpServletRequestBuilder mockPostRequest
             () throws Exception {
         return MockMvcRequestBuilders
                 .post(PATH)
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
-    MockHttpServletRequestBuilder mockPostRequest
+    protected MockHttpServletRequestBuilder mockPostRequest
             (String endpoint) throws Exception {
         return MockMvcRequestBuilders
                 .post(PATH + "/" + endpoint)
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
-    MockHttpServletRequestBuilder mockPostRequest
+    protected MockHttpServletRequestBuilder mockPostRequest
             (Object requestObject) throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .post(PATH)
@@ -60,7 +60,7 @@ public abstract class ApplicationConfigTestController extends ApplicationConfigT
                 .content(this.objectMapper.writeValueAsString(requestObject));
     }
 
-    MockHttpServletRequestBuilder mockPostRequest
+    protected MockHttpServletRequestBuilder mockPostRequest
             (String endpoint, Object requestObject) throws Exception {
         return MockMvcRequestBuilders
                 .post(PATH + "/" + endpoint)
@@ -69,16 +69,15 @@ public abstract class ApplicationConfigTestController extends ApplicationConfigT
                 .content(this.objectMapper.writeValueAsString(requestObject));
     }
 
-    MockHttpServletRequestBuilder mockPostRequestWithParams
+    protected MockHttpServletRequestBuilder mockPostRequestWithParams
             (String endpoint, String paramName, String paramValue)
             throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .post(PATH + "/" + endpoint)
-                .param(paramName, paramValue)
-                .contentType(MediaType.APPLICATION_JSON);
+                .param(paramName, paramValue);
     }
 
-    MockHttpServletRequestBuilder mockPostRequestWithParams
+    protected MockHttpServletRequestBuilder mockPostRequestWithParams
             (String endpoint, Object requestObject, String paramName, String paramValue)
             throws JsonProcessingException {
         return MockMvcRequestBuilders
@@ -88,28 +87,23 @@ public abstract class ApplicationConfigTestController extends ApplicationConfigT
                 .contentType(MediaType.APPLICATION_JSON);
     }
 
-    MockHttpServletRequestBuilder mockGetRequest() {
-        return MockMvcRequestBuilders
-                .get(PATH)
-                .contentType(MediaType.APPLICATION_JSON);
+    protected MockHttpServletRequestBuilder mockGetRequest() {
+        return MockMvcRequestBuilders.get(PATH);
     }
 
-    MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .get(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
+    protected MockHttpServletRequestBuilder mockGetRequest(String endpoint) {
+        return MockMvcRequestBuilders.get(PATH + "/" + endpoint);
     }
 
-    MockHttpServletRequestBuilder mockGetRequestWithParams
+    protected MockHttpServletRequestBuilder mockGetRequestWithParams
             (String endpoint, String paramName, String paramValue)
             throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .get(PATH + "/" + endpoint)
-                .param(paramName, paramValue)
-                .contentType(MediaType.APPLICATION_JSON);
+                .param(paramName, paramValue);
     }
 
-    MockHttpServletRequestBuilder mockPatchRequest
+    protected MockHttpServletRequestBuilder mockPatchRequest
             (String endpoint, Object requestObject) throws JsonProcessingException {
         return MockMvcRequestBuilders
                 .patch(PATH + "/" + endpoint)
@@ -118,9 +112,7 @@ public abstract class ApplicationConfigTestController extends ApplicationConfigT
                 .content(this.objectMapper.writeValueAsString(requestObject));
     }
 
-    MockHttpServletRequestBuilder mockDeleteRequest(String endpoint) {
-        return MockMvcRequestBuilders
-                .delete(PATH + "/" + endpoint)
-                .contentType(MediaType.APPLICATION_JSON);
+    protected MockHttpServletRequestBuilder mockDeleteRequest(String endpoint) {
+        return MockMvcRequestBuilders.delete(PATH + "/" + endpoint);
     }
 }
