@@ -3,8 +3,6 @@ package com.example.demo.config;
 import com.example.demo.ApplicationConfigTest;
 import com.example.demo.controller.exceptions.RateLimitException;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.ConsumptionProbe;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -12,7 +10,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class RateLimitInterceptorTest extends ApplicationConfigTest {
 
@@ -26,10 +23,10 @@ class RateLimitInterceptorTest extends ApplicationConfigTest {
 
     @Test
     void givenRateLimitNotExceeded_whenPreHandle_thenReturnTrueAndHeaderOfRemainingTokens() throws Exception {
-        boolean result = rateLimitInterceptor.preHandle(request,response,handler);
+        boolean result = rateLimitInterceptor.preHandle(request, response, handler);
 
         assertTrue(result);
-        assertEquals(99,Integer.parseInt(response.getHeader("X-Rate-Limit-Remaining")));
+        assertEquals(99, Integer.parseInt(response.getHeader("X-Rate-Limit-Remaining")));
     }
 
     @Test

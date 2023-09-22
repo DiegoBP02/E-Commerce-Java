@@ -2,9 +2,7 @@ package com.example.demo.repositories;
 
 import com.example.demo.entities.Order;
 import com.example.demo.entities.OrderHistory;
-import com.example.demo.entities.Product;
 import com.example.demo.entities.user.Customer;
-import com.example.demo.entities.user.Seller;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,11 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.*;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class OrderHistoryRepositoryTest {

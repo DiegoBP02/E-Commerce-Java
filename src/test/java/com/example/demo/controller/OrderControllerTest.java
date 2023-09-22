@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.ApplicationConfigTest;
 import com.example.demo.entities.Order;
 import com.example.demo.services.OrderService;
 import com.example.demo.services.exceptions.ActiveOrderAlreadyExistsException;
@@ -8,17 +7,11 @@ import com.example.demo.services.exceptions.DatabaseException;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
 import com.example.demo.services.exceptions.UnauthorizedAccessException;
 import com.example.demo.utils.TestDataBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 

@@ -1,36 +1,24 @@
 package com.example.demo.controller;
 
-import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
 import com.example.demo.dtos.UserLoginResponseDTO;
-import com.example.demo.entities.Product;
-import com.example.demo.services.exceptions.*;
 import com.example.demo.services.AuthenticationService;
+import com.example.demo.services.exceptions.*;
 import com.example.demo.utils.TestDataBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,7 +28,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class AuthenticationControllerTest extends ApplicationConfigTestController  {
+class AuthenticationControllerTest extends ApplicationConfigTestController {
 
     private static final String PATH = "/auth";
 
@@ -54,7 +42,7 @@ class AuthenticationControllerTest extends ApplicationConfigTestController  {
     private RegisterDTO registerDTO = TestDataBuilder.buildRegisterDTO();
     private LoginDTO loginDTO = TestDataBuilder.buildLoginDTO();
     private UUID randomUUID = UUID.randomUUID();
-    private UserLoginResponseDTO userLoginResponseDTO= TestDataBuilder.buildUserLoginResponseDTO(registerDTO);
+    private UserLoginResponseDTO userLoginResponseDTO = TestDataBuilder.buildUserLoginResponseDTO(registerDTO);
 
     @Test
     void givenValidUser_whenRegister_thenReturnTokenAndOk() throws Exception {
@@ -312,7 +300,7 @@ class AuthenticationControllerTest extends ApplicationConfigTestController  {
     @Test
     void givenConfirmationTokenNotFound_whenConfirmAccount_thenHandleEntityNotFoundException() throws Exception {
         doThrow(EntityNotFoundException.class).when(authenticationService)
-                .confirmAccount(any(HttpServletRequest.class),eq(randomUUID));
+                .confirmAccount(any(HttpServletRequest.class), eq(randomUUID));
 
         MockHttpServletRequestBuilder mockRequest =
                 mockPostRequestWithParams
@@ -332,7 +320,7 @@ class AuthenticationControllerTest extends ApplicationConfigTestController  {
     @WithMockUser(authorities = "Customer")
     void givenUserNotFound_whenConfirmAccount_thenHandleUserNotFoundException() throws Exception {
         doThrow(UserNotFoundException.class).when(authenticationService)
-                .confirmAccount(any(HttpServletRequest.class),eq(randomUUID));
+                .confirmAccount(any(HttpServletRequest.class), eq(randomUUID));
 
         MockHttpServletRequestBuilder mockRequest =
                 mockPostRequestWithParams
@@ -352,7 +340,7 @@ class AuthenticationControllerTest extends ApplicationConfigTestController  {
     @WithMockUser(authorities = "Customer")
     void givenConfirmationTokenExpired_whenConfirmAccount_thenHandleConfirmationTokenExpiredException() throws Exception {
         doThrow(ConfirmationTokenExpiredException.class).when(authenticationService)
-                .confirmAccount(any(HttpServletRequest.class),eq(randomUUID));
+                .confirmAccount(any(HttpServletRequest.class), eq(randomUUID));
 
         MockHttpServletRequestBuilder mockRequest =
                 mockPostRequestWithParams

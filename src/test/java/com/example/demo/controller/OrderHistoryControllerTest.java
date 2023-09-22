@@ -1,29 +1,21 @@
 package com.example.demo.controller;
 
-import com.example.demo.ApplicationConfigTest;
-import com.example.demo.dtos.OrderHistoryDTO;
 import com.example.demo.entities.Order;
 import com.example.demo.entities.OrderHistory;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.services.OrderHistoryService;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
 import com.example.demo.utils.TestDataBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -98,7 +90,7 @@ class OrderHistoryControllerTest extends ApplicationConfigTestController {
     void givenOrderHistory_whenFindByCurrentUser_thenReturnOrderHistoryPage() throws Exception {
         Page<OrderHistory> orderHistoryPage = mock(PageImpl.class);
 
-        when(orderHistoryService.findByCurrentUser(0, 5, Sort.Direction.ASC,"paymentDate"))
+        when(orderHistoryService.findByCurrentUser(0, 5, Sort.Direction.ASC, "paymentDate"))
                 .thenReturn(orderHistoryPage);
 
         mockMvc.perform(mockGetRequest("/user"))
@@ -106,7 +98,7 @@ class OrderHistoryControllerTest extends ApplicationConfigTestController {
                 .andExpect(content().json(objectMapper.writeValueAsString(orderHistoryPage)));
 
         verify(orderHistoryService, times(1))
-                .findByCurrentUser(0, 5, Sort.Direction.ASC,"paymentDate");
+                .findByCurrentUser(0, 5, Sort.Direction.ASC, "paymentDate");
     }
 
     @Test

@@ -1,21 +1,16 @@
 package com.example.demo.controller;
 
-import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.ChangePasswordDTO;
 import com.example.demo.dtos.ForgotPasswordDTO;
 import com.example.demo.dtos.ResetPasswordDTO;
 import com.example.demo.services.PasswordService;
 import com.example.demo.services.exceptions.*;
 import com.example.demo.utils.TestDataBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;

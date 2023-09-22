@@ -4,15 +4,13 @@ import com.example.demo.controller.ApplicationConfigTestController;
 import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.user.Seller;
-import com.example.demo.entities.user.User;
 import com.example.demo.repositories.ProductRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.utils.TestDataBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -22,7 +20,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Testcontainers
 class ProductIntegrationTest extends ApplicationConfigTestController {
@@ -30,14 +29,7 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
     private static final String PATH = "/products";
 
     @Container
-    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:latest");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-    }
+    static PostgreSQLContainer postgreSQLContainer = BasePostgresqlContainer.getInstance();
 
     @Autowired
     private MockMvc mockMvc;
@@ -58,9 +50,9 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
         productRepository.deleteAll();
     }
 
-    private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
     private Seller seller = (Seller) TestDataBuilder.buildUserNoId();
     private Product product = TestDataBuilder.buildProductNoId(seller);
+    private ProductDTO productDTO = TestDataBuilder.buildProductDTO();
 
     private void insertSeller() {
         userRepository.save(seller);
@@ -71,18 +63,19 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
         productRepository.save(product);
     }
 
-    User setupSeller(){
+    Seller setupSeller() {
         seller.setEnabled(true);
         return userRepository.save(seller);
     }
 
     @Test
-    void givenValidBody_whenCreate_thenReturnProductAndCreated() throws Exception {
+    void givenValidBodyAndSeller_whenCreate_thenReturnProductAndCreated() throws Exception {
         MockHttpServletRequestBuilder mockRequest = mockPostRequest(productDTO).with(user(setupSeller()));
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(productDTO.getName()));
+
         assertEquals(1, productRepository.findAll().size());
     }
 
@@ -118,18 +111,17 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
     }
 
     @Test
-    void givenProduct_whenFindByCurrentUser_thenReturnProductPage() throws Exception {
+    void givenProductAndSeller_whenFindByCurrentUser_thenReturnProductPage() throws Exception {
         insertProduct();
 
         mockMvc.perform(mockGetRequest("user").with(user(setupSeller())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content", hasSize(1)));
-
     }
 
     @Test
-    void givenProduct_whenFindBySellerId_thenReturnProductPage() throws Exception {
+    void givenProductAndSeller_whenFindBySellerId_thenReturnProductPage() throws Exception {
         insertProduct();
 
         mockMvc.perform(mockGetRequest("seller/" + seller.getId()))
@@ -139,7 +131,7 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
     }
 
     @Test
-    void givenValidBodyAndUser_whenUpdate_thenReturnProduct() throws Exception {
+    void givenValidBodyAndSeller_whenUpdate_thenReturnProduct() throws Exception {
         insertProduct();
 
         MockHttpServletRequestBuilder mockRequest
@@ -151,14 +143,14 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
     }
 
     @Test
-    void givenValidUserAndProduct_whenDelete_thenReturnNoContent() throws Exception {
+    void givenProductAndSeller_whenDelete_thenReturnNoContentAndDeleteProduct() throws Exception {
         insertProduct();
 
         MockHttpServletRequestBuilder mockRequest
                 = mockDeleteRequest(product.getId().toString()).with(user(setupSeller()));
 
-        mockMvc.perform(mockRequest)
-                .andExpect(status().isNoContent());
+        mockMvc.perform(mockRequest).andExpect(status().isNoContent());
+
         assertEquals(0, productRepository.findAll().size());
     }
 }

@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.ApplicationConfigTest;
 import com.example.demo.dtos.OrderPaymentDTO;
 import com.example.demo.dtos.PaymentResponse;
 import com.example.demo.entities.exceptions.NoActiveOrderException;
@@ -9,17 +8,11 @@ import com.example.demo.services.exceptions.InvalidOrderException;
 import com.example.demo.services.exceptions.StripeErrorException;
 import com.example.demo.services.stripe.StripeService;
 import com.example.demo.utils.TestDataBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

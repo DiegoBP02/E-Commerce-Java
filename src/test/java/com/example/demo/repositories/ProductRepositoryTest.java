@@ -1,7 +1,6 @@
 package com.example.demo.repositories;
 
 import com.example.demo.entities.Product;
-import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.AfterEach;

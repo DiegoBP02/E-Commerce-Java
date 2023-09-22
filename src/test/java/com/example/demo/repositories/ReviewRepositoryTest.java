@@ -1,11 +1,9 @@
 package com.example.demo.repositories;
 
-import com.example.demo.entities.OrderHistory;
 import com.example.demo.entities.Product;
 import com.example.demo.entities.Review;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
-import com.example.demo.entities.user.User;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +15,7 @@ import org.springframework.data.domain.*;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class ReviewRepositoryTest {
@@ -43,7 +41,7 @@ class ReviewRepositoryTest {
         userRepository.save(customer);
         product = TestDataBuilder.buildProductNoId(seller);
         productRepository.save(product);
-        review = TestDataBuilder.buildReviewNoId(product,customer);
+        review = TestDataBuilder.buildReviewNoId(product, customer);
     }
 
     @AfterEach

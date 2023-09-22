@@ -198,7 +198,7 @@ class OrderServiceTest extends ApplicationConfigTest {
 
         Order result = orderService.findOrCreateActiveOrderByCurrentUser();
 
-        assertEquals(order,result);
+        assertEquals(order, result);
 
         verifyAuthentication();
         verify(orderRepository, times(1)).findActiveOrderByCurrentUser(customer);

@@ -1,10 +1,7 @@
 package com.example.demo.repositories;
 
 import com.example.demo.entities.ConfirmationToken;
-import com.example.demo.entities.Order;
-import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.User;
-import com.example.demo.enums.OrderStatus;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class ConfirmationTokenRepositoryTest {
