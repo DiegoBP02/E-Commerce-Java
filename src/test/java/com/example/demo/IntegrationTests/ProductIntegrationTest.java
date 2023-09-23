@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -29,12 +31,15 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
     private static final String PATH = "/products";
 
     @Container
-    static PostgreSQLContainer postgreSQLContainer = BasePostgresqlContainer.getInstance();
+    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:latest");
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+    }
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -131,7 +136,7 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
     }
 
     @Test
-    void givenValidBodyAndSeller_whenUpdate_thenReturnProduct() throws Exception {
+    void givenValidBodyAndSeller_whenUpdate_thenReturnUpdatedProduct() throws Exception {
         insertProduct();
 
         MockHttpServletRequestBuilder mockRequest
