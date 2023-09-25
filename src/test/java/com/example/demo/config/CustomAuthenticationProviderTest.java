@@ -86,7 +86,7 @@ class CustomAuthenticationProviderTest extends ApplicationConfigTest {
 
     @Test
     @DisplayName("given user is non locked and failed attempts are smaller than " +
-            "MAX_FAILED_ATTEMPS, when authenticate, then increase user failed attempts and" +
+            "MAX_FAILED_ATTEMPTS, when authenticate, then increase user failed attempts and" +
             "throw BadCredentialsException")
     void authenticate_invalidUser() {
         when(authenticationService.loadUserByUsername(user.getEmail())).thenReturn(user);
@@ -108,7 +108,7 @@ class CustomAuthenticationProviderTest extends ApplicationConfigTest {
     }
 
     @Test
-    @DisplayName("given user is non locked and failed attemps reach MAX_FAILED_ATTEMPS," +
+    @DisplayName("given user is non locked and failed attempts reach MAX_FAILED_ATTEMPTS," +
             "when authenticate, then lock user account and throw LockedException")
     void authenticate_invalidUserMaxFailedAttempts() {
         when(authenticationService.loadUserByUsername(user.getEmail())).thenReturn(user);
