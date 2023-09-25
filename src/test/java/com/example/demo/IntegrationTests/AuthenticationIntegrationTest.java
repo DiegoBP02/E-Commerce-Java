@@ -4,10 +4,8 @@ import com.example.demo.controller.ApplicationConfigTestController;
 import com.example.demo.dtos.LoginDTO;
 import com.example.demo.dtos.RegisterDTO;
 import com.example.demo.entities.user.Seller;
-import com.example.demo.entities.user.User;
 import com.example.demo.enums.Role;
 import com.example.demo.repositories.UserRepository;
-import com.example.demo.services.AuthenticationService;
 import com.example.demo.services.exceptions.InvalidRoleException;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.AfterEach;
@@ -16,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -25,10 +22,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Instant;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -65,12 +60,12 @@ class AuthenticationIntegrationTest extends ApplicationConfigTestController {
     private RegisterDTO registerDTO = TestDataBuilder.buildRegisterDTO();
     private LoginDTO loginDTO = TestDataBuilder.buildLoginDTO();
 
-    private void insertSellerValidPassword() {
+    private void insertSellerHashedPassword() {
         seller.setPassword(passwordEncoder.encode(seller.getPassword()));
         userRepository.save(seller);
     }
 
-    private void insertSellerWrongPassword() {
+    private void insertSellerRawPassword() {
         userRepository.save(seller);
     }
 
@@ -115,7 +110,7 @@ class AuthenticationIntegrationTest extends ApplicationConfigTestController {
 
     @Test
     void givenValidBodyAndNoUser_whenLogin_thenReturnUserLoginResponseDto() throws Exception {
-        insertSellerValidPassword();
+        insertSellerHashedPassword();
 
         mockMvc.perform(mockPostRequest("login", loginDTO))
                 .andExpect(status().isOk())
@@ -130,7 +125,7 @@ class AuthenticationIntegrationTest extends ApplicationConfigTestController {
             "then reset user failed attempts and return UsernamePasswordAuthenticationToken")
     void authenticate_validUserFailedAttempts() throws Exception {
         seller.setFailedAttempt(1);
-        insertSellerValidPassword();
+        insertSellerHashedPassword();
 
         mockMvc.perform(mockPostRequest("login", loginDTO))
                 .andExpect(status().isOk())
@@ -146,7 +141,7 @@ class AuthenticationIntegrationTest extends ApplicationConfigTestController {
             "MAX_FAILED_ATTEMPTS, when authenticate, then increase user failed attempts and" +
             "throw BadCredentialsException")
     void authenticate_invalidUser() throws Exception {
-        insertSellerWrongPassword();
+        insertSellerRawPassword();
 
         mockMvc.perform(mockPostRequest("login", loginDTO))
                 .andExpect(status().isUnauthorized())
@@ -163,7 +158,7 @@ class AuthenticationIntegrationTest extends ApplicationConfigTestController {
             "when authenticate, then lock user account and throw LockedException")
     void authenticate_invalidUserMaxFailedAttempts() throws Exception {
         seller.setFailedAttempt(2);
-        insertSellerWrongPassword();
+        insertSellerRawPassword();
 
         mockMvc.perform(mockPostRequest("login", loginDTO))
                 .andExpect(status().isLocked())
@@ -184,7 +179,7 @@ class AuthenticationIntegrationTest extends ApplicationConfigTestController {
         seller.setLockTime(Instant.now().minusSeconds(60 * 60 * 24));
         seller.setAccountNonLocked(false);
         seller.setFailedAttempt(1);
-        insertSellerValidPassword();
+        insertSellerHashedPassword();
 
         mockMvc.perform(mockPostRequest("login", loginDTO))
                 .andExpect(status().isLocked())
@@ -205,7 +200,7 @@ class AuthenticationIntegrationTest extends ApplicationConfigTestController {
         seller.setLockTime(Instant.now());
         seller.setAccountNonLocked(false);
         seller.setFailedAttempt(3);
-        insertSellerValidPassword();
+        insertSellerHashedPassword();
 
         mockMvc.perform(mockPostRequest("login", loginDTO))
                 .andExpect(status().isLocked())
