@@ -61,9 +61,6 @@ class OrderItemIntegrationTest extends ApplicationConfigTestController {
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
-        productRepository.deleteAll();
-        orderRepository.deleteAll();
-        orderItemRepository.deleteAll();
     }
 
     private Admin admin = new Admin("admin", "admin", "admin");

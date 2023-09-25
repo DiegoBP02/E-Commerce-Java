@@ -63,11 +63,6 @@ class ReviewIntegrationTest extends ApplicationConfigTestController {
 
     @AfterEach
     void tearDown() {
-        orderHistoryRepository.deleteAll();
-        reviewRepository.deleteAll();
-        productRepository.deleteAll();
-        orderRepository.deleteAll();
-        orderItemRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -111,7 +106,6 @@ class ReviewIntegrationTest extends ApplicationConfigTestController {
 
     private void insertReview(){
         insertProduct();
-        review.setCustomer(customer);
         customer.setReviews(Collections.singletonList(review));
         insertCustomer();
         reviewRepository.save(review);

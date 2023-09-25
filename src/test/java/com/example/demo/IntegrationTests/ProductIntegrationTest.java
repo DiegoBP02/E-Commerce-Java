@@ -50,7 +50,6 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
-        productRepository.deleteAll();
     }
 
     private Seller seller = (Seller) TestDataBuilder.buildUserNoId();

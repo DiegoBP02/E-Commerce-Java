@@ -47,7 +47,6 @@ class OrderHistoryIntegrationTest extends ApplicationConfigTestController {
 
     @AfterEach
     void tearDown() {
-        orderHistoryRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -55,11 +54,11 @@ class OrderHistoryIntegrationTest extends ApplicationConfigTestController {
     private Order order = TestDataBuilder.buildOrder(customer);
     private OrderHistory orderHistory = TestDataBuilder.buildOrderHistory(order);
 
-    private void insertCustomer(){
+    private void insertCustomer() {
         userRepository.save(customer);
     }
 
-    private void insertOrderHistory(){
+    private void insertOrderHistory() {
         insertCustomer();
         orderHistoryRepository.save(orderHistory);
     }
