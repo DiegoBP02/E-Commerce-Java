@@ -74,7 +74,8 @@ class OrderIntegrationTest extends ApplicationConfigTestController {
     }
 
     Customer setupCustomer() {
-        return userRepository.save(customer);
+        return (Customer) userRepository.findByEmail(customer.getEmail())
+                .orElseGet(() -> userRepository.save(customer));
     }
 
     Customer setupCustomerWithOrder() {
@@ -84,7 +85,8 @@ class OrderIntegrationTest extends ApplicationConfigTestController {
     }
 
     Admin setupAdmin() {
-        return userRepository.save(admin);
+        return (Admin) userRepository.findByEmail(admin.getEmail())
+                .orElseGet(() -> userRepository.save(admin));
     }
 
     @Test

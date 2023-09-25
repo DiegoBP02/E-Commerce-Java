@@ -3,6 +3,7 @@ package com.example.demo.IntegrationTests;
 import com.example.demo.controller.ApplicationConfigTestController;
 import com.example.demo.dtos.ProductDTO;
 import com.example.demo.entities.Product;
+import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
 import com.example.demo.repositories.ProductRepository;
 import com.example.demo.repositories.UserRepository;
@@ -70,14 +71,13 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
 
     Seller setupSeller() {
         seller.setEnabled(true);
-        return userRepository.save(seller);
+        return (Seller) userRepository.findByEmail(seller.getEmail())
+                .orElseGet(() -> userRepository.save(seller));
     }
 
     @Test
     void givenValidBodyAndSeller_whenCreate_thenReturnProductAndCreated() throws Exception {
-        MockHttpServletRequestBuilder mockRequest = mockPostRequest(productDTO).with(user(setupSeller()));
-
-        mockMvc.perform(mockRequest)
+        mockMvc.perform(mockPostRequest(productDTO).with(user(setupSeller())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(productDTO.getName()));
 
@@ -138,6 +138,7 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
     @Test
     void givenValidBodyAndSeller_whenUpdate_thenReturnUpdatedProduct() throws Exception {
         insertProduct();
+        productDTO.setName("random");
 
         MockHttpServletRequestBuilder mockRequest
                 = mockPatchRequest(product.getId().toString(), productDTO).with(user(setupSeller()));

@@ -8,7 +8,6 @@ import com.example.demo.entities.Product;
 import com.example.demo.entities.user.Admin;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.Seller;
-import com.example.demo.enums.OrderStatus;
 import com.example.demo.repositories.OrderItemRepository;
 import com.example.demo.repositories.OrderRepository;
 import com.example.demo.repositories.ProductRepository;
@@ -84,8 +83,6 @@ class OrderItemIntegrationTest extends ApplicationConfigTestController {
         userRepository.save(seller);
     }
 
-    private void insertAdmin(){userRepository.save(admin);}
-
     private void insertOrder() {
         insertCustomer();
         orderRepository.save(order);
@@ -103,7 +100,8 @@ class OrderItemIntegrationTest extends ApplicationConfigTestController {
     }
 
     Customer setupCustomer() {
-        return userRepository.save(customer);
+        return (Customer) userRepository.findByEmail(customer.getEmail())
+                .orElseGet(() -> userRepository.save(customer));
     }
 
     Customer setupCustomerWithOrder() {
