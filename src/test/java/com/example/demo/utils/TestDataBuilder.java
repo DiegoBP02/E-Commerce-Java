@@ -157,31 +157,20 @@ public class TestDataBuilder {
 
     public static Order buildOrderNoId() {
         return Order.builder()
-                .items(new ArrayList<>())
-                .status(OrderStatus.Pending)
-                .orderDate(Instant.now())
-                .totalAmount(BigDecimal.ONE)
                 .customer(buildCustomerWithId())
                 .build();
     }
 
     public static Order buildOrderWithId() {
-        return Order.builder()
-                .id(UUID.randomUUID())
-                .items(new ArrayList<>())
-                .status(OrderStatus.Pending)
-                .orderDate(Instant.now())
-                .totalAmount(BigDecimal.ONE)
+        Order order = Order.builder()
                 .customer(buildCustomerWithId())
                 .build();
+        order.setId(UUID.randomUUID());
+        return order;
     }
 
     public static Order buildOrder(Customer customer) {
         return Order.builder()
-                .items(new ArrayList<>())
-                .status(OrderStatus.Pending)
-                .orderDate(Instant.now())
-                .totalAmount(BigDecimal.ONE)
                 .customer(customer)
                 .build();
     }

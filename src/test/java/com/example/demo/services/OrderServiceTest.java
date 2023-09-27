@@ -5,6 +5,7 @@ import com.example.demo.dtos.OrderHistoryDTO;
 import com.example.demo.entities.Order;
 import com.example.demo.entities.OrderHistory;
 import com.example.demo.entities.OrderItem;
+import com.example.demo.entities.Product;
 import com.example.demo.entities.user.Customer;
 import com.example.demo.entities.user.User;
 import com.example.demo.enums.CreditCard;
@@ -19,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,6 +60,8 @@ class OrderServiceTest extends ApplicationConfigTest {
     private Order order = TestDataBuilder.buildOrder(customer);
     private OrderItem mockOrderItem = mock(OrderItem.class);
     private OrderHistory orderHistory = TestDataBuilder.buildOrderHistory(order);
+    private Page<Order> orderPage =
+            TestDataBuilder.buildPage(order, 0, 5, Sort.Direction.ASC, "name");
 
     @BeforeEach
     void setupSecurityContext() {
@@ -122,15 +128,17 @@ class OrderServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenOrders_whenFindAll_ThenReturnOrder() {
-        List<Order> orders = Collections.singletonList(order);
-        when(orderRepository.findAll()).thenReturn(orders);
+        when(orderRepository.findAll(any(Pageable.class))).thenReturn(orderPage);
 
-        List<Order> result = orderService.findAll();
+        Page<Order> result = orderService.findAll(orderPage.getPageable().getPageNumber(),
+                orderPage.getPageable().getPageSize(),
+                orderPage.getPageable().getSort().stream().toList().get(0).getDirection(),
+                orderPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
-        assertEquals(orders, result);
+        assertEquals(orderPage, result);
 
         verifyNoAuthentication();
-        verify(orderRepository, times(1)).findAll();
+        verify(orderRepository, times(1)).findAll(orderPage.getPageable());
     }
 
     @Test

@@ -41,8 +41,12 @@ class ProductRepositoryTest {
     @Test
     void givenProducts_whenFindByCategory_thenReturnProducts() {
         productRepository.save(product);
-        List<Product> result = productRepository.findByCategory(product.getCategory());
-        assertEquals(Collections.singletonList(product), result);
+        List<Product> productList = Collections.singletonList(product);
+        Page<Product> expectedResult = new PageImpl<>(productList, paging, productList.size());
+
+        Page<Product> result = productRepository.findByCategory(product.getCategory(), paging);
+
+        assertEquals(expectedResult, result);
     }
 
     @Test
@@ -52,6 +56,7 @@ class ProductRepositoryTest {
         Page<Product> expectedResult = new PageImpl<>(productList, paging, productList.size());
 
         Page<Product> result = productRepository.findAllBySeller(seller, paging);
+
         assertEquals(expectedResult, result);
     }
 

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -49,8 +48,17 @@ public class ProductController {
     }
 
     @GetMapping(value = "/category")
-    public ResponseEntity<List<Product>> findByCategory(@RequestParam ProductCategory productCategory) {
-        return ResponseEntity.ok().body(productService.findByCategory(productCategory));
+    public ResponseEntity<Page<Product>> findByCategory(
+            @RequestParam ProductCategory productCategory,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(defaultValue = "name") String sortBy
+    ) {
+        Sort.Direction sortOrder = Sort.Direction.fromString(sortDirection);
+        Page<Product> productPage = productService.findByCategory
+                (productCategory, pageNo, pageSize, sortOrder, sortBy);
+        return ResponseEntity.ok().body(productPage);
     }
 
     @GetMapping(value = "/{id}")

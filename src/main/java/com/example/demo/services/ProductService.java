@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.example.demo.config.utils.GetCurrentUser.getCurrentUser;
@@ -54,8 +53,10 @@ public class ProductService {
         return productRepository.findAll(paging);
     }
 
-    public List<Product> findByCategory(ProductCategory productCategory) {
-        return productRepository.findByCategory(productCategory);
+    public Page<Product> findByCategory(ProductCategory productCategory, Integer pageNo,
+                                        Integer pageSize, Sort.Direction sortOrder, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortOrder, sortBy);
+        return productRepository.findByCategory(productCategory, paging);
     }
 
     public Product findById(UUID id) {

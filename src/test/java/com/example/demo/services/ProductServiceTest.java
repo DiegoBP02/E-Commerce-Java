@@ -107,15 +107,20 @@ class ProductServiceTest extends ApplicationConfigTest {
 
     @Test
     void givenProducts_whenFindByCategory_ThenReturnProducts() {
-        List<Product> products = Collections.singletonList(product);
-        when(productRepository.findByCategory(product.getCategory())).thenReturn(products);
+        when(productRepository.findByCategory(eq(product.getCategory()),any(Pageable.class)))
+                .thenReturn(productPage);
 
-        List<Product> result = productService.findByCategory(product.getCategory());
+        Page<Product> result = productService.findByCategory(product.getCategory(),
+                productPage.getPageable().getPageNumber(),
+                productPage.getPageable().getPageSize(),
+                productPage.getPageable().getSort().stream().toList().get(0).getDirection(),
+                productPage.getPageable().getSort().stream().toList().get(0).getProperty());
 
-        assertEquals(products, result);
+        assertEquals(productPage, result);
 
         verifyNoAuthentication();
-        verify(productRepository, times(1)).findByCategory(product.getCategory());
+        verify(productRepository, times(1))
+                .findByCategory(product.getCategory(),productPage.getPageable());
     }
 
     @Test

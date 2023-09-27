@@ -3,13 +3,14 @@ package com.example.demo.controller;
 import com.example.demo.entities.Order;
 import com.example.demo.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,8 +34,14 @@ public class OrderController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @GetMapping
-    public ResponseEntity<List<Order>> findAll() {
-        List<Order> orders = orderService.findAll();
+    public ResponseEntity<Page<Order>> findAll(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(defaultValue = "orderDate") String sortBy
+    ) {
+        Sort.Direction sortOrder = Sort.Direction.fromString(sortDirection);
+        Page<Order> orders = orderService.findAll(pageNo, pageSize, sortOrder, sortBy);
         return ResponseEntity.ok().body(orders);
     }
 

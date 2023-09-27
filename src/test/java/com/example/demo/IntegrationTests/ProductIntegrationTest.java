@@ -99,7 +99,8 @@ class ProductIntegrationTest extends ApplicationConfigTestController {
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value(product.getName()));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(1)));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.entities.Order;
+import com.example.demo.entities.Product;
 import com.example.demo.services.OrderService;
 import com.example.demo.services.exceptions.ActiveOrderAlreadyExistsException;
 import com.example.demo.services.exceptions.DatabaseException;
@@ -9,6 +10,9 @@ import com.example.demo.services.exceptions.UnauthorizedAccessException;
 import com.example.demo.utils.TestDataBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -34,6 +38,7 @@ class OrderControllerTest extends ApplicationConfigTestController {
 
     private Order order = TestDataBuilder.buildOrderWithId();
     private List<Order> orders = TestDataBuilder.buildList(order);
+    Page<Order> orderPage = mock(PageImpl.class);
 
     @Test
     @WithMockUser(authorities = "Customer")
@@ -94,13 +99,15 @@ class OrderControllerTest extends ApplicationConfigTestController {
     @Test
     @WithMockUser(authorities = "Admin")
     void givenOrdersAndUserIsAdmin_whenFindAll_thenReturnOrders() throws Exception {
-        when(orderService.findAll()).thenReturn(orders);
+        when(orderService.findAll(0, 5, Sort.Direction.ASC, "orderDate"))
+                        .thenReturn(orderPage);
 
         mockMvc.perform(mockGetRequest())
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(orders)));
+                .andExpect(content().json(objectMapper.writeValueAsString(orderPage)));
 
-        verify(orderService, times(1)).findAll();
+        verify(orderService, times(1))
+                .findAll(0, 5, Sort.Direction.ASC, "orderDate");
     }
 
     @Test
@@ -111,7 +118,7 @@ class OrderControllerTest extends ApplicationConfigTestController {
                         assertEquals("Access Denied",
                                 result.getResponse().getErrorMessage()));
 
-        verify(orderService, never()).findAll();
+        verifyNoInteractions(orderService);
     }
 
     @Test
@@ -124,7 +131,7 @@ class OrderControllerTest extends ApplicationConfigTestController {
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
 
-        verify(orderService, never()).findAll();
+        verifyNoInteractions(orderService);
     }
 
     @Test
@@ -137,7 +144,7 @@ class OrderControllerTest extends ApplicationConfigTestController {
                         assertTrue(result.getResolvedException()
                                 instanceof AccessDeniedException));
 
-        verify(orderService, never()).findAll();
+        verifyNoInteractions(orderService);
     }
 
     @Test

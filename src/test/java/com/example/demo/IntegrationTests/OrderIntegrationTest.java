@@ -21,6 +21,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Collections;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -101,7 +102,8 @@ class OrderIntegrationTest extends ApplicationConfigTestController {
 
         mockMvc.perform(mockGetRequest().with(user(setupAdmin())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].totalAmount").value(order.getTotalAmount()));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content", hasSize(1)));
     }
 
     @Test

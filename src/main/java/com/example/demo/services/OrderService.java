@@ -13,13 +13,14 @@ import com.example.demo.services.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,10 +52,7 @@ public class OrderService {
             }
 
             Order order = Order.builder()
-                    .orderDate(Instant.now())
                     .customer(user)
-                    .status(OrderStatus.Active)
-                    .items(new ArrayList<>())
                     .build();
             return orderRepository.save(order);
         } catch (DataIntegrityViolationException e) {
@@ -62,8 +60,10 @@ public class OrderService {
         }
     }
 
-    public List<Order> findAll() {
-        return orderRepository.findAll();
+    public Page<Order> findAll(Integer pageNo, Integer pageSize, Sort.Direction sortOrder, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortOrder, sortBy);
+
+        return orderRepository.findAll(paging);
     }
 
     public Order findById(UUID id) {

@@ -17,7 +17,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Builder
 @Table(name = "orders")
 public class Order {
     @Id
@@ -44,6 +43,14 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
+
+    @Builder
+    public Order(Customer customer) {
+        this.customer = customer;
+        this.orderDate = Instant.now();
+        this.status = OrderStatus.Active;
+        this.items = new ArrayList<>();
+    }
 
     public BigDecimal getTotalAmount() {
         BigDecimal calculatedTotal = BigDecimal.ZERO;

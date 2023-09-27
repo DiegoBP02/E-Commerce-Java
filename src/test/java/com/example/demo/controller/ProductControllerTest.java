@@ -119,23 +119,24 @@ class ProductControllerTest extends ApplicationConfigTestController {
 
     @Test
     void givenProductsAndNoUser_whenFindByCategory_thenReturnProduct() throws Exception {
-        List<Product> products = Collections.singletonList(product);
-        when(productService.findByCategory(product.getCategory())).thenReturn(products);
+        when(productService.findByCategory(product.getCategory(),
+                0, 5, Sort.Direction.ASC, "name")).thenReturn(productPage);
 
         MockHttpServletRequestBuilder mockRequest = mockGetRequestWithParams
                 ("/category", "productCategory", product.getCategory().toString());
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(products)));
+                .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
 
-        verify(productService, times(1)).findByCategory(product.getCategory());
+        verify(productService, times(1))
+                .findByCategory(product.getCategory(), 0, 5, Sort.Direction.ASC, "name");
     }
 
     @Test
     void givenMissingParamAndNoUser_whenFindByCategory_thenHandleMissingServletRequestParameterException() throws Exception {
-        List<Product> products = Collections.singletonList(product);
-        when(productService.findByCategory(product.getCategory())).thenReturn(products);
+        when(productService.findByCategory(product.getCategory(),
+                0, 5, Sort.Direction.ASC, "name")).thenReturn(productPage);
 
         mockMvc.perform(mockGetRequest("/category"))
                 .andExpect(status().isBadRequest())
@@ -143,13 +144,13 @@ class ProductControllerTest extends ApplicationConfigTestController {
                         assertTrue(result.getResolvedException()
                                 instanceof MissingServletRequestParameterException));
 
-        verify(productService, never()).findByCategory(product.getCategory());
+        verifyNoInteractions(productService);
     }
 
     @Test
     void givenInvalidParamAndNoUser_whenFindByCategory_thenHandleMethodArgumentTypeMismatchException() throws Exception {
-        List<Product> products = Collections.singletonList(product);
-        when(productService.findByCategory(product.getCategory())).thenReturn(products);
+        when(productService.findByCategory(product.getCategory(),
+                0, 5, Sort.Direction.ASC, "name")).thenReturn(productPage);
 
         MockHttpServletRequestBuilder mockRequest = mockGetRequestWithParams
                 ("/category", "productCategory", "random");
@@ -160,7 +161,8 @@ class ProductControllerTest extends ApplicationConfigTestController {
                         assertTrue(result.getResolvedException()
                                 instanceof MethodArgumentTypeMismatchException));
 
-        verify(productService, never()).findByCategory(product.getCategory());
+        verify(productService, never()).findByCategory
+                (product.getCategory(),0, 5, Sort.Direction.ASC, "name");
     }
 
     @Test
